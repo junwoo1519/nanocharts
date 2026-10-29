@@ -1,0 +1,17 @@
+# 소스 코드 및 개발 데모 (빌드 결과물인 dist만 배포)
+src/
+demo/
+index.html
+
+# 설정 파일들
+vite.config.ts
+tsconfig.json
+
+# 개발 도구 및 임시 파일
+.git/
+.github/
+.vscode/
+.idea/
+*.tgz
+*.log
+.gemini/

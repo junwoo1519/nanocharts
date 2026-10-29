@@ -1,0 +1,11 @@
+export { BarChart } from './core/Chart';
+export { LayerManager } from './core/LayerManager';
+export { EventEmitter } from './core/EventEmitter';
+export { LinearScale } from './scale/LinearScale';
+export { BandScale } from './scale/BandScale';
+export { BarSeries } from './series/BarSeries';
+export { Axis } from './components/Axis';
+export { Grid } from './components/Grid';
+export { Tooltip } from './components/Tooltip';
+export * from './types';
+export * from './utils/canvas';

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas Bar Chart Customization & Large Dataset Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0B0F19;
+      color: #E2E8F0;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header h1 span.badge {
+      font-size: 11px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+    header p {
+      color: #94A3B8;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    /* Control Panel */
+    .controls {
+      background: #151C2C;
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 6px;
+      background: #0B0F19;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #1E293B;
+    }
+    button.btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    button.btn:hover {
+      color: #F8FAFC;
+      background: #1E293B;
+    }
+    button.btn.active {
+      background: #4F46E5;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    select, input[type="range"] {
+      background: #0B0F19;
+      color: #F8FAFC;
+      border: 1px solid #1E293B;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    select:focus {
+      border-color: #6366F1;
+    }
+
+    /* Chart Container Card */
+    .chart-card {
+      background: #151C2C;
+      border: 1px solid #1E293B;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F8FAFC;
+    }
+    .chart-meta {
+      font-size: 13px;
+      color: #64748B;
+      display: flex;
+      gap: 16px;
+    }
+    .chart-meta span strong {
+      color: #38BDF8;
+    }
+    #chart-wrapper {
+      width: 100%;
+      height: 480px;
+      position: relative;
+    }
+
+    .guide-box {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .guide-box kbd {
+      background: #0B0F19;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: #F1F5F9;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        Canvas Bar Chart Engine
+        <span class="badge">TypeScript + Canvas 2D</span>
+      </h1>
+      <p>대용량 데이터(수천~수만 개)와 극대화된 디자이너 커스텀 자유도를 지원하는 차트 라이브러리</p>
+    </header>
+
+    <!-- UI 컨트롤러 -->
+    <div class="controls">
+      <!-- 데이터 크기 -->
+      <div class="control-group">
+        <label>데이터 규모</label>
+        <div class="btn-group" id="data-size-group">
+          <button class="btn active" data-size="20">20개 (기본)</button>
+          <button class="btn" data-size="500">500개</button>
+          <button class="btn" data-size="3000">3,000개 (대용량)</button>
+        </div>
+      </div>
+
+      <!-- 스타일 프리셋 -->
+      <div class="control-group">
+        <label>디자인 스타일 프리셋</label>
+        <select id="theme-select">
+          <option value="indigo-purple">인디고-퍼플 그라데이션 (추천)</option>
+          <option value="cyber-cyan">사이버 청록 네온 & 보더</option>
+          <option value="conditional">조건부 컬러 (값에 따른 동적 하이라이트)</option>
+          <option value="warm-orange">선셋 웜 오렌지</option>
+        </select>
+      </div>
+
+      <!-- 라벨 위치 -->
+      <div class="control-group">
+        <label>라벨 위치 (디자인 커스텀)</label>
+        <select id="label-pos-select">
+          <option value="top-outside">바 상단 바깥 (top-outside)</option>
+          <option value="inside-top">바 상단 내부 (inside-top)</option>
+          <option value="inside-center">바 정중앙 내부 (inside-center)</option>
+          <option value="inside-bottom">바 하단 내부 (inside-bottom)</option>
+          <option value="none">숨김 (none)</option>
+        </select>
+      </div>
+
+      <!-- 모서리 라운딩 -->
+      <div class="control-group">
+        <label>모서리 둥글기: <span id="radius-val">6px</span></label>
+        <input type="range" id="radius-range" min="0" max="16" value="6" step="1" />
+      </div>
+
+      <!-- 바 두께 비율 -->
+      <div class="control-group">
+        <label>바 너비 비율: <span id="ratio-val">65%</span></label>
+        <input type="range" id="ratio-range" min="20" max="95" value="65" step="5" />
+      </div>
+
+      <div class="control-group" style="margin-left: auto;">
+        <button class="btn" id="reset-zoom-btn" style="border: 1px solid #334155; color: #F1F5F9;">
+          🔍 줌 리셋
+        </button>
+      </div>
+    </div>
+
+    <!-- 차트 카드 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title" id="display-title">실시간 퍼포먼스 메트릭</div>
+        <div class="chart-meta">
+          <span>총 데이터: <strong id="total-count-text">20</strong>건</span>
+          <span>렌더링 시간: <strong id="render-time-text">0.5ms</strong></span>
+        </div>
+      </div>
+
+      <!-- Canvas 컨테이너 -->
+      <div id="chart-wrapper"></div>
+
+      <div class="guide-box">
+        <div>💡 <strong>인터랙션 안내:</strong> 차트 위에서 <kbd>마우스 휠</kbd>로 줌인/줌아웃, <kbd>드래그</kbd>로 좌우 탐색(Pan)이 가능합니다.</div>
+        <div>호버 시 <strong>$O(1)$</strong> 초고속 하이라이트 & 툴팁 지원</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/demo/main.ts"></script>
+</body>
+</html>
