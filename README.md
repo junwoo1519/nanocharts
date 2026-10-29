@@ -23,11 +23,11 @@
 ## 🚀 Installation
 
 ```bash
-npm install nanocharts
+npm install @ju9nu7/nanocharts
 # or
-yarn add nanocharts
+yarn add @ju9nu7/nanocharts
 # or
-pnpm add nanocharts
+pnpm add @ju9nu7/nanocharts
 ```
 
 ---
@@ -35,7 +35,7 @@ pnpm add nanocharts
 ## 📖 Quick Start
 
 ```typescript
-import { BarChart } from 'nanocharts';
+import { BarChart } from '@ju9nu7/nanocharts';
 
 // 1. 차트 컨테이너 준비 (<div id="chart" style="width: 100%; height: 400px;"></div>)
 const chart = new BarChart('#chart', {
