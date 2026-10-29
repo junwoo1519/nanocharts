@@ -265,3 +265,114 @@ export interface BarChartOptions {
     enabled?: boolean;
   };
 }
+
+// ==========================================
+// 🥧 Pie / Donut Chart Types
+// ==========================================
+
+/**
+ * 계산된 단일 파이/도넛 조각의 기하 정보
+ */
+export interface PieSliceGeometry {
+  /** 시작 각도 (라디안) */
+  startAngle: number;
+  /** 종료 각도 (라디안) */
+  endAngle: number;
+  /** 중심 각도 (라디안, 라벨 및 explode 오프셋 계산용) */
+  midAngle: number;
+  /** 내부 반지름 (px) */
+  innerRadius: number;
+  /** 외부 반지름 (px) */
+  outerRadius: number;
+  /** 전체 값 중 해당 조각이 차지하는 비율 (0 ~ 1) */
+  percentage: number;
+  /** 중심점 X */
+  cx: number;
+  /** 중심점 Y */
+  cy: number;
+  /** 해당 조각의 채우기 색상 */
+  color: string;
+  /** 원본 데이터 아이템 */
+  item: DataItem;
+  /** 원본 데이터 인덱스 */
+  index: number;
+}
+
+/**
+ * 파이/도넛 스타일 옵션
+ */
+export interface PieStyleOptions {
+  /**
+   * 도넛 차트 내부 구멍의 반지름 비율 (0.0 ~ 0.9, 기본값: 0 - 파이 차트)
+   * 예: 0.6으로 설정하면 가운데가 뚫린 세련된 도넛 차트가 됩니다.
+   */
+  innerRadiusRatio?: number;
+  /** 조각들 사이의 빈 여백 각도 (라디안, 기본값: 0.02) */
+  padAngle?: number;
+  /** 파이 조각 외곽 모서리 둥글기 (px, 기본값: 0) */
+  cornerRadius?: number;
+  /** 조각별 기본 컬러 팔레트 (기본 모던 색상 8종 내장) */
+  colors?: string[] | ((item: DataItem, index: number) => string);
+  /** 마우스 호버 시 중심에서 밖으로 살짝 튀어나오는 픽셀 거리 (기본값: 8) */
+  hoverExplode?: number;
+  /** 외곽 테두리 스타일 */
+  border?: {
+    color?: string;
+    width?: number;
+  };
+}
+
+/**
+ * 파이 데이터 라벨 옵션
+ */
+export interface PieLabelOptions {
+  /** 라벨 표시 여부 (기본값: true) */
+  visible?: boolean;
+  /** 라벨 위치 ('outside': 바깥쪽 가이드선, 'inside': 조각 내부, 'none': 숨김) */
+  position?: 'outside' | 'inside' | 'none';
+  /** 폰트 스타일 */
+  font?: string;
+  /** 글자 색상 */
+  color?: string;
+  /** 텍스트 포맷터 (기본: `${item.label} (${(percent * 100).toFixed(1)}%)`) */
+  formatter?: (item: DataItem, percentage: number) => string;
+}
+
+/**
+ * 도넛 차트 중앙에 표시할 텍스트 옵션
+ */
+export interface PieCenterContentOptions {
+  /** 중앙 메인 타이틀/숫자 (예: 'Total' 또는 '1,240건') */
+  title?: string | ((data: DataItem[], total: number) => string);
+  /** 타이틀 폰트 */
+  titleFont?: string;
+  /** 타이틀 색상 */
+  titleColor?: string;
+  /** 하단 서브타이틀 텍스트 */
+  subtitle?: string | ((data: DataItem[], total: number) => string);
+  /** 서브타이틀 폰트 */
+  subtitleFont?: string;
+  /** 서브타이틀 색상 */
+  subtitleColor?: string;
+  /** 완전 커스텀 렌더러 함수 */
+  renderCustom?: (ctx: CanvasRenderingContext2D, center: { cx: number; cy: number; innerRadius: number }) => void;
+}
+
+/**
+ * PieChart 초기화 옵션
+ */
+export interface PieChartOptions {
+  /** 차트에 바인딩할 데이터 배열 */
+  data: DataItem[];
+  /** 차트 내부 여백 설정 */
+  padding?: Partial<Padding>;
+  /** 파이/도넛 형태 및 색상 스타일 */
+  pie?: PieStyleOptions;
+  /** 데이터 라벨 옵션 */
+  labels?: PieLabelOptions;
+  /** 도넛 차트 중앙 텍스트 옵션 */
+  center?: PieCenterContentOptions;
+  /** 툴팁 옵션 */
+  tooltip?: TooltipOptions;
+}
+

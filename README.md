@@ -34,10 +34,10 @@ pnpm add @ju9nu7/nanocharts
 
 ## 📖 Quick Start
 
+### 1. Bar Chart (바 차트)
 ```typescript
 import { BarChart } from '@ju9nu7/nanocharts';
 
-// 1. 차트 컨테이너 준비 (<div id="chart" style="width: 100%; height: 400px;"></div>)
 const chart = new BarChart('#chart', {
   data: [
     { label: 'Q1', value: 120 },
@@ -45,26 +45,42 @@ const chart = new BarChart('#chart', {
     { label: 'Q3', value: 180 },
     { label: 'Q4', value: 310 },
   ],
-  // 바 스타일 커스텀
   bar: {
-    borderRadius: [6, 6, 0, 0], // 상단만 둥글게
+    borderRadius: [6, 6, 0, 0],
     fill: {
       type: 'linear',
       from: '#6366F1',
       to: '#9333EA',
-      direction: 'vertical',
     },
     widthRatio: 0.6,
   },
-  // 데이터 라벨 커스텀
-  labels: {
-    visible: true,
-    position: 'top-outside',
-    formatter: (val) => `${val.toLocaleString()}건`,
-  },
-  // 줌 & 팬 활성화
+  labels: { visible: true, position: 'top-outside' },
   zoom: { enabled: true },
   pan: { enabled: true },
+});
+```
+
+### 2. Pie & Donut Chart (파이 & 도넛 차트)
+```typescript
+import { PieChart } from '@ju9nu7/nanocharts';
+
+const pie = new PieChart('#pie-chart', {
+  data: [
+    { label: 'Frontend', value: 45 },
+    { label: 'Backend', value: 30 },
+    { label: 'DevOps', value: 15 },
+    { label: 'Design', value: 10 },
+  ],
+  pie: {
+    innerRadiusRatio: 0.6, // 0이면 파이 차트, 0.6이면 세련된 도넛 차트!
+    padAngle: 0.03,        // 조각 사이의 여백
+    hoverExplode: 8,       // 마우스 호버 시 밖으로 팝아웃되는 거리
+  },
+  center: {
+    title: '100%',
+    subtitle: '전체 점유율',
+  },
+  labels: { position: 'outside' },
 });
 ```
 
