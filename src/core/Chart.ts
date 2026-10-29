@@ -1,3 +1,16 @@
+/**
+ * @fileoverview 메인 바 차트 클래스 (BarChart)
+ * 
+ * nanocharts의 최상위 오케스트레이터입니다.
+ * 
+ * [주요 책임]
+ * 1. 3중 Canvas 레이어 라이프사이클 및 ResizeObserver 자동 반응형 관리
+ * 2. LinearScale(Y축 수치), BandScale(X축 이산형) 스케일 계산 및 동기화
+ * 3. 렌더 파이프라인 조율 (Background -> Data Series -> Interaction)
+ * 4. 마우스 인터랙션: O(1) 초고속 호버 하이라이트 & 툴팁 제어
+ * 5. 대용량 인터랙션: 마우스 휠 줌(Zoom) 및 마우스 드래그 팬(Pan) 지원
+ */
+
 import type {
   BarChartOptions,
   Padding,
@@ -12,27 +25,45 @@ import { Tooltip } from '../components/Tooltip';
 import { BarSeries, BarGeometry } from '../series/BarSeries';
 
 export class BarChart extends EventEmitter {
+  /** 차트가 마운트될 부모 DOM 엘리먼트 */
   private container: HTMLElement;
+  /** 사용자 설정 옵션 객체 */
   private options: BarChartOptions;
+  /** 3중 캔버스 레이어 관리자 */
   private layerManager: LayerManager;
+  /** 부동형 툴팁 컴포넌트 */
   private tooltip: Tooltip;
+  /** 바 렌더링 시리즈 모듈 */
   private barSeries: BarSeries;
 
+  /** X축 밴드 스케일 */
   private xScale: BandScale;
+  /** Y축 선형 수치 스케일 */
   private yScale: LinearScale;
 
+  /** 차트 컨테이너 가로 크기 (px) */
   private width: number = 0;
+  /** 차트 컨테이너 세로 크기 (px) */
   private height: number = 0;
+  /** 플롯 영역 상하좌우 여백 */
   private padding: Padding;
 
+  /** 컨테이너 크기 변경 감지 옵저버 */
   private resizeObserver: ResizeObserver;
+  /** 현재 마우스가 올라가 있는 데이터 항목 인덱스 */
   private hoveredIndex: number | null = null;
 
-  // 드래그 팬(Pan) 상태
+  // 드래그 팬(Pan) 내부 상태 변수
   private isDragging: boolean = false;
   private dragStartX: number = 0;
   private dragStartView: [number, number] = [0, 0];
 
+  /**
+   * BarChart 인스턴스를 생성하고 초기화합니다.
+   * 
+   * @param container DOM 선택자 문자열(예: '#my-chart') 또는 HTMLElement 객체
+   * @param options 차트 옵션 설정
+   */
   constructor(container: string | HTMLElement, options: BarChartOptions) {
     super();
 
@@ -61,6 +92,7 @@ export class BarChart extends EventEmitter {
     this.initScales();
     this.setupInteractions();
 
+    // 부모 컨테이너 크기 변화를 실시간 감지하여 자동 리사이징 & 리렌더링
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
@@ -72,6 +104,9 @@ export class BarChart extends EventEmitter {
     this.resizeObserver.observe(this.container);
   }
 
+  /**
+   * 데이터 기반으로 X/Y 스케일의 도메인을 초기화합니다.
+   */
   private initScales(): void {
     const data = this.options.data || [];
     this.xScale.setDomainCount(data.length);
@@ -87,53 +122,63 @@ export class BarChart extends EventEmitter {
       maxVal = 100;
     }
 
-    // Y축은 0에서 maxVal(양수인 경우) 또는 minVal ~ maxVal
+    // Y축 범위 계산 (상단 10% 여유 패딩 적용 후 nice 확장)
     const yMin = minVal < 0 ? minVal : 0;
-    const yMax = maxVal > 0 ? maxVal * 1.1 : 0; // 상단 여유 10%
+    const yMax = maxVal > 0 ? maxVal * 1.1 : 0;
     this.yScale.domain([yMin, yMax]).nice(5);
   }
 
+  /**
+   * 차트 크기를 재설정하고 모든 레이어를 다시 그립니다.
+   */
   public resize(width: number, height: number): void {
     this.width = width;
     this.height = height;
 
     this.layerManager.resize(width, height);
 
-    // 스케일 범위 업데이트
+    // 플롯 영역 내부 픽셀 범위 동기화
     const plotLeft = this.padding.left;
     const plotRight = width - this.padding.right;
     const plotTop = this.padding.top;
     const plotBottom = height - this.padding.bottom;
 
     this.xScale.range([plotLeft, plotRight]);
-    this.yScale.range([plotBottom, plotTop]); // Canvas Y는 아래가 큰 값이므로 반전
+    // Canvas의 Y축은 아래로 갈수록 커지므로 위아래를 반전시킵니다.
+    this.yScale.range([plotBottom, plotTop]);
 
     this.render();
   }
 
+  /**
+   * 차트의 모든 레이어(Background, Series, Interaction)를 순차적으로 렌더링합니다.
+   */
   public render(): void {
     if (this.width <= 0 || this.height <= 0) return;
 
-    // 1. Background & Grid & Axis 레이어 렌더링
+    // 1. Background 레이어: 격자선 및 축 렌더링
     const bgCtx = this.layerManager.getContext('background');
     this.layerManager.clear('background');
     Grid.render(bgCtx, this.options.grid, this.yScale, this.width, this.padding);
     Axis.renderYAxis(bgCtx, this.options.yAxis, this.yScale, this.padding);
     Axis.renderXAxis(bgCtx, this.options.xAxis, this.xScale, this.options.data, this.height, this.padding);
 
-    // 2. Series (Data) 레이어 렌더링
+    // 2. Series 레이어: 바(Bar) 데이터 렌더링
     const seriesCtx = this.layerManager.getContext('series');
     this.layerManager.clear('series');
     this.barSeries.render(seriesCtx, this.options.data, this.xScale, this.yScale);
 
-    // 3. Interaction 레이어 갱신
+    // 3. Interaction 레이어: 호버 하이라이트 갱신
     this.renderHoverState();
   }
 
+  /**
+   * 마우스 이벤트(호버, 클릭, 드래그 팬, 휠 줌) 리스너를 설정합니다.
+   */
   private setupInteractions(): void {
     const interactionCanvas = this.layerManager.getCanvas('interaction');
 
-    // 마우스 이동 (호버 & 툴팁)
+    // 마우스 이동 (호버 & 툴팁 감지)
     interactionCanvas.addEventListener('mousemove', (e) => {
       const rect = interactionCanvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -147,6 +192,7 @@ export class BarChart extends EventEmitter {
       this.handleHover(mouseX, mouseY);
     });
 
+    // 캔버스 밖으로 마우스가 나갔을 때
     interactionCanvas.addEventListener('mouseleave', () => {
       this.hoveredIndex = null;
       this.layerManager.clear('interaction');
@@ -154,10 +200,10 @@ export class BarChart extends EventEmitter {
       this.isDragging = false;
     });
 
-    // 드래그 팬 (Pan)
+    // 드래그 좌우 스크롤 (Pan)
     if (this.options.pan?.enabled !== false) {
       interactionCanvas.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return; // 좌클릭만
+        if (e.button !== 0) return; // 마우스 좌클릭만 처리
         this.isDragging = true;
         const rect = interactionCanvas.getBoundingClientRect();
         this.dragStartX = e.clientX - rect.left;
@@ -178,6 +224,9 @@ export class BarChart extends EventEmitter {
     }
   }
 
+  /**
+   * 마우스 위치로부터 O(1)로 호버 대상을 찾아내고 하이라이트 및 툴팁을 표시합니다.
+   */
   private handleHover(mouseX: number, mouseY: number): void {
     const plotTop = this.padding.top;
     const plotBottom = this.height - this.padding.bottom;
@@ -194,7 +243,7 @@ export class BarChart extends EventEmitter {
       return;
     }
 
-    // O(1) 인덱스 역산!
+    // O(1) 초고속 인덱스 역산!
     const index = this.xScale.invert(mouseX);
     const item = this.options.data[index];
 
@@ -209,7 +258,7 @@ export class BarChart extends EventEmitter {
 
     const geom = this.barSeries.getBarGeometry(item, index, this.xScale, this.yScale);
 
-    // 마우스가 바의 가로 범위 안에 있는지 검사
+    // 마우스가 바의 가로 폭 안에 위치하는지 판정
     const isInsideBarX = mouseX >= geom.x && mouseX <= geom.x + geom.width;
     if (isInsideBarX) {
       if (this.hoveredIndex !== index) {
@@ -227,6 +276,9 @@ export class BarChart extends EventEmitter {
     }
   }
 
+  /**
+   * 호버된 바 1개만 인터랙션 레이어에 하이라이트 렌더링
+   */
   private renderHoverState(specificGeom?: BarGeometry): void {
     this.layerManager.clear('interaction');
     if (this.hoveredIndex === null) return;
@@ -239,6 +291,9 @@ export class BarChart extends EventEmitter {
     this.barSeries.renderHighlight(ctx, geom);
   }
 
+  /**
+   * 마우스 드래그 이동 거리에 따라 뷰포트 윈도우를 좌우로 이동(Pan)합니다.
+   */
   private handlePan(currentMouseX: number): void {
     const deltaX = currentMouseX - this.dragStartX;
     const step = this.xScale.step();
@@ -252,6 +307,7 @@ export class BarChart extends EventEmitter {
     let newStart = origStart + deltaIndex;
     let newEnd = newStart + visibleCount;
 
+    // 경계 범위 보정
     if (newStart < 0) {
       newStart = 0;
       newEnd = visibleCount;
@@ -265,19 +321,23 @@ export class BarChart extends EventEmitter {
     this.render();
   }
 
+  /**
+   * 마우스 휠 이벤트 시 커서 위치를 중심으로 뷰포트를 확대/축소(Zoom)합니다.
+   */
   private handleZoom(e: WheelEvent): void {
     const [start, end] = this.xScale.getViewport();
     const currentCount = end - start + 1;
     const minPoints = this.options.zoom?.minPoints ?? 5;
     const totalCount = this.options.data.length;
 
-    const zoomFactor = e.deltaY > 0 ? 1.15 : 0.85; // 아래 휠: 줌아웃, 위 휠: 줌인
+    // 휠 아래: 줌아웃(1.15배 확대), 휠 위: 줌인(0.85배 축소)
+    const zoomFactor = e.deltaY > 0 ? 1.15 : 0.85;
     let newCount = Math.round(currentCount * zoomFactor);
     newCount = Math.max(minPoints, Math.min(totalCount, newCount));
 
     if (newCount === currentCount) return;
 
-    // 마우스 위치를 중심으로 줌 확대/축소
+    // 마우스 커서의 상대적 위치 비율을 계산하여 커서 위치 중심으로 줌
     const rect = this.layerManager.getCanvas('interaction').getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseRatio = Math.max(0, Math.min(1, (mouseX - this.padding.left) / (this.width - this.padding.left - this.padding.right)));
@@ -300,7 +360,7 @@ export class BarChart extends EventEmitter {
   }
 
   /**
-   * 데이터 및 옵션 업데이트
+   * 런타임에 차트의 데이터 및 옵션을 동적으로 갱신하고 다시 그립니다.
    */
   public update(options: Partial<BarChartOptions>): void {
     if (options.data) {
@@ -330,13 +390,16 @@ export class BarChart extends EventEmitter {
   }
 
   /**
-   * 뷰포트 초기화 (전체 보기)
+   * 줌/팬 상태를 초기화하여 전체 데이터를 한 화면에 표시합니다.
    */
   public resetZoom(): void {
     this.xScale.setViewport(0, this.options.data.length - 1);
     this.render();
   }
 
+  /**
+   * 차트 인스턴스를 파괴하고 ResizeObserver 및 DOM 캔버스 자원을 해제합니다.
+   */
   public destroy(): void {
     this.resizeObserver.disconnect();
     this.layerManager.destroy();

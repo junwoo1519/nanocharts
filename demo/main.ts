@@ -1,5 +1,5 @@
 import { BarChart } from '../src';
-import type { DataItem, BarChartOptions, LabelPosition } from '../src/types';
+import type { DataItem, BarChartOptions, LabelPosition } from '../src';
 
 // 1. 더미 데이터 생성기
 function generateData(count: number): DataItem[] {
