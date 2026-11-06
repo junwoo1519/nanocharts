@@ -47,7 +47,6 @@ export class PieSeries {
   ) {
     this.styleOptions = {
       innerRadiusRatio: 0,
-      padAngle: 0.02,
       cornerRadius: 0,
       hoverExplode: 8,
       ...styleOptions,
@@ -104,8 +103,11 @@ export class PieSeries {
     const outerRadius = maxRadius;
 
     // 12시 방향(-PI/2)에서 시작
+    // 내부 구멍이 없는 순수 파이 차트(innerRatio === 0)는 기본적으로 조각 간격(padAngle)을 0으로 설정하여 빈틈을 방지합니다.
     let currentAngle = -Math.PI / 2;
-    const padAngle = data.length > 1 ? (this.styleOptions.padAngle ?? 0.02) : 0;
+    const defaultPadAngle = innerRatio > 0.001 ? 0.02 : 0;
+    const rawPadAngle = this.styleOptions.padAngle ?? defaultPadAngle;
+    const padAngle = data.length > 1 ? Math.max(0, rawPadAngle) : 0;
     const slices: PieSliceGeometry[] = [];
 
     data.forEach((item, index) => {
@@ -278,6 +280,7 @@ export class PieSeries {
 
     // 기본 테두리 또는 호버 하이라이트 테두리
     const border = this.styleOptions.border;
+    const effectivePad = this.styleOptions.padAngle ?? (innerRadius > 0 ? 0.02 : 0);
     if (hoverRatio > 0.05) {
       ctx.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, hoverRatio)})`;
       ctx.lineWidth = 1.5 * Math.min(1, hoverRatio);
@@ -285,6 +288,12 @@ export class PieSeries {
     } else if (border && border.width && border.width > 0) {
       ctx.strokeStyle = border.color || '#151C2C';
       ctx.lineWidth = border.width;
+      ctx.stroke();
+    } else if (effectivePad <= 0.0005) {
+      // 조각 간격(padAngle)이 0일 때 인접 조각 사이의 안티앨리어싱 미세 실금(Seam)을 메우기 위한 동색 미세 테두리
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.6;
+      ctx.lineJoin = 'round';
       ctx.stroke();
     }
 
@@ -425,10 +434,12 @@ export class PieSeries {
     const sliceEls: string[] = [];
     const labelEls: string[] = [];
     const border = this.styleOptions.border;
-    let strokeAttr = '';
+    const hasInnerHole = (slices[0]?.innerRadius ?? 0) > 0.5;
+    const effectivePad = this.styleOptions.padAngle ?? (hasInnerHole ? 0.02 : 0);
+    let customStrokeAttr = '';
     if (border && border.width && border.width > 0) {
       const parsedBorder = parseSvgColor(border.color || '#151C2C');
-      strokeAttr = ` stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(border.width)}"`;
+      customStrokeAttr = ` stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(border.width)}"`;
     }
 
     slices.forEach((slice) => {
@@ -443,8 +454,14 @@ export class PieSeries {
       if (!pathD) return;
       const parsedFill = parseSvgColor(slice.color);
       const pctText = `${(slice.percentage * 100).toFixed(1)}%`;
+      // padAngle이 0이고 별도 border가 없을 때는 조각 경계 안티앨리어싱 실금을 막기 위해 0.5px 동색 stroke 부여
+      const sliceStrokeAttr =
+        customStrokeAttr ||
+        (effectivePad <= 0.0005
+          ? ` stroke="${escapeXml(parsedFill.color)}" stroke-width="0.5" stroke-linejoin="round"`
+          : '');
       sliceEls.push(
-        `<path id="Slice: ${escapeXml(slice.item.label)} (${pctText})" d="${pathD}" fill="${escapeXml(parsedFill.color)}"${strokeAttr} />`
+        `<path id="Slice: ${escapeXml(slice.item.label)} (${pctText})" d="${pathD}" fill="${escapeXml(parsedFill.color)}"${sliceStrokeAttr} />`
       );
     });
 
@@ -546,7 +563,8 @@ export class PieSeries {
           const x2 = x1 + (isRightSide ? 14 : -14);
           const y2 = y1;
 
-          const leaderPath = `<path id="Leader: ${escapeXml(item.label)}" d="M ${fmt(x0)} ${fmt(y0)} L ${fmt(x1)} ${fmt(y1)} L ${fmt(x2)} ${fmt(y2)}" fill="none" stroke="#94A3B8" stroke-opacity="0.4" stroke-width="1" />`;
+          const parsedLeader = parseSvgColor(lOpts.color || '#676C75');
+          const leaderPath = `<path id="Leader: ${escapeXml(item.label)}" d="M ${fmt(x0)} ${fmt(y0)} L ${fmt(x1)} ${fmt(y1)} L ${fmt(x2)} ${fmt(y2)}" fill="none" stroke="${escapeXml(parsedLeader.color)}" stroke-opacity="0.4" stroke-width="1" />`;
           const textEl = svgTextElement({
             id: `Label: ${item.label}`,
             x: x2 + (isRightSide ? 4 : -4),

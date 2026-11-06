@@ -147,6 +147,58 @@ const multiLine = new LineChart('#multi-line', {
 });
 ```
 
+### 5. Funnel Chart (퍼널 차트 — 상하/좌우 방향 & 전환율)
+```typescript
+import { FunnelChart } from '@ju9nu7/nanocharts';
+
+const funnel = new FunnelChart('#funnel-chart', {
+  data: [
+    { label: '방문', value: 1200 },
+    { label: '회원가입', value: 820 },
+    { label: '장바구니', value: 540 },
+    { label: '구매완료', value: 310 },
+  ],
+  font: {
+    family: 'Pretendard, Inter, sans-serif',
+    size: 12,
+    weight: 600,
+  },
+  funnel: {
+    direction: 'vertical', // 'vertical' (상->하 기본) | 'horizontal' (좌->우)
+    shape: 'trapezoid',    // 'trapezoid' (사다리꼴) | 'bar' (단계별 바)
+    gap: 4,
+    showConversion: true,  // 단계별 전환율(%) 자동 표시
+  },
+  legend: {
+    visible: true,
+    position: 'top-right', // 상좌/상중/상우, 하좌/하중/하우, 좌상/좌중/좌하, 우상/우중/우하 12방향 지원
+  },
+});
+```
+
+### 6. Area 그라데이션 채도·명도 조절 & 그리드 선 커스텀
+```typescript
+const customLine = new LineChart('#custom-line', {
+  data,
+  font: { family: 'Pretendard, sans-serif', size: 11, weight: 500 },
+  line: { color: 'var(--primary)', width: 2.5, curve: 'smooth' },
+  area: {
+    visible: true,
+    topOpacity: 0.45,
+    bottomOpacity: 0.02,
+    saturationDelta: 15, // 원본 선 색상 대비 채도 +15%
+    lightnessDelta: 10,  // 원본 선 색상 대비 명도 +10%
+  },
+  grid: {
+    y: { visible: true, style: 'dashed', lineWidth: 1, color: 'var(--outline)' },
+    x: { visible: true, style: 'dotted', lineWidth: 1, color: 'var(--outline-low)' },
+    border: { visible: true, color: 'var(--outline)', radius: 4 },
+    alternateBand: { visible: true, color: 'rgba(233, 236, 239, 0.35)' },
+  },
+  legend: { visible: true, position: 'bottom-center' },
+});
+```
+
 ---
 
 ## 🎨 Designer Customization Examples
