@@ -11,11 +11,32 @@ import {
   DataLabelOptions,
   DataItem,
   ColorStyle,
+  ColorAccessor,
   BarBorderStyle,
+  BorderRadius,
+  BarGroupMode,
 } from '../types';
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
 import { drawRoundedRect, createGradient } from '../utils/canvas';
+
+/**
+ * 정규화된 다중 바 시리즈 내부 데이터 구조
+ */
+export interface NormalizedBarSeries {
+  /** 시리즈 고유 식별 키 */
+  key: string;
+  /** 시리즈 표시 이름 */
+  name: string;
+  /** X축 슬롯별 데이터 배열 */
+  items: DataItem[];
+  /** 시리즈 색상 설정 */
+  color?: ColorAccessor;
+  /** 시리즈 외곽선 설정 */
+  border?: BarBorderStyle | ((item: DataItem, index: number) => BarBorderStyle | undefined);
+  /** 범례 및 툴팁용 대표 단색 */
+  swatchColor: string;
+}
 
 /**
  * 계산된 바(Bar)의 화면 좌표 및 크기 메타데이터
@@ -31,8 +52,24 @@ export interface BarGeometry {
   height: number;
   /** 원본 데이터 아이템 */
   item: DataItem;
-  /** 원본 데이터 인덱스 */
+  /** 원본 데이터 인덱스 (X축 슬롯 인덱스) */
   index: number;
+  /** 다중 시리즈에서의 시리즈 고유 키 (선택) */
+  seriesKey?: string;
+  /** 다중 시리즈에서의 시리즈 이름 (선택) */
+  seriesName?: string;
+  /** 다중 시리즈에서의 시리즈 순서 인덱스 (선택) */
+  seriesIndex?: number;
+  /** 시리즈 전용 채우기 색상 오버라이드 (선택) */
+  seriesColor?: ColorAccessor;
+  /** 시리즈 전용 테두리 오버라이드 (선택) */
+  seriesBorder?: BarBorderStyle | ((item: DataItem, index: number) => BarBorderStyle | undefined);
+  /** 스택 모드 등에서 개별 바에 적용할 모서리 둥글기 오버라이드 (선택) */
+  borderRadiusOverride?: BorderRadius;
+  /** 대표 단색 (툴팁/범례 연동용) */
+  swatchColor?: string;
+  /** 100% 누적 모드일 때의 비율 (0 ~ 100) */
+  percentage?: number;
 }
 
 export class BarSeries {
@@ -42,6 +79,7 @@ export class BarSeries {
   constructor(barOptions?: BarStyleOptions, labelOptions?: DataLabelOptions) {
     this.barOptions = {
       widthRatio: 0.65,
+      groupGap: 0.12,
       borderRadius: [4, 4, 0, 0],
       fill: '#4F46E5', // 기본 색상: 인디고
       ...barOptions,
@@ -50,16 +88,27 @@ export class BarSeries {
   }
 
   /**
+   * 현재 설정된 다중 시리즈 바 배치 모드를 반환합니다.
+   */
+  public getMode(): BarGroupMode {
+    if (this.barOptions.stacked) return 'stacked';
+    return this.barOptions.mode || 'grouped';
+  }
+
+  /**
    * 단일 바의 기하학적 수치(X, Y, 너비, 높이)를 계산합니다.
    * 
    * 양수 값인 경우: 베이스라인(0)에서 위쪽으로 생성
    * 음수 값인 경우: 베이스라인(0)에서 아래쪽으로 생성
+   * 
+   * @param progress 애니메이션 진행률 (0.0 ~ 1.0, 기본값: 1)
    */
   getBarGeometry(
     item: DataItem,
     index: number,
     xScale: BandScale,
-    yScale: LinearScale
+    yScale: LinearScale,
+    progress: number = 1
   ): BarGeometry {
     const rawX = xScale.scale(index);
     const rawWidth = xScale.bandwidth();
@@ -73,37 +122,249 @@ export class BarSeries {
     const targetY = yScale.scale(item.value);
 
     const isPositive = item.value >= 0;
-    const y = isPositive ? targetY : baseZero;
-    const height = isPositive ? baseZero - targetY : targetY - baseZero;
+    const fullHeight = isPositive ? baseZero - targetY : targetY - baseZero;
+    const height = Math.max(0, fullHeight * progress);
+    const y = isPositive ? baseZero - height : baseZero;
 
     return { x, y, width, height, item, index };
   }
 
   /**
-   * 시리즈 레이어에 현재 뷰포트 내의 모든 바를 일괄 렌더링합니다.
+   * 다중 시리즈(Grouped / Stacked / Percent)의 특정 X축 슬롯(`slotIndex`)에 속한 모든 바의 기하 정보를 계산합니다.
+   */
+  public getMultiBarGeometriesAtSlot(
+    slotIndex: number,
+    activeSeries: NormalizedBarSeries[],
+    xScale: BandScale,
+    yScale: LinearScale,
+    progress: number = 1
+  ): BarGeometry[] {
+    const seriesCount = activeSeries.length;
+    if (seriesCount === 0) return [];
+
+    const mode = this.getMode();
+    const rawX = xScale.scale(slotIndex);
+    const rawWidth = xScale.bandwidth();
+    const ratio = Math.max(0.05, Math.min(1.0, this.barOptions.widthRatio ?? 0.65));
+    const totalGroupWidth = rawWidth * ratio;
+    const groupStartX = rawX + (rawWidth - totalGroupWidth) / 2;
+
+    const geometries: BarGeometry[] = [];
+
+    if (mode === 'grouped') {
+      const stepWidth = totalGroupWidth / seriesCount;
+      const gapRatio = seriesCount > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0;
+      const barWidth = Math.max(1, stepWidth * (1 - gapRatio));
+      const baseZero = yScale.scale(0);
+
+      for (let s = 0; s < seriesCount; s++) {
+        const series = activeSeries[s];
+        const item = series.items[slotIndex];
+        if (!item) continue;
+
+        const x = groupStartX + s * stepWidth + (stepWidth - barWidth) / 2;
+        const targetY = yScale.scale(item.value);
+        const isPositive = item.value >= 0;
+        const fullHeight = isPositive ? baseZero - targetY : targetY - baseZero;
+        const height = Math.max(0, fullHeight * progress);
+        const y = isPositive ? baseZero - height : baseZero;
+
+        geometries.push({
+          x,
+          y,
+          width: barWidth,
+          height,
+          item,
+          index: slotIndex,
+          seriesKey: series.key,
+          seriesName: series.name,
+          seriesIndex: s,
+          seriesColor: series.color,
+          seriesBorder: series.border,
+          swatchColor: series.swatchColor,
+        });
+      }
+      return geometries;
+    }
+
+    // Stacked 또는 Percent(100% 누적) 모드
+    let posTotal = 0;
+    let negTotal = 0;
+    let topPosSeriesIdx = -1;
+    let bottomNegSeriesIdx = -1;
+
+    for (let s = 0; s < seriesCount; s++) {
+      const val = activeSeries[s].items[slotIndex]?.value ?? 0;
+      if (val > 0) {
+        posTotal += val;
+        topPosSeriesIdx = s;
+      } else if (val < 0) {
+        negTotal += Math.abs(val);
+        bottomNegSeriesIdx = s;
+      }
+    }
+
+    let posAcc = 0;
+    let negAcc = 0;
+
+    for (let s = 0; s < seriesCount; s++) {
+      const series = activeSeries[s];
+      const item = series.items[slotIndex];
+      if (!item) continue;
+
+      const rawVal = item.value;
+      const isPositive = rawVal >= 0;
+      let effectiveVal = rawVal;
+      let percentage: number | undefined;
+
+      if (mode === 'percent') {
+        if (isPositive) {
+          percentage = posTotal > 0 ? (rawVal / posTotal) * 100 : 0;
+          effectiveVal = percentage;
+        } else {
+          percentage = negTotal > 0 ? (Math.abs(rawVal) / negTotal) * 100 : 0;
+          effectiveVal = -percentage;
+        }
+      }
+
+      if (isPositive) {
+        const startVal = posAcc * progress;
+        const endVal = (posAcc + effectiveVal) * progress;
+        posAcc += effectiveVal;
+
+        const yBottom = yScale.scale(startVal);
+        const yTop = yScale.scale(endVal);
+        const height = Math.max(0, yBottom - yTop);
+        const y = yTop;
+
+        const isTopCap = s === topPosSeriesIdx;
+        geometries.push({
+          x: groupStartX,
+          y,
+          width: totalGroupWidth,
+          height,
+          item,
+          index: slotIndex,
+          seriesKey: series.key,
+          seriesName: series.name,
+          seriesIndex: s,
+          seriesColor: series.color,
+          seriesBorder: series.border,
+          swatchColor: series.swatchColor,
+          borderRadiusOverride: isTopCap ? this.barOptions.borderRadius : 0,
+          percentage,
+        });
+      } else {
+        const startVal = negAcc * progress;
+        const endVal = (negAcc + effectiveVal) * progress;
+        negAcc += effectiveVal;
+
+        const yTop = yScale.scale(startVal);
+        const yBottom = yScale.scale(endVal);
+        const height = Math.max(0, yBottom - yTop);
+        const y = yTop;
+
+        const isBottomCap = s === bottomNegSeriesIdx;
+        geometries.push({
+          x: groupStartX,
+          y,
+          width: totalGroupWidth,
+          height,
+          item,
+          index: slotIndex,
+          seriesKey: series.key,
+          seriesName: series.name,
+          seriesIndex: s,
+          seriesColor: series.color,
+          seriesBorder: series.border,
+          swatchColor: series.swatchColor,
+          borderRadiusOverride: isBottomCap ? this.barOptions.borderRadius : 0,
+          percentage,
+        });
+      }
+    }
+
+    return geometries;
+  }
+
+  /**
+   * 시리즈 레이어에 현재 뷰포트 내의 모든 바를 일괄 렌더링합니다 (단일 시리즈).
    * 뷰포트 컬링을 적용하여 화면 밖의 데이터는 연산 및 그리기를 완전히 스킵합니다.
+   * 
+   * @param progress 애니메이션 진행률 (0.0 ~ 1.0, 기본값: 1)
    */
   render(
     ctx: CanvasRenderingContext2D,
     data: DataItem[],
     xScale: BandScale,
-    yScale: LinearScale
+    yScale: LinearScale,
+    progress: number = 1
   ): void {
     const [start, end] = xScale.getViewport();
     if (data.length === 0 || start > end) return;
 
     ctx.save();
 
+    const labelAlpha = progress >= 1 ? 1 : Math.max(0, Math.min(1, (progress - 0.55) / 0.45));
+
     for (let i = start; i <= end; i++) {
       const item = data[i];
       if (!item) continue;
 
-      const geom = this.getBarGeometry(item, i, xScale, yScale);
+      const geom = this.getBarGeometry(item, i, xScale, yScale, progress);
       this.drawSingleBar(ctx, geom);
 
-      // 데이터 라벨 표시 옵션이 켜져 있는 경우 라벨 렌더링
-      if (this.labelOptions?.visible) {
+      // 데이터 라벨 표시 옵션이 켜져 있는 경우 라벨 렌더링 (애니메이션 후반부에 페이드인)
+      if (this.labelOptions?.visible && labelAlpha > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = labelAlpha;
         this.drawDataLabel(ctx, geom);
+        ctx.restore();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * 다중 시리즈(Grouped / Stacked / Percent) 바를 일괄 렌더링합니다.
+   */
+  public renderMulti(
+    ctx: CanvasRenderingContext2D,
+    activeSeries: NormalizedBarSeries[],
+    xScale: BandScale,
+    yScale: LinearScale,
+    progress: number = 1
+  ): void {
+    const [start, end] = xScale.getViewport();
+    if (activeSeries.length === 0 || start > end) return;
+
+    ctx.save();
+    const labelAlpha = progress >= 1 ? 1 : Math.max(0, Math.min(1, (progress - 0.55) / 0.45));
+    const isStacked = this.getMode() !== 'grouped';
+
+    for (let i = start; i <= end; i++) {
+      const geoms = this.getMultiBarGeometriesAtSlot(i, activeSeries, xScale, yScale, progress);
+      for (let gIdx = 0; gIdx < geoms.length; gIdx++) {
+        const geom = geoms[gIdx];
+        this.drawSingleBar(ctx, geom);
+
+        if (this.labelOptions?.visible && labelAlpha > 0.01) {
+          // 스택 모드에서 top-outside 라벨이면 최상단 바에만 그리거나 충분한 높이의 바 내부에 표시
+          if (isStacked && (this.labelOptions.position || 'top-outside') === 'top-outside') {
+            if (gIdx === geoms.length - 1) {
+              ctx.save();
+              ctx.globalAlpha = labelAlpha;
+              this.drawDataLabel(ctx, geom);
+              ctx.restore();
+            }
+          } else if (!isStacked || geom.height >= 15) {
+            ctx.save();
+            ctx.globalAlpha = labelAlpha;
+            this.drawDataLabel(ctx, geom);
+            ctx.restore();
+          }
+        }
       }
     }
 
@@ -114,19 +375,19 @@ export class BarSeries {
    * 단일 바(Bar) 그리기 (모서리 둥글기, 채우기, 테두리)
    */
   private drawSingleBar(ctx: CanvasRenderingContext2D, geom: BarGeometry): void {
-    const { x, y, width, height, item, index } = geom;
+    const { x, y, width, height } = geom;
     if (width <= 0 || height <= 0) return;
 
     // 1. 둥근 모서리 경로 생성
-    const radius = this.barOptions.borderRadius;
+    const radius = geom.borderRadiusOverride !== undefined ? geom.borderRadiusOverride : this.barOptions.borderRadius;
     drawRoundedRect(ctx, x, y, width, height, radius);
 
     // 2. 채우기 스타일 적용 (단색, 그라데이션, 조건부 콜백)
-    ctx.fillStyle = this.resolveColor(ctx, x, y, width, height, item, index);
+    ctx.fillStyle = this.resolveColor(ctx, geom);
     ctx.fill();
 
     // 3. 외곽 테두리(Border) 렌더링
-    const border = this.resolveBorder(item, index);
+    const border = this.resolveBorder(geom);
     if (border && border.width > 0) {
       ctx.strokeStyle = border.color;
       ctx.lineWidth = border.width;
@@ -150,13 +411,13 @@ export class BarSeries {
     if (width <= 0 || height <= 0) return;
 
     ctx.save();
-    const radius = this.barOptions.borderRadius;
+    const radius = geom.borderRadiusOverride !== undefined ? geom.borderRadiusOverride : this.barOptions.borderRadius;
     drawRoundedRect(ctx, x, y, width, height, radius);
 
     const hoverOpt = this.barOptions.hover;
 
-    // 사용자 지정 호버 스타일이 있으면 적용, 없으면 기본 반투명 화이트 오버레이
-    if (hoverOpt?.fill) {
+    // 다중 시리즈이거나 커스텀 색상이 지정된 경우 반투명 화이트 하이라이트로 원래 시리즈 색상을 보존
+    if (hoverOpt?.fill && !geom.seriesColor) {
       const fillStyle = typeof hoverOpt.fill === 'function' ? hoverOpt.fill(item, index) : hoverOpt.fill;
       if (typeof fillStyle === 'string') {
         ctx.fillStyle = fillStyle;
@@ -208,9 +469,12 @@ export class BarSeries {
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
 
-    const text = opts.formatter
-      ? opts.formatter(item.value, item, index)
-      : item.value.toLocaleString();
+    const text =
+      geom.percentage !== undefined && this.getMode() === 'percent' && !opts.formatter
+        ? `${geom.percentage.toFixed(0)}%`
+        : opts.formatter
+          ? opts.formatter(item.value, item, index)
+          : item.value.toLocaleString();
 
     const centerX = x + width / 2;
     let labelY = y;
@@ -247,20 +511,37 @@ export class BarSeries {
   }
 
   /**
+   * 범례(Legend) 아이콘 등에 표시할 대표 단색(Hex/RGB) 문자열을 반환합니다.
+   */
+  public resolveSwatchColor(item: DataItem, index: number, seriesColor?: ColorAccessor): string {
+    let style: ColorStyle = item.color || '#4F46E5';
+    if (item.color) {
+      style = item.color;
+    } else if (seriesColor) {
+      style = typeof seriesColor === 'function' ? seriesColor(item, index) : seriesColor;
+    } else if (typeof this.barOptions.fill === 'function') {
+      style = this.barOptions.fill(item, index);
+    } else if (this.barOptions.fill) {
+      style = this.barOptions.fill;
+    }
+    return typeof style === 'string' ? style : style.from;
+  }
+
+  /**
    * 바의 채우기 스타일(단색, 그라데이션, 함수 콜백)을 최종 캔버스 FillStyle로 변환
    */
   private resolveColor(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    item: DataItem,
-    index: number
+    geom: BarGeometry
   ): string | CanvasGradient {
+    const { x, y, width, height, item, index, seriesColor } = geom;
     let style: ColorStyle = item.color || '#4F46E5';
 
-    if (typeof this.barOptions.fill === 'function') {
+    if (item.color) {
+      style = item.color;
+    } else if (seriesColor) {
+      style = typeof seriesColor === 'function' ? seriesColor(item, index) : seriesColor;
+    } else if (typeof this.barOptions.fill === 'function') {
       style = this.barOptions.fill(item, index);
     } else if (this.barOptions.fill) {
       style = this.barOptions.fill;
@@ -277,9 +558,12 @@ export class BarSeries {
    * 바의 테두리 옵션 계산
    */
   private resolveBorder(
-    item: DataItem,
-    index: number
+    geom: BarGeometry
   ): BarBorderStyle | undefined {
+    const { item, index, seriesBorder } = geom;
+    if (seriesBorder) {
+      return typeof seriesBorder === 'function' ? seriesBorder(item, index) : seriesBorder;
+    }
     if (typeof this.barOptions.border === 'function') {
       return this.barOptions.border(item, index);
     }

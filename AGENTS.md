@@ -27,6 +27,8 @@ src/
 ├── core/
 │   ├── Chart.ts            # BarChart 메인 오케스트레이터 (리사이즈, 줌/팬, 이벤트)
 │   ├── PieChart.ts         # PieChart 메인 오케스트레이터 (극좌표 히트테스팅, 팝아웃)
+│   ├── LineChart.ts        # LineChart 메인 오케스트레이터 (크로스헤어, LTTB, 줌/팬)
+│   ├── Animator.ts         # 초경량 60fps rAF 애니메이션 엔진 및 이징 함수
 │   ├── LayerManager.ts     # 3단 Canvas(Background, Series, Interaction) 및 DPR 보정
 │   └── EventEmitter.ts     # 초경량 이벤트 버스 (on, off, emit)
 ├── scale/
@@ -35,11 +37,13 @@ src/
 │   └── BandScale.ts        # 이산형 X축 바 스케일 (O(1) invert 역산 및 뷰포트 윈도우)
 ├── series/
 │   ├── BarSeries.ts        # 바 렌더링 (뷰포트 컬링, 배치 렌더, roundRect, 라벨)
-│   └── PieSeries.ts        # 파이/도넛 아크 연산, padAngle, 리더라인 라벨, 중앙 텍스트
+│   ├── PieSeries.ts        # 파이/도넛 아크 연산, padAngle, 리더라인 라벨, 중앙 텍스트
+│   └── LineSeries.ts       # 라인/영역 렌더링 (smooth/linear/step, LTTB 다운샘플링, 크로스헤어)
 ├── components/
 │   ├── Axis.ts             # X/Y축 눈금선 및 라벨 렌더링
 │   ├── Grid.ts             # 배경 격자선 렌더링
-│   └── Tooltip.ts          # 모던 부동형 DOM 툴팁
+│   ├── Tooltip.ts          # 모던 부동형 DOM 툴팁
+│   └── Legend.ts           # 범례 표시, 클릭 데이터 토글 및 호버 하이라이트 연동
 ├── utils/
 │   └── canvas.ts           # 둥근 사각형(drawRoundedRect), 그라데이션(createGradient) 유틸
 └── index.ts                # 라이브러리 공개 진입점 (Public Export)
@@ -98,8 +102,14 @@ npm publish --access public
 
 ## 6. 기능 로드맵 (Feature Roadmap)
 
+### Phase 1 (완료 ✅)
 - [x] **Bar Chart**: 단색, 그라데이션, roundRect, 테두리, 수치 라벨, 줌/팬 탐색
 - [x] **Pie / Donut Chart**: innerRadius 도넛 전환, padAngle, 호버 팝아웃, 가이드라인 라벨, 중앙 요약
-- [ ] **Line / Area Chart**: 베지에 곡선(Smooth Spline), LTTB 다운샘플링, 채우기 그라데이션
-- [ ] **Legend Component**: 범례 표시 및 항목 클릭 시 데이터 토글 기능
-- [ ] **Animation Engine**: 최초 렌더링 시 성장(Grow/Wipe) 애니메이션
+- [x] **Line / Area Chart**: 베지에 곡선(Smooth Spline), LTTB 다운샘플링, 채우기 그라데이션
+- [x] **Legend Component**: 범례 표시(상/하/좌/우), 항목 클릭 시 데이터 토글 및 양방향 호버 연동
+- [x] **Animation Engine**: 최초 렌더링 및 데이터 토글 시 성장(Grow/Wipe/Sweep) 애니메이션
+
+### Phase 2 (다음 작업 후보 📋)
+- [x] **Multi-Series / Stacked Chart**: 다중 라인(Multi-Line) 비교 및 그룹형/누적형(Grouped/Stacked/Percent) 바 차트 지원
+- [ ] **새로운 차트 타입 확장**: `ScatterChart`(산점도/버블), `RadarChart`(방사형), `HorizontalBarChart`(가로 바)
+- [ ] **문서화 & 패키지 배포**: `README.md`에 Legend/Animation 가이드 반영 및 `v0.1.5` (또는 `v0.2.0`) npm 배포

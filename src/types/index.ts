@@ -27,6 +27,8 @@ export interface DataItem {
   value: number;
   /** 이 항목에만 단독으로 적용할 개별 바 색상 (선택, Hex/RGB) */
   color?: string;
+  /** 데이터 그룹/카테고리 분류명 (선택, 범례 그룹핑 및 필터링에 활용) */
+  category?: string;
   /** 개발자가 툴팁이나 라벨 등에서 활용할 수 있는 임의의 추가 데이터 */
   [key: string]: unknown;
 }
@@ -157,11 +159,49 @@ export interface DataLabelOptions {
 }
 
 /**
+ * 바(Bar) 배치 모드
+ * - `'grouped'`: 다중 시리즈를 나란히 병렬 배치 (기본값)
+ * - `'stacked'`: 다중 시리즈를 수직으로 누적 배치
+ * - `'percent'`: 다중 시리즈를 100% 비율 기준으로 누적 배치
+ */
+export type BarGroupMode = 'grouped' | 'stacked' | 'percent';
+
+/**
+ * 다중 바 차트(Multi-Bar / Stacked Bar)용 개별 시리즈 데이터셋 인터페이스
+ * 
+ * @example
+ * ```ts
+ * const series: BarSeriesDataset[] = [
+ *   { name: 'Frontend', data: [120, 150, 180, 210], color: '#6366F1' },
+ *   { name: 'Backend', data: [90, 110, 140, 160], color: '#10B981' }
+ * ];
+ * ```
+ */
+export interface BarSeriesDataset {
+  /** 시리즈 고유 식별 키 (미지정 시 `name` 사용) */
+  id?: string;
+  /** 범례 및 툴팁에 표시될 시리즈 이름 */
+  name: string;
+  /** 시리즈 수치 배열 (`number[]` 또는 `DataItem[]`) */
+  data: (number | DataItem)[];
+  /** 이 시리즈에 적용할 채우기 색상 (단색, 그라데이션, 또는 조건부 콜백) */
+  color?: ColorAccessor;
+  /** 이 시리즈에 적용할 외곽 테두리 스타일 */
+  border?: BarBorderStyle | ((item: DataItem, index: number) => BarBorderStyle | undefined);
+}
+
+/**
  * 바(Bar) 형태 및 비주얼 스타일 옵션
  */
 export interface BarStyleOptions {
-  /** 한 슬롯 내에서 바가 차지하는 너비 비율 (0.1 ~ 1.0, 기본값: 0.65) */
+  /** 다중 시리즈 배치 모드 ('grouped' | 'stacked' | 'percent', 기본값: 'grouped') */
+  mode?: BarGroupMode;
+  /** 누적(Stacked) 모드 단축 설정 (`true` 설정 시 `mode: 'stacked'`와 동일) */
+  stacked?: boolean;
+  /** 한 슬롯 내에서 바(또는 바 그룹 전체)가 차지하는 너비 비율 (0.1 ~ 1.0, 기본값: 0.65) */
   widthRatio?: number;
+  /** 그룹형(grouped) 바 차트에서 같은 슬롯 내 개별 바 사이의 간격 비율 (0.0 ~ 0.5, 기본값: 0.12) */
+  groupGap?: number;
   /** 바의 최대 허용 너비 (픽셀) */
   maxWidth?: number;
   /** 바의 최소 허용 너비 (픽셀) */
@@ -222,22 +262,170 @@ export interface AxisOptions {
   formatter?: (value: string | number) => string;
 }
 
+/**
+ * 다중 시리즈(Multi-Series) 툴팁에 전달되는 개별 시리즈 항목 정보
+ */
+export interface TooltipEntry {
+  /** 시리즈 고유 식별 키 */
+  seriesKey: string;
+  /** 시리즈 이름 */
+  seriesName: string;
+  /** 시리즈 마커 색상 */
+  color: string;
+  /** 해당 X축 위치의 수치값 */
+  value: number;
+  /** 누적(Percent) 모드 등에서의 비중 (0 ~ 100, 선택) */
+  percentage?: number;
+  /** 원본 데이터 아이템 */
+  item: DataItem;
+  /** 현재 마우스가 직접 올라간 강조 시리즈 여부 */
+  highlighted?: boolean;
+}
+
 /** 툴팁(Tooltip) 옵션 */
 export interface TooltipOptions {
   /** 툴팁 활성화 여부 (기본값: true) */
   enabled?: boolean;
+  /** 다중 시리즈 차트에서 같은 X축 슬롯의 모든 시리즈 값을 하나의 통합 툴팁에 표시할지 여부 (기본값: true) */
+  shared?: boolean;
   /** 커스텀 CSS 클래스명 */
   className?: string;
-  /** 툴팁 HTML 내용 커스텀 포맷터 */
+  /** 단일 시리즈 툴팁 HTML 내용 커스텀 포맷터 */
   formatter?: (item: DataItem, index: number) => string;
+  /** 다중 시리즈 통합 툴팁 HTML 내용 커스텀 포맷터 */
+  multiFormatter?: (title: string, entries: TooltipEntry[], index: number) => string;
+}
+
+/**
+ * 범례(Legend) 배치 위치
+ * - `'top'`: 차트 상단
+ * - `'bottom'`: 차트 하단
+ * - `'left'`: 차트 좌측
+ * - `'right'`: 차트 우측
+ */
+export type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
+
+/**
+ * 범례(Legend) 정렬 방식
+ */
+export type LegendAlign = 'start' | 'center' | 'end';
+
+/**
+ * 범례(Legend) 마커 아이콘 형태
+ * - `'circle'`: 원형
+ * - `'rounded'`: 둥근 사각형 (기본값)
+ * - `'square'`: 직각 사각형
+ * - `'line'`: 선형
+ */
+export type LegendMarkerShape = 'circle' | 'rounded' | 'square' | 'line';
+
+/**
+ * 단일 범례 항목 인터페이스
+ */
+export interface LegendItem {
+  /** 범례 항목의 고유 식별 키 (예: 카테고리명 또는 항목 라벨/ID) */
+  key: string;
+  /** 화면에 표시될 범례 텍스트 */
+  label: string;
+  /** 마커 아이콘 색상 (Hex/RGB 문자열) */
+  color: string;
+  /** 관련 수치 합계 또는 대푯값 (선택) */
+  value?: number;
+  /** 현재 활성화(표시) 상태 여부 (기본값: true) */
+  active?: boolean;
+}
+
+/**
+ * 범례(Legend) 컴포넌트 옵션
+ * 
+ * @example
+ * ```ts
+ * const legend: LegendOptions = {
+ *   visible: true,
+ *   position: 'top',
+ *   align: 'end',
+ *   markerShape: 'rounded',
+ *   interactive: true
+ * };
+ * ```
+ */
+export interface LegendOptions {
+  /** 범례 표시 여부 (기본값: true) */
+  visible?: boolean;
+  /** 범례 배치 위치 ('top' | 'bottom' | 'left' | 'right', 기본값: 'top') */
+  position?: LegendPosition;
+  /** 범례 정렬 방식 ('start' | 'center' | 'end', 기본값: 'end') */
+  align?: LegendAlign;
+  /** 마커 아이콘 도형 형태 ('circle' | 'rounded' | 'square' | 'line', 기본값: 'rounded') */
+  markerShape?: LegendMarkerShape;
+  /** 범례 항목 클릭 시 데이터 토글(표시/숨김) 활성화 여부 (기본값: true) */
+  interactive?: boolean;
+  /** 글자 크기 (px, 기본값: 12) */
+  fontSize?: number;
+  /** 활성 항목 글자 색상 (기본값: '#E2E8F0') */
+  textColor?: string;
+  /** 비활성(숨김) 항목 글자 색상 (기본값: '#64748B') */
+  inactiveColor?: string;
+  /** 자동 추출 시 표시할 최대 범례 개수 (기본값: 12) */
+  maxItems?: number;
+  /** 수동으로 지정할 커스텀 범례 아이템 목록 (미지정 시 데이터/카테고리에서 자동 추출) */
+  items?: LegendItem[];
+  /** 범례 텍스트 커스텀 포맷터 */
+  formatter?: (item: LegendItem) => string;
+  /** 범례 항목 클릭 시 호출되는 콜백 */
+  onClick?: (item: LegendItem, active: boolean) => void;
+  /** 범례 항목 마우스 호버/이탈 시 호출되는 콜백 */
+  onHover?: (item: LegendItem | null) => void;
+}
+
+/**
+ * 내장 애니메이션 이징(가감속) 함수 타입
+ * - `'linear'`: 일정한 속도로 진행
+ * - `'easeOutCubic'`: 부드럽게 감속하며 마무리
+ * - `'easeOutQuart'`: 빠르고 세련되게 감속 (기본값)
+ * - `'easeOutExpo'`: 초반에 역동적으로 치고 나가며 감속
+ * - `'easeOutBack'`: 목표치를 살짝 넘어섰다가 탄성 있게 안착
+ */
+export type EasingType =
+  | 'linear'
+  | 'easeOutCubic'
+  | 'easeOutQuart'
+  | 'easeOutExpo'
+  | 'easeOutBack';
+
+/**
+ * 차트 렌더링 애니메이션 옵션
+ * 
+ * @example
+ * ```ts
+ * const animation: AnimationOptions = {
+ *   enabled: true,
+ *   duration: 700,
+ *   easing: 'easeOutQuart'
+ * };
+ * ```
+ */
+export interface AnimationOptions {
+  /** 애니메이션 활성화 여부 (기본값: true) */
+  enabled?: boolean;
+  /** 애니메이션 재생 시간 (밀리초 단위, 기본값: 650) */
+  duration?: number;
+  /** 이징 프리셋 이름 또는 커스텀 이징 함수 `(t: number) => number` (기본값: 'easeOutQuart') */
+  easing?: EasingType | ((t: number) => number);
+  /** 애니메이션 완료 시 호출되는 콜백 */
+  onComplete?: () => void;
 }
 
 /**
  * BarChart 전체 초기화 옵션
  */
 export interface BarChartOptions {
-  /** 차트에 바인딩할 데이터 배열 */
-  data: DataItem[];
+  /** 단일 시리즈 데이터 배열 (`series`를 사용할 경우 생략 가능) */
+  data?: DataItem[];
+  /** 다중 시리즈(Grouped / Stacked Bar) 데이터셋 배열 */
+  series?: BarSeriesDataset[];
+  /** 다중 시리즈에서 숫자 배열(`number[]`)을 사용할 때 지정할 X축 라벨 목록 */
+  xLabels?: string[];
   /** 차트 내부 여백 설정 */
   padding?: Partial<Padding>;
   /** 바 스타일 옵션 */
@@ -252,6 +440,10 @@ export interface BarChartOptions {
   yAxis?: AxisOptions;
   /** 툴팁 옵션 */
   tooltip?: TooltipOptions;
+  /** 범례(Legend) 표시 및 데이터 토글 옵션 (`true`/`false` 또는 상세 설정 객체) */
+  legend?: boolean | LegendOptions;
+  /** 렌더링 애니메이션 옵션 (`false` 전달 시 즉시 렌더링, 기본값: 활성화) */
+  animation?: boolean | AnimationOptions;
   /** 마우스 휠 줌 옵션 */
   zoom?: {
     /** 줌 활성화 여부 (기본값: true) */
@@ -374,5 +566,211 @@ export interface PieChartOptions {
   center?: PieCenterContentOptions;
   /** 툴팁 옵션 */
   tooltip?: TooltipOptions;
+  /** 범례(Legend) 표시 및 데이터 토글 옵션 (`true`/`false` 또는 상세 설정 객체) */
+  legend?: boolean | LegendOptions;
+  /** 렌더링 애니메이션 옵션 (`false` 전달 시 즉시 렌더링, 기본값: 활성화) */
+  animation?: boolean | AnimationOptions;
 }
+
+// ==========================================
+// 📈 Line / Area Chart Types
+// ==========================================
+
+/**
+ * 라인 보간(곡선) 방식
+ * - `'linear'`: 데이터 포인트를 직선으로 연결
+ * - `'smooth'`: 부드러운 3차 베지에 곡선(Spline)으로 연결
+ * - `'step'`: 계단형(수평 이동 후 수직 이동)으로 연결
+ */
+export type LineCurveType = 'linear' | 'smooth' | 'step';
+
+/**
+ * 계산된 단일 라인 데이터 포인트의 화면 좌표 및 메타데이터
+ */
+export interface LinePointGeometry {
+  /** 포인트의 캔버스 X 좌표 (px) */
+  x: number;
+  /** 포인트의 캔버스 Y 좌표 (px) */
+  y: number;
+  /** 원본 데이터 아이템 */
+  item: DataItem;
+  /** 원본 데이터 배열 상의 인덱스 */
+  index: number;
+}
+
+/**
+ * 선(Line) 스타일 옵션
+ * 
+ * @example
+ * ```ts
+ * const line: LineStyleOptions = {
+ *   color: '#6366F1',
+ *   width: 2.5,
+ *   curve: 'smooth',
+ *   tension: 0.35
+ * };
+ * ```
+ */
+export interface LineStyleOptions {
+  /** 선 색상 (단색 Hex/RGB 또는 그라데이션 설정, 기본값: '#6366F1') */
+  color?: ColorStyle;
+  /** 선 두께 (픽셀 단위, 기본값: 2.5) */
+  width?: number;
+  /** 선 보간 형태 ('linear' | 'smooth' | 'step', 기본값: 'smooth') */
+  curve?: LineCurveType;
+  /** 'smooth' 곡선일 때의 곡률 텐션 (0.0 ~ 1.0, 기본값: 0.35) */
+  tension?: number;
+  /** 점선 패턴 배열 (예: [6, 4]) */
+  dash?: number[];
+}
+
+/**
+ * 라인 하단 영역(Area) 채우기 스타일 옵션
+ * 
+ * @example
+ * ```ts
+ * const area: AreaStyleOptions = {
+ *   visible: true,
+ *   fill: {
+ *     type: 'linear',
+ *     from: 'rgba(99, 102, 241, 0.45)',
+ *     to: 'rgba(99, 102, 241, 0.0)',
+ *     direction: 'vertical'
+ *   }
+ * };
+ * ```
+ */
+export interface AreaStyleOptions {
+  /** 영역 채우기 활성화 여부 (기본값: true) */
+  visible?: boolean;
+  /** 채우기 색상 또는 그라데이션 (미지정 시 선 색상 기반 반투명 그라데이션 자동 적용) */
+  fill?: ColorStyle;
+  /** 전체 채우기 영역의 투명도 (0.0 ~ 1.0, 기본값: 1.0) */
+  opacity?: number;
+}
+
+/**
+ * 데이터 포인트 마커(점) 스타일 옵션
+ */
+export interface LinePointStyleOptions {
+  /** 평상시 포인트 마커 표시 여부 (데이터가 많을 경우 false로 두면 깔끔하며 호버 시에만 표시 가능, 기본값: true) */
+  visible?: boolean;
+  /** 기본 포인트 원 반지름 (px, 기본값: 4) */
+  radius?: number;
+  /** 호버 시 확대될 포인트 원 반지름 (px, 기본값: 6) */
+  hoverRadius?: number;
+  /** 포인트 내부 채우기 색상 (기본값: '#0B0F19' 다크 배경색 또는 흰색) */
+  fill?: string | ((item: DataItem, index: number) => string);
+  /** 포인트 외곽 테두리 색상 (미지정 시 선 색상 자동 계승) */
+  borderColor?: string | ((item: DataItem, index: number) => string);
+  /** 포인트 외곽 테두리 두께 (px, 기본값: 2) */
+  borderWidth?: number;
+}
+
+/**
+ * 마우스 호버 시 표시되는 십자선(Crosshair) 가이드 옵션
+ */
+export interface CrosshairOptions {
+  /** 크로스헤어 활성화 여부 (기본값: true) */
+  enabled?: boolean;
+  /** 수직 가이드선 표시 여부 (기본값: true) */
+  vertical?: boolean;
+  /** 수평 가이드선 표시 여부 (기본값: false) */
+  horizontal?: boolean;
+  /** 가이드선 색상 (기본값: 'rgba(148, 163, 184, 0.45)') */
+  color?: string;
+  /** 가이드선 두께 (px, 기본값: 1) */
+  width?: number;
+  /** 점선 스타일 배열 (기본값: [4, 4]) */
+  dash?: number[];
+}
+
+/**
+ * 다중 라인/영역 차트(Multi-Line / Stacked Area)용 개별 시리즈 데이터셋 인터페이스
+ * 
+ * @example
+ * ```ts
+ * const series: LineSeriesDataset[] = [
+ *   { name: '모바일 트래픽', data: [140, 230, 195, 290], color: '#6366F1' },
+ *   { name: '데스크톱 트래픽', data: [95, 130, 160, 185], color: '#22D3EE', dash: [6, 4] }
+ * ];
+ * ```
+ */
+export interface LineSeriesDataset {
+  /** 시리즈 고유 식별 키 (미지정 시 `name` 사용) */
+  id?: string;
+  /** 범례 및 툴팁에 표시될 시리즈 이름 */
+  name: string;
+  /** 시리즈 수치 배열 (`number[]` 또는 `DataItem[]`) */
+  data: (number | DataItem)[];
+  /** 선 색상 (단색 또는 그라데이션) */
+  color?: ColorStyle;
+  /** 선 두께 (px) */
+  width?: number;
+  /** 선 보간 형태 ('linear' | 'smooth' | 'step') */
+  curve?: LineCurveType;
+  /** 점선 패턴 배열 (예: [6, 4]) */
+  dash?: number[];
+  /** 하단 영역(Area) 채우기 설정 (`boolean` 또는 상세 설정 객체) */
+  area?: boolean | AreaStyleOptions;
+  /** 포인트 마커 스타일 설정 */
+  points?: LinePointStyleOptions;
+}
+
+/**
+ * LineChart (및 AreaChart) 전체 초기화 옵션
+ */
+export interface LineChartOptions {
+  /** 단일 시리즈 데이터 배열 (`series`를 사용할 경우 생략 가능) */
+  data?: DataItem[];
+  /** 다중 라인/영역 시리즈 데이터셋 배열 */
+  series?: LineSeriesDataset[];
+  /** 다중 시리즈에서 숫자 배열(`number[]`)을 사용할 때 지정할 X축 라벨 목록 */
+  xLabels?: string[];
+  /** 다중 시리즈 누적(Stacked Line / Stacked Area) 모드 활성화 여부 (기본값: false) */
+  stacked?: boolean;
+  /** 차트 내부 여백 설정 */
+  padding?: Partial<Padding>;
+  /** 선(Line) 스타일 옵션 */
+  line?: LineStyleOptions;
+  /** 영역(Area) 채우기 스타일 옵션 */
+  area?: AreaStyleOptions;
+  /** 데이터 포인트(마커) 옵션 */
+  points?: LinePointStyleOptions;
+  /** 데이터 수치 라벨 옵션 */
+  labels?: DataLabelOptions;
+  /** 호버 크로스헤어(십자 가이드선) 옵션 */
+  crosshair?: CrosshairOptions;
+  /** 배경 격자선 옵션 */
+  grid?: GridOptions;
+  /** X축 옵션 */
+  xAxis?: AxisOptions;
+  /** Y축 옵션 */
+  yAxis?: AxisOptions;
+  /** 툴팁 옵션 */
+  tooltip?: TooltipOptions;
+  /** 범례(Legend) 표시 및 데이터 토글 옵션 (`true`/`false` 또는 상세 설정 객체) */
+  legend?: boolean | LegendOptions;
+  /** 렌더링 애니메이션 옵션 (`false` 전달 시 즉시 렌더링, 기본값: 활성화) */
+  animation?: boolean | AnimationOptions;
+  /**
+   * 대용량 데이터 렌더링 최적화를 위한 LTTB 다운샘플링 임계치
+   * - 화면 내 포인트 개수가 `samplingThreshold`를 초과하면 시각적 형태를 보존하면서 샘플링하여 60fps를 보장합니다.
+   * - 기본값: 600 (0 또는 false 설정 시 비활성화)
+   */
+  samplingThreshold?: number | false;
+  /** 마우스 휠 줌 옵션 */
+  zoom?: {
+    /** 줌 활성화 여부 (기본값: true) */
+    enabled?: boolean;
+    /** 최대로 확대했을 때 화면에 보일 최소 데이터 개수 (기본값: 5) */
+    minPoints?: number;
+  };
+  /** 마우스 드래그 좌우 스크롤(팬) 옵션 */
+  pan?: {
+    /** 팬 활성화 여부 (기본값: true) */
+    enabled?: boolean;
+  };
+}
+
 

@@ -175,16 +175,37 @@
   <div class="container">
     <header>
       <h1>
-        Canvas Bar Chart Engine
-        <span class="badge">TypeScript + Canvas 2D</span>
+        NanoCharts Engine
+        <span class="badge">Zero-Dependency Canvas 2D</span>
       </h1>
-      <p>대용량 데이터(수천~수만 개)와 극대화된 디자이너 커스텀 자유도를 지원하는 차트 라이브러리</p>
+      <p>대용량 데이터(수천~수만 개) 60fps 렌더링과 극대화된 디자이너 커스텀 자유도를 지원하는 차트 라이브러리</p>
     </header>
 
     <!-- UI 컨트롤러 -->
     <div class="controls">
-      <!-- 데이터 크기 -->
+      <!-- 차트 타입 전환 -->
       <div class="control-group">
+        <label>차트 종류</label>
+        <div class="btn-group" id="chart-type-group">
+          <button class="btn active" data-type="bar">📊 Bar</button>
+          <button class="btn" data-type="line">📈 Line / Area</button>
+          <button class="btn" data-type="pie">🍩 Pie / Donut</button>
+        </div>
+      </div>
+
+      <!-- 다중 시리즈 / 누적 모드 (Bar & Line 공용) -->
+      <div class="control-group" id="series-mode-control">
+        <label>시리즈 구성 (Multi / Stacked)</label>
+        <select id="series-mode-select">
+          <option value="single">단일 시리즈 (Single)</option>
+          <option value="grouped">다중 비교 (Grouped Bar / Multi-Line)</option>
+          <option value="stacked">누적형 (Stacked Bar / Stacked Area)</option>
+          <option value="percent">100% 비율 누적 (Bar 전용)</option>
+        </select>
+      </div>
+
+      <!-- 데이터 크기 -->
+      <div class="control-group" id="data-size-control">
         <label>데이터 규모</label>
         <div class="btn-group" id="data-size-group">
           <button class="btn active" data-size="20">20개 (기본)</button>
@@ -194,7 +215,7 @@
       </div>
 
       <!-- 스타일 프리셋 -->
-      <div class="control-group">
+      <div class="control-group" id="theme-control">
         <label>디자인 스타일 프리셋</label>
         <select id="theme-select">
           <option value="indigo-purple">인디고-퍼플 그라데이션 (추천)</option>
@@ -204,31 +225,74 @@
         </select>
       </div>
 
+      <!-- 라인 곡선 모드 (Line 전용) -->
+      <div class="control-group" id="line-curve-control" style="display: none;">
+        <label>라인 보간 (Curve)</label>
+        <select id="curve-select">
+          <option value="smooth">베지에 곡선 (smooth)</option>
+          <option value="linear">직선 (linear)</option>
+          <option value="step">계단형 (step)</option>
+        </select>
+      </div>
+
+      <!-- 도넛 구멍 비율 (Pie 전용) -->
+      <div class="control-group" id="pie-hole-control" style="display: none;">
+        <label>도넛 내부 반지름: <span id="hole-val">60%</span></label>
+        <input type="range" id="hole-range" min="0" max="80" value="60" step="5" />
+      </div>
+
       <!-- 라벨 위치 -->
-      <div class="control-group">
+      <div class="control-group" id="label-pos-control">
         <label>라벨 위치 (디자인 커스텀)</label>
         <select id="label-pos-select">
-          <option value="top-outside">바 상단 바깥 (top-outside)</option>
-          <option value="inside-top">바 상단 내부 (inside-top)</option>
-          <option value="inside-center">바 정중앙 내부 (inside-center)</option>
-          <option value="inside-bottom">바 하단 내부 (inside-bottom)</option>
+          <option value="top-outside">상단 바깥 (top-outside)</option>
+          <option value="inside-top">상단 내부 (inside-top)</option>
+          <option value="inside-center">정중앙 내부 (inside-center)</option>
+          <option value="inside-bottom">하단 내부 (inside-bottom)</option>
           <option value="none">숨김 (none)</option>
         </select>
       </div>
 
-      <!-- 모서리 라운딩 -->
-      <div class="control-group">
+      <!-- 모서리 라운딩 (Bar 전용) -->
+      <div class="control-group" id="bar-radius-control">
         <label>모서리 둥글기: <span id="radius-val">6px</span></label>
         <input type="range" id="radius-range" min="0" max="16" value="6" step="1" />
       </div>
 
-      <!-- 바 두께 비율 -->
-      <div class="control-group">
+      <!-- 바 두께 비율 (Bar 전용) -->
+      <div class="control-group" id="bar-ratio-control">
         <label>바 너비 비율: <span id="ratio-val">65%</span></label>
         <input type="range" id="ratio-range" min="20" max="95" value="65" step="5" />
       </div>
 
-      <div class="control-group" style="margin-left: auto;">
+      <!-- 애니메이션 이징 -->
+      <div class="control-group">
+        <label>애니메이션 이징</label>
+        <select id="easing-select">
+          <option value="easeOutQuart">세련된 감속 (easeOutQuart)</option>
+          <option value="easeOutBack">탄성 바운스 (easeOutBack)</option>
+          <option value="easeOutExpo">역동적 질주 (easeOutExpo)</option>
+          <option value="easeOutCubic">부드러운 감속 (easeOutCubic)</option>
+          <option value="linear">등속 (linear)</option>
+        </select>
+      </div>
+
+      <!-- 범례 위치 -->
+      <div class="control-group" id="legend-pos-control">
+        <label>범례 (클릭 토글)</label>
+        <select id="legend-pos-select">
+          <option value="top">상단 (top)</option>
+          <option value="bottom">하단 (bottom)</option>
+          <option value="right">우측 (right)</option>
+          <option value="left">좌측 (left)</option>
+          <option value="none">숨김 (none)</option>
+        </select>
+      </div>
+
+      <div class="control-group" style="margin-left: auto; flex-direction: row; align-items: center; gap: 8px;">
+        <button class="btn" id="replay-anim-btn" style="background: #4F46E5; color: #FFFFFF; font-weight: 600;">
+          ▶️ 애니메이션 재생
+        </button>
         <button class="btn" id="reset-zoom-btn" style="border: 1px solid #334155; color: #F1F5F9;">
           🔍 줌 리셋
         </button>

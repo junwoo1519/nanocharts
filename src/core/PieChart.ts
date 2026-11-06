@@ -11,13 +11,17 @@
  */
 
 import type {
+  DataItem,
+  LegendItem,
   PieChartOptions,
   Padding,
   PieSliceGeometry,
 } from '../types';
 import { LayerManager } from './LayerManager';
 import { EventEmitter } from './EventEmitter';
+import { Animator } from './Animator';
 import { Tooltip } from '../components/Tooltip';
+import { Legend } from '../components/Legend';
 import { PieSeries } from '../series/PieSeries';
 
 export class PieChart extends EventEmitter {
@@ -25,6 +29,7 @@ export class PieChart extends EventEmitter {
   private options: PieChartOptions;
   private layerManager: LayerManager;
   private tooltip: Tooltip;
+  private legend: Legend;
   private pieSeries: PieSeries;
 
   private width: number = 0;
@@ -32,8 +37,14 @@ export class PieChart extends EventEmitter {
   private padding: Padding;
 
   private resizeObserver: ResizeObserver;
+  private animator: Animator = new Animator();
+  private hasRenderedOnce: boolean = false;
   private slices: PieSliceGeometry[] = [];
   private hoveredIndex: number | null = null;
+  /** 각 조각별 현재 호버 팝아웃 진행률 (0.0 ~ 1.0) */
+  private hoverRatios: number[] = [];
+  /** 호버 트랜지션 rAF 핸들 */
+  private hoverRafId: number | null = null;
 
   constructor(container: string | HTMLElement, options: PieChartOptions) {
     super();
@@ -56,6 +67,41 @@ export class PieChart extends EventEmitter {
     this.layerManager = new LayerManager(this.container);
     this.tooltip = new Tooltip(this.container, options.tooltip);
     this.pieSeries = new PieSeries(options.pie, options.labels, options.center);
+    this.legend = new Legend(
+      this.container,
+      this.resolveLegendOptions(options.legend),
+      {
+        onToggle: (item, active) => {
+          this.hoveredIndex = null;
+          this.tooltip.hide();
+          this.emit('legendToggle', { item, active });
+          this.render(true);
+        },
+        onHover: (legendItem) => {
+          if (!legendItem) {
+            if (this.hoveredIndex !== null) {
+              this.hoveredIndex = null;
+              this.startHoverTransition();
+            }
+            this.tooltip.hide();
+            return;
+          }
+          const sliceIdx = this.slices.findIndex(
+            (s) => this.getItemLegendKey(s.item, s.index) === legendItem.key
+          );
+          if (sliceIdx !== -1) {
+            this.hoveredIndex = sliceIdx;
+            this.startHoverTransition();
+            const targetSlice = this.slices[sliceIdx];
+            const tx = targetSlice.cx + Math.cos(targetSlice.midAngle) * (targetSlice.outerRadius * 0.85);
+            const ty = targetSlice.cy + Math.sin(targetSlice.midAngle) * (targetSlice.outerRadius * 0.85);
+            this.showSliceTooltip(tx, ty, targetSlice, sliceIdx);
+          }
+        },
+      },
+      true
+    );
+    this.syncLegend();
 
     this.setupInteractions();
 
@@ -63,38 +109,121 @@ export class PieChart extends EventEmitter {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         if (width > 0 && height > 0) {
-          this.resize(width, height);
+          if (width !== this.width || height !== this.height) {
+            this.resize(width, height);
+          }
         }
       }
     });
     this.resizeObserver.observe(this.container);
+
+    if (this.container.clientWidth > 0 && this.container.clientHeight > 0) {
+      this.resize(this.container.clientWidth, this.container.clientHeight);
+    }
   }
 
   public resize(width: number, height: number): void {
     this.width = width;
     this.height = height;
     this.layerManager.resize(width, height);
-    this.render();
+
+    const shouldAnimate = !this.hasRenderedOnce;
+    this.hasRenderedOnce = true;
+    this.render(shouldAnimate);
   }
 
-  public render(): void {
+  private resolveLegendOptions(legendOpt?: PieChartOptions['legend']) {
+    if (typeof legendOpt === 'boolean') {
+      return {
+        visible: legendOpt,
+        position: 'bottom' as const,
+        align: 'center' as const,
+        markerShape: 'circle' as const,
+      };
+    }
+    return {
+      position: 'bottom' as const,
+      align: 'center' as const,
+      markerShape: 'circle' as const,
+      ...legendOpt,
+    };
+  }
+
+  private getItemLegendKey(item: DataItem, fallbackIndex: number): string {
+    return String(item.id ?? item.label ?? fallbackIndex);
+  }
+
+  private syncLegend(): void {
+    const data = this.options.data || [];
+    const items: LegendItem[] = data.map((item, idx) => ({
+      key: this.getItemLegendKey(item, idx),
+      label: item.label,
+      color: this.pieSeries.resolveSliceColor(item, idx),
+      value: item.value,
+    }));
+    this.legend.setItems(items);
+  }
+
+  public render(animate: boolean = false): void {
     if (this.width <= 0 || this.height <= 0) return;
+
+    const rawData = this.options.data || [];
+    const activeData: DataItem[] = [];
+    rawData.forEach((item, idx) => {
+      const key = this.getItemLegendKey(item, idx);
+      if (this.legend.isKeyActive(key)) {
+        activeData.push({
+          ...item,
+          color: this.pieSeries.resolveSliceColor(item, idx),
+        });
+      }
+    });
+
+    const reserved = this.legend.getReservedPadding();
+    const effectivePadding: Padding = {
+      top: this.padding.top + (reserved.top ?? 0),
+      right: this.padding.right + (reserved.right ?? 0),
+      bottom: this.padding.bottom + (reserved.bottom ?? 0),
+      left: this.padding.left + (reserved.left ?? 0),
+    };
 
     // 조각 기하학 수치 재계산
     this.slices = this.pieSeries.calculateSlices(
-      this.options.data || [],
+      activeData,
       this.width,
       this.height,
-      this.padding
+      effectivePadding
     );
 
-    // 데이터 레이어 렌더링
-    const seriesCtx = this.layerManager.getContext('series');
-    this.layerManager.clear('series');
-    this.pieSeries.render(seriesCtx, this.slices, null);
+    if (this.hoverRatios.length !== this.slices.length) {
+      this.hoverRatios = new Array(this.slices.length).fill(0);
+    }
 
-    // 인터랙션 레이어 갱신
-    this.renderHoverState();
+    const seriesCtx = this.layerManager.getContext('series');
+
+    if (animate && this.options.animation !== false) {
+      this.stopHoverTransition();
+      this.hoverRatios.fill(0);
+      this.layerManager.clear('interaction');
+      this.animator.start(this.options.animation, (progress) => {
+        this.layerManager.clear('series');
+        this.pieSeries.render(seriesCtx, this.slices, this.hoverRatios, progress);
+        if (progress >= 1 && this.hoveredIndex !== null) {
+          this.startHoverTransition();
+        }
+      });
+    } else {
+      this.animator.cancel();
+      this.layerManager.clear('series');
+      this.pieSeries.render(seriesCtx, this.slices, this.hoverRatios, 1);
+    }
+  }
+
+  /**
+   * 현재 파이/도넛 차트에 대해 회전(Sweep) 애니메이션을 처음부터 다시 재생합니다.
+   */
+  public replayAnimation(): void {
+    this.render(true);
   }
 
   private setupInteractions(): void {
@@ -109,10 +238,29 @@ export class PieChart extends EventEmitter {
     });
 
     interactionCanvas.addEventListener('mouseleave', () => {
-      this.hoveredIndex = null;
-      this.layerManager.clear('interaction');
+      if (this.hoveredIndex !== null) {
+        this.hoveredIndex = null;
+        this.startHoverTransition();
+      }
+      this.legend.setHoveredKey(null);
       this.tooltip.hide();
     });
+  }
+
+  private showSliceTooltip(tx: number, ty: number, targetSlice: PieSliceGeometry, index: number): void {
+    if (this.options.tooltip?.formatter) {
+      this.tooltip.show(tx, ty, targetSlice.item, index);
+    } else {
+      this.tooltip.show(
+        tx,
+        ty,
+        {
+          ...targetSlice.item,
+          label: `${targetSlice.item.label} (${(targetSlice.percentage * 100).toFixed(1)}%)`,
+        },
+        index
+      );
+    }
   }
 
   /**
@@ -141,8 +289,10 @@ export class PieChart extends EventEmitter {
 
     for (let i = 0; i < this.slices.length; i++) {
       const slice = this.slices[i];
-      // 반지름 범위 검사 (도넛 구멍 안쪽이나 외곽 밖 제외)
-      if (distance >= slice.innerRadius && distance <= slice.outerRadius + 8) {
+      // 반지름 범위 검사 (도넛 구멍 안쪽이나 외곽 밖 제외, 팝아웃 여유 거리 포함)
+      const currentRatio = this.hoverRatios[i] ?? 0;
+      const extraRadius = (this.options.pie?.hoverExplode ?? 10) * currentRatio + 10;
+      if (distance >= slice.innerRadius && distance <= slice.outerRadius + extraRadius) {
         let sAngle = slice.startAngle;
         let eAngle = slice.endAngle;
 
@@ -160,65 +310,104 @@ export class PieChart extends EventEmitter {
       const targetSlice = this.slices[foundIndex];
       if (this.hoveredIndex !== foundIndex) {
         this.hoveredIndex = foundIndex;
-        this.renderHoverState();
+        this.startHoverTransition();
+        this.legend.setHoveredKey(this.getItemLegendKey(targetSlice.item, targetSlice.index));
         this.emit('hover', { item: targetSlice.item, index: foundIndex, slice: targetSlice });
       }
 
       // 툴팁 위치는 해당 조각의 외곽 중앙 쪽으로 표시
-      const tooltipRadius = targetSlice.outerRadius * 0.85;
+      const currentRatio = this.hoverRatios[foundIndex] ?? 0;
+      const explodeOffset = (this.options.pie?.hoverExplode ?? 10) * currentRatio;
+      const tooltipRadius = targetSlice.outerRadius * 0.82 + explodeOffset;
       const tx = cx + Math.cos(targetSlice.midAngle) * tooltipRadius;
       const ty = cy + Math.sin(targetSlice.midAngle) * tooltipRadius;
 
-      if (this.options.tooltip?.formatter) {
-        this.tooltip.show(tx, ty, targetSlice.item, foundIndex);
-      } else {
-        // 기본 파이 차트 툴팁 (퍼센트 포함)
-        this.tooltip.show(tx, ty, {
-          ...targetSlice.item,
-          label: `${targetSlice.item.label} (${(targetSlice.percentage * 100).toFixed(1)}%)`,
-        }, foundIndex);
-      }
+      this.showSliceTooltip(tx, ty, targetSlice, foundIndex);
     } else {
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null;
-        this.layerManager.clear('interaction');
+        this.startHoverTransition();
+        this.legend.setHoveredKey(null);
         this.tooltip.hide();
       }
     }
   }
 
   /**
-   * 호버된 조각을 인터랙션 레이어에 살짝 바깥쪽으로 팝아웃(Explode)시켜 그립니다.
+   * 각 조각의 호버 비율(`hoverRatios[i]`)을 목표 상태(`0` 또는 `1`)로
+   * 매 프레임 부드럽게 보간(Lerp)하여 팝아웃/복귀 애니메이션을 구동합니다.
    */
-  private renderHoverState(): void {
-    this.layerManager.clear('interaction');
-    if (this.hoveredIndex === null) return;
+  private startHoverTransition(): void {
+    if (this.animator.isAnimating()) return;
+    if (this.hoverRafId !== null) return;
 
-    const slice = this.slices[this.hoveredIndex];
-    if (!slice) return;
+    const step = () => {
+      let needsMoreFrames = false;
+      const smoothing = 0.22; // 60fps 기준 약 180~220ms 동안 부드럽게 감속 수렴
 
-    const ctx = this.layerManager.getContext('interaction');
-    // 호버된 조각 팝아웃 렌더링
-    this.pieSeries.drawSingleSlice(ctx, slice, true);
+      for (let i = 0; i < this.slices.length; i++) {
+        const target = this.hoveredIndex === i ? 1 : 0;
+        const current = this.hoverRatios[i] ?? 0;
+        const diff = target - current;
+
+        if (Math.abs(diff) > 0.004) {
+          this.hoverRatios[i] = current + diff * smoothing;
+          needsMoreFrames = true;
+        } else {
+          this.hoverRatios[i] = target;
+        }
+      }
+
+      const seriesCtx = this.layerManager.getContext('series');
+      this.layerManager.clear('series');
+      this.pieSeries.render(seriesCtx, this.slices, this.hoverRatios, 1);
+
+      if (needsMoreFrames) {
+        this.hoverRafId = requestAnimationFrame(step);
+      } else {
+        this.hoverRafId = null;
+      }
+    };
+
+    this.hoverRafId = requestAnimationFrame(step);
+  }
+
+  private stopHoverTransition(): void {
+    if (this.hoverRafId !== null) {
+      cancelAnimationFrame(this.hoverRafId);
+      this.hoverRafId = null;
+    }
   }
 
   public update(options: Partial<PieChartOptions>): void {
+    const hasNewData = Boolean(options.data);
     if (options.data) this.options.data = options.data;
+    if (options.animation !== undefined) this.options.animation = options.animation;
     if (options.pie || options.labels || options.center) {
       if (options.pie) this.options.pie = { ...this.options.pie, ...options.pie };
       if (options.labels) this.options.labels = { ...this.options.labels, ...options.labels };
       if (options.center) this.options.center = { ...this.options.center, ...options.center };
       this.pieSeries = new PieSeries(this.options.pie, this.options.labels, this.options.center);
     }
+    if (options.legend !== undefined) {
+      this.options.legend = options.legend;
+      this.legend.updateOptions(this.resolveLegendOptions(options.legend), true);
+    }
+    if (hasNewData || options.pie || options.legend !== undefined) {
+      this.syncLegend();
+    }
     if (options.padding) this.padding = { ...this.padding, ...options.padding };
 
-    this.render();
+    this.render(hasNewData);
   }
 
   public destroy(): void {
+    this.animator.cancel();
+    this.stopHoverTransition();
     this.resizeObserver.disconnect();
     this.layerManager.destroy();
     this.tooltip.destroy();
+    this.legend.destroy();
     this.clear();
   }
 }

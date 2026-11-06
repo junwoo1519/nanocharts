@@ -16,7 +16,7 @@ import {
 } from '../types';
 
 /** 기본 모던 컬러 팔레트 */
-const DEFAULT_PALETTE = [
+export const DEFAULT_PALETTE = [
   '#6366F1', // Indigo
   '#06B6D4', // Cyan
   '#10B981', // Emerald
@@ -50,6 +50,20 @@ export class PieSeries {
       ...labelOptions,
     };
     this.centerOptions = centerOptions;
+  }
+
+  /**
+   * 데이터 항목의 채우기 색상을 결정합니다.
+   */
+  public resolveSliceColor(item: DataItem, index: number): string {
+    if (item.color) return item.color;
+    if (typeof this.styleOptions.colors === 'function') {
+      return this.styleOptions.colors(item, index);
+    }
+    if (Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0) {
+      return this.styleOptions.colors[index % this.styleOptions.colors.length];
+    }
+    return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
 
   /**
@@ -94,16 +108,7 @@ export class PieSeries {
       const midAngle = currentAngle + sweepAngle / 2;
 
       // 색상 결정
-      let color = item.color;
-      if (!color) {
-        if (typeof this.styleOptions.colors === 'function') {
-          color = this.styleOptions.colors(item, index);
-        } else if (Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0) {
-          color = this.styleOptions.colors[index % this.styleOptions.colors.length];
-        } else {
-          color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
-        }
-      }
+      const color = this.resolveSliceColor(item, index);
 
       slices.push({
         startAngle,
@@ -127,69 +132,129 @@ export class PieSeries {
 
   /**
    * 데이터 레이어: 전체 파이/도넛 조각 및 라벨 렌더링
+   * 
+   * @param hoverState 현재 호버된 조각 인덱스(`number | null`) 또는 조각별 호버 진행률 배열(`number[]`, 0.0 ~ 1.0)
+   * @param progress 최초 등장 애니메이션 진행률 (0.0 ~ 1.0, 기본값: 1)
    */
   render(
     ctx: CanvasRenderingContext2D,
     slices: PieSliceGeometry[],
-    hoveredIndex: number | null
+    hoverState: number | null | number[],
+    progress: number = 1
   ): void {
     if (slices.length === 0) return;
 
     ctx.save();
 
-    // 1. 모든 조각 그리기 (호버된 조각은 살짝 팝아웃 오프셋 적용)
+    const clampedProgress = Math.max(0, Math.min(1, progress));
+    // 12시 방향(-PI/2)부터 시계 방향으로 360도 회전하며 펼쳐지는 최대 각도
+    const maxSweepAngle = -Math.PI / 2 + clampedProgress * Math.PI * 2;
+    // 반지름도 85% -> 100%로 부드럽게 확장
+    const radiusScale = progress >= 1 ? 1 : 0.85 + 0.15 * progress;
+
+    const resolveHoverRatio = (index: number): number => {
+      if (progress < 1) return 0;
+      if (Array.isArray(hoverState)) return hoverState[index] ?? 0;
+      return hoverState === index ? 1 : 0;
+    };
+
+    // 1. 일반 조각들을 먼저 그리고, 호버 애니메이션 중인 조각은 가장 위에 그려 그림자/경계선이 가려지지 않게 처리
+    const activeIndices: number[] = [];
+
     slices.forEach((slice, i) => {
-      const isHovered = hoveredIndex === i;
-      this.drawSingleSlice(ctx, slice, isHovered);
+      if (progress < 1 && slice.startAngle >= maxSweepAngle) return;
+
+      const hoverRatio = resolveHoverRatio(i);
+      if (hoverRatio > 0.01) {
+        activeIndices.push(i);
+        return;
+      }
+
+      const animatedSlice: PieSliceGeometry =
+        progress >= 1
+          ? slice
+          : {
+              ...slice,
+              endAngle: Math.min(slice.endAngle, maxSweepAngle),
+              innerRadius: slice.innerRadius * radiusScale,
+              outerRadius: slice.outerRadius * radiusScale,
+            };
+
+      this.drawSingleSlice(ctx, animatedSlice, 0);
     });
 
-    // 2. 도넛 중앙 텍스트 렌더링 (innerRadius가 있을 때)
-    if (slices[0] && slices[0].innerRadius > 15) {
-      this.drawCenterContent(ctx, slices);
+    // 호버 중인 조각들을 최상단에 렌더링
+    for (const idx of activeIndices) {
+      this.drawSingleSlice(ctx, slices[idx], resolveHoverRatio(idx));
     }
 
-    // 3. 데이터 라벨 렌더링
-    if (this.labelOptions?.visible) {
-      this.drawLabels(ctx, slices);
+    const textAlpha = progress >= 1 ? 1 : Math.max(0, Math.min(1, (progress - 0.55) / 0.45));
+
+    if (textAlpha > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = textAlpha;
+
+      // 2. 도넛 중앙 텍스트 렌더링 (innerRadius가 있을 때)
+      if (slices[0] && slices[0].innerRadius > 15) {
+        this.drawCenterContent(ctx, slices);
+      }
+
+      // 3. 데이터 라벨 렌더링 (호버 오프셋 동기화)
+      if (this.labelOptions?.visible) {
+        this.drawLabels(ctx, slices, resolveHoverRatio);
+      }
+
+      ctx.restore();
     }
 
     ctx.restore();
   }
 
   /**
-   * 단일 파이/도넛 조각 그리기 (호버 Explode 오프셋 지원)
+   * 단일 파이/도넛 조각 그리기 (연속적인 호버 Explode 진행률 및 스케일/글로우 지원)
+   * 
+   * @param hoverInput `boolean` 또는 `0.0 ~ 1.0` 사이의 호버 애니메이션 진행률
    */
   drawSingleSlice(
     ctx: CanvasRenderingContext2D,
     slice: PieSliceGeometry,
-    isHovered: boolean
+    hoverInput: boolean | number = 0
   ): void {
     const { startAngle, endAngle, innerRadius, outerRadius, midAngle, cx, cy, color } = slice;
     if (endAngle <= startAngle) return;
 
-    // 호버 시 중심에서 바깥쪽으로 이동할 오프셋 벡터 계산
-    let offsetX = 0;
-    let offsetY = 0;
-    if (isHovered) {
-      const explodeDist = this.styleOptions.hoverExplode ?? 8;
-      offsetX = Math.cos(midAngle) * explodeDist;
-      offsetY = Math.sin(midAngle) * explodeDist;
-    }
+    const hoverRatio =
+      typeof hoverInput === 'boolean' ? (hoverInput ? 1 : 0) : Math.max(0, Math.min(1.2, hoverInput));
+
+    // 호버 시 중심에서 바깥쪽으로 이동할 오프셋 벡터 및 외곽 반지름 확장 계산
+    const explodeDist = (this.styleOptions.hoverExplode ?? 10) * hoverRatio;
+    const offsetX = Math.cos(midAngle) * explodeDist;
+    const offsetY = Math.sin(midAngle) * explodeDist;
+    const currentOuterRadius = outerRadius + 4 * hoverRatio;
 
     const currentCx = cx + offsetX;
     const currentCy = cy + offsetY;
 
     ctx.save();
+
+    // 호버 정도에 비례하는 부드러운 글로우 드롭섀도우 효과
+    if (hoverRatio > 0.02) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 16 * hoverRatio;
+      ctx.shadowOffsetX = offsetX * 0.35;
+      ctx.shadowOffsetY = offsetY * 0.35;
+    }
+
     ctx.beginPath();
 
     if (innerRadius <= 0) {
       // 1. 순수 파이 차트 (부채꼴)
       ctx.moveTo(currentCx, currentCy);
-      ctx.arc(currentCx, currentCy, outerRadius, startAngle, endAngle, false);
+      ctx.arc(currentCx, currentCy, currentOuterRadius, startAngle, endAngle, false);
       ctx.closePath();
     } else {
       // 2. 도넛 차트 (도넛 링 형태: 외곽 아크 -> 안쪽 역방향 아크)
-      ctx.arc(currentCx, currentCy, outerRadius, startAngle, endAngle, false);
+      ctx.arc(currentCx, currentCy, currentOuterRadius, startAngle, endAngle, false);
       ctx.arc(currentCx, currentCy, innerRadius, endAngle, startAngle, true);
       ctx.closePath();
     }
@@ -197,9 +262,17 @@ export class PieSeries {
     ctx.fillStyle = color;
     ctx.fill();
 
-    // 테두리
+    // 그림자가 테두리에는 중복 적용되지 않도록 초기화
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+
+    // 기본 테두리 또는 호버 하이라이트 테두리
     const border = this.styleOptions.border;
-    if (border && border.width && border.width > 0) {
+    if (hoverRatio > 0.05) {
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, hoverRatio)})`;
+      ctx.lineWidth = 1.5 * Math.min(1, hoverRatio);
+      ctx.stroke();
+    } else if (border && border.width && border.width > 0) {
       ctx.strokeStyle = border.color || '#151C2C';
       ctx.lineWidth = border.width;
       ctx.stroke();
@@ -261,7 +334,8 @@ export class PieSeries {
    */
   private drawLabels(
     ctx: CanvasRenderingContext2D,
-    slices: PieSliceGeometry[]
+    slices: PieSliceGeometry[],
+    resolveHoverRatio?: (index: number) => number
   ): void {
     const opts = this.labelOptions!;
     if (opts.position === 'none') return;
@@ -269,11 +343,20 @@ export class PieSeries {
     ctx.save();
     ctx.font = opts.font || '600 11px Pretendard, -apple-system, sans-serif';
 
-    slices.forEach((slice) => {
+    slices.forEach((slice, idx) => {
       // 5% 미만의 너무 작은 조각은 라벨 겹침 방지를 위해 스킵
       if (slice.percentage < 0.04) return;
 
-      const { midAngle, innerRadius, outerRadius, cx, cy, item, percentage } = slice;
+      const hoverRatio = resolveHoverRatio ? resolveHoverRatio(idx) : 0;
+      const explodeDist = (this.styleOptions.hoverExplode ?? 10) * hoverRatio;
+      const offsetX = Math.cos(slice.midAngle) * explodeDist;
+      const offsetY = Math.sin(slice.midAngle) * explodeDist;
+
+      const { midAngle, innerRadius, item, percentage } = slice;
+      const outerRadius = slice.outerRadius + 4 * hoverRatio;
+      const cx = slice.cx + offsetX;
+      const cy = slice.cy + offsetY;
+
       const text = opts.formatter
         ? opts.formatter(item, percentage)
         : `${item.label} ${(percentage * 100).toFixed(0)}%`;

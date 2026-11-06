@@ -1,32 +1,115 @@
-import { BarChart } from '../src';
-import type { DataItem, BarChartOptions, LabelPosition } from '../src';
+import { BarChart, LineChart, PieChart } from '../src';
+import type {
+  DataItem,
+  BarChartOptions,
+  LineChartOptions,
+  PieChartOptions,
+  BarSeriesDataset,
+  LineSeriesDataset,
+  BarGroupMode,
+  LabelPosition,
+  LineCurveType,
+  EasingType,
+  LegendPosition,
+  LegendOptions,
+} from '../src';
+
+type ChartMode = 'bar' | 'line' | 'pie';
+type SeriesMode = 'single' | 'grouped' | 'stacked' | 'percent';
+type ThemeType = 'indigo-purple' | 'cyber-cyan' | 'conditional' | 'warm-orange';
 
 // 1. 더미 데이터 생성기
 function generateData(count: number): DataItem[] {
-  const categories = ['Frontend', 'Backend', 'DevOps', 'Mobile', 'AI/ML', 'Cloud', 'Data', 'Security', 'QA', 'Design'];
+  const categories = ['Frontend', 'Backend', 'AI/ML', 'Cloud', 'Design'];
   const data: DataItem[] = [];
 
   for (let i = 0; i < count; i++) {
     const cat = categories[i % categories.length];
     const label = count <= 30 ? `${cat} #${i + 1}` : `#${i + 1}`;
-    // 부드러운 사인 곡선 + 랜덤 노이즈
-    const base = Math.sin(i * 0.1) * 35 + 50;
-    const noise = Math.random() * 20 - 10;
-    const value = Math.max(5, Math.round(base + noise));
+    const base = Math.sin(i * 0.12) * 32 + 52;
+    const noise = Math.random() * 18 - 9;
+    const value = Math.max(8, Math.round(base + noise));
 
     data.push({
       id: i,
       label,
       value,
+      category: cat,
     });
   }
   return data;
 }
 
-// 2. 테마 프리셋 정의
-type ThemeType = 'indigo-purple' | 'cyber-cyan' | 'conditional' | 'warm-orange';
+function generateMultiBarSeries(count: number): { xLabels: string[]; series: BarSeriesDataset[] } {
+  const xLabels: string[] = [];
+  const s1: number[] = [];
+  const s2: number[] = [];
+  const s3: number[] = [];
 
-function getThemeOptions(theme: ThemeType, radius: number, widthRatio: number) {
+  for (let i = 0; i < count; i++) {
+    xLabels.push(count <= 24 ? `${i + 1}일` : `#${i + 1}`);
+    s1.push(Math.max(12, Math.round(Math.sin(i * 0.25) * 25 + 48 + (Math.random() * 10 - 5))));
+    s2.push(Math.max(10, Math.round(Math.cos(i * 0.22) * 20 + 36 + (Math.random() * 10 - 5))));
+    s3.push(Math.max(8, Math.round(Math.sin(i * 0.18 + 1.2) * 18 + 28 + (Math.random() * 8 - 4))));
+  }
+
+  return {
+    xLabels,
+    series: [
+      {
+        name: 'Frontend',
+        data: s1,
+        color: { type: 'linear', from: '#6366F1', to: '#4F46E5', direction: 'vertical' },
+      },
+      {
+        name: 'Backend',
+        data: s2,
+        color: { type: 'linear', from: '#10B981', to: '#059669', direction: 'vertical' },
+      },
+      {
+        name: 'AI / Cloud',
+        data: s3,
+        color: { type: 'linear', from: '#F59E0B', to: '#D97706', direction: 'vertical' },
+      },
+    ],
+  };
+}
+
+function generateMultiLineSeries(count: number): { xLabels: string[]; series: LineSeriesDataset[] } {
+  const xLabels: string[] = [];
+  const s1: number[] = [];
+  const s2: number[] = [];
+  const s3: number[] = [];
+
+  for (let i = 0; i < count; i++) {
+    xLabels.push(count <= 24 ? `${i + 1}일` : `#${i + 1}`);
+    s1.push(Math.max(15, Math.round(Math.sin(i * 0.2) * 28 + 55 + (Math.random() * 8 - 4))));
+    s2.push(Math.max(12, Math.round(Math.cos(i * 0.18) * 22 + 42 + (Math.random() * 8 - 4))));
+    s3.push(Math.max(10, Math.round(Math.sin(i * 0.15 + 1.5) * 18 + 30 + (Math.random() * 6 - 3))));
+  }
+
+  return {
+    xLabels,
+    series: [
+      { name: '모바일 트래픽', data: s1, color: '#6366F1' },
+      { name: '데스크톱 트래픽', data: s2, color: '#22D3EE' },
+      { name: 'API 호출량', data: s3, color: '#F43F5E', dash: [6, 4] },
+    ],
+  };
+}
+
+function generatePieData(): DataItem[] {
+  return [
+    { label: 'Frontend', value: 38 },
+    { label: 'Backend', value: 27 },
+    { label: 'AI / Data', value: 18 },
+    { label: 'Cloud / DevOps', value: 11 },
+    { label: 'Design System', value: 6 },
+  ];
+}
+
+// 2. Bar 테마 프리셋
+function getBarThemeOptions(theme: ThemeType, radius: number, widthRatio: number) {
   const borderRadius = [radius, radius, 0, 0];
 
   switch (theme) {
@@ -75,7 +158,6 @@ function getThemeOptions(theme: ThemeType, radius: number, widthRatio: number) {
       return {
         widthRatio,
         borderRadius,
-        // 조건부 색상: 70 이상이면 에메랄드 그린, 35 미만이면 레드, 중간은 슬레이트 블루
         fill: (item: DataItem) => {
           if (item.value >= 70) return '#10B981';
           if (item.value < 35) return '#EF4444';
@@ -99,73 +181,348 @@ function getThemeOptions(theme: ThemeType, radius: number, widthRatio: number) {
   }
 }
 
-// 3. 상태 관리 및 차트 초기화
+// 3. Line 테마 프리셋
+function getLineThemeOptions(theme: ThemeType, curve: LineCurveType) {
+  switch (theme) {
+    case 'indigo-purple':
+      return {
+        line: {
+          color: { type: 'linear' as const, from: '#818CF8', to: '#C084FC', direction: 'horizontal' as const },
+          width: 2.5,
+          curve,
+        },
+        area: {
+          visible: true,
+          fill: {
+            type: 'linear' as const,
+            from: 'rgba(99, 102, 241, 0.45)',
+            to: 'rgba(147, 51, 234, 0.0)',
+            direction: 'vertical' as const,
+          },
+        },
+        points: {
+          visible: true,
+          radius: 4,
+          hoverRadius: 6,
+          borderColor: '#818CF8',
+        },
+      };
+
+    case 'cyber-cyan':
+      return {
+        line: {
+          color: '#22D3EE',
+          width: 2.5,
+          curve,
+        },
+        area: {
+          visible: true,
+          fill: {
+            type: 'linear' as const,
+            from: 'rgba(6, 182, 212, 0.42)',
+            to: 'rgba(2, 132, 199, 0.0)',
+            direction: 'vertical' as const,
+          },
+        },
+        points: {
+          visible: true,
+          radius: 4,
+          hoverRadius: 6,
+          borderColor: '#22D3EE',
+        },
+      };
+
+    case 'conditional':
+      return {
+        line: {
+          color: '#10B981',
+          width: 2.5,
+          curve,
+        },
+        area: {
+          visible: true,
+          fill: {
+            type: 'linear' as const,
+            from: 'rgba(16, 185, 129, 0.38)',
+            to: 'rgba(16, 185, 129, 0.0)',
+            direction: 'vertical' as const,
+          },
+        },
+        points: {
+          visible: true,
+          radius: 4.5,
+          hoverRadius: 6.5,
+          borderColor: (item: DataItem) => {
+            if (item.value >= 70) return '#10B981';
+            if (item.value < 35) return '#EF4444';
+            return '#6366F1';
+          },
+        },
+      };
+
+    case 'warm-orange':
+      return {
+        line: {
+          color: { type: 'linear' as const, from: '#FB923C', to: '#F43F5E', direction: 'horizontal' as const },
+          width: 2.5,
+          curve,
+        },
+        area: {
+          visible: true,
+          fill: {
+            type: 'linear' as const,
+            from: 'rgba(249, 115, 22, 0.42)',
+            to: 'rgba(225, 29, 72, 0.0)',
+            direction: 'vertical' as const,
+          },
+        },
+        points: {
+          visible: true,
+          radius: 4,
+          hoverRadius: 6,
+          borderColor: '#FB923C',
+        },
+      };
+  }
+}
+
+// 4. 상태 변수
+let currentMode: ChartMode = 'bar';
+let currentSeriesMode: SeriesMode = 'single';
 let currentCount = 20;
 let currentTheme: ThemeType = 'indigo-purple';
 let currentLabelPos: LabelPosition = 'top-outside';
 let currentRadius = 6;
 let currentWidthRatio = 0.65;
+let currentCurve: LineCurveType = 'smooth';
+let currentHoleRatio = 0.6;
+let currentEasing: EasingType = 'easeOutQuart';
+let currentLegendPos: LegendPosition | 'none' = 'top';
 
-const data = generateData(currentCount);
-
-const chartOptions: BarChartOptions = {
-  data,
-  padding: {
-    top: 36,
-    right: 20,
-    bottom: 40,
-    left: 45,
-  },
-  bar: getThemeOptions(currentTheme, currentRadius, currentWidthRatio),
-  labels: {
+function getLegendConfig(): LegendOptions {
+  if (currentLegendPos === 'none') {
+    return { visible: false };
+  }
+  return {
     visible: true,
-    position: currentLabelPos,
-    font: '600 11px Pretendard, sans-serif',
-    color: '#94A3B8',
-    formatter: (val) => `${val}`,
-  },
-  grid: {
-    y: { visible: true, color: '#1E293B', lineWidth: 1, lineDash: [3, 3] },
-  },
-  xAxis: {
-    font: '11px Pretendard, sans-serif',
-    labelColor: '#64748B',
-    color: '#1E293B',
-  },
-  yAxis: {
-    font: '11px Pretendard, sans-serif',
-    labelColor: '#64748B',
-    formatter: (v) => `${v}`,
-  },
-  zoom: {
-    enabled: true,
-    minPoints: 5,
-  },
-  pan: {
-    enabled: true,
-  },
-};
+    position: currentLegendPos,
+    align: currentLegendPos === 'top' || currentLegendPos === 'bottom' ? 'center' : 'center',
+    markerShape: currentMode === 'pie' ? 'circle' : 'rounded',
+    interactive: true,
+  };
+}
+
+let currentData = generateData(currentCount);
+let currentMultiBar = generateMultiBarSeries(currentCount);
+let currentMultiLine = generateMultiLineSeries(currentCount);
+
+let barChart: BarChart | null = null;
+let lineChart: LineChart | null = null;
+let pieChart: PieChart | null = null;
 
 const renderTimeEl = document.getElementById('render-time-text')!;
 const totalCountEl = document.getElementById('total-count-text')!;
+const wrapperEl = document.getElementById('chart-wrapper')!;
 
-// 렌더링 시간 측정 래퍼
 function measureRender(callback: () => void) {
   const t0 = performance.now();
   callback();
   const t1 = performance.now();
-  const diff = (t1 - t0).toFixed(2);
-  renderTimeEl.innerText = `${diff}ms`;
+  renderTimeEl.innerText = `${(t1 - t0).toFixed(2)}ms`;
 }
 
-// 차트 인스턴스 생성
-let chart: BarChart;
-measureRender(() => {
-  chart = new BarChart('#chart-wrapper', chartOptions);
-});
-totalCountEl.innerText = `${currentCount}`;
+function destroyActiveChart() {
+  if (barChart) {
+    barChart.destroy();
+    barChart = null;
+  }
+  if (lineChart) {
+    lineChart.destroy();
+    lineChart = null;
+  }
+  if (pieChart) {
+    pieChart.destroy();
+    pieChart = null;
+  }
+  wrapperEl.innerHTML = '';
+}
 
-// 4. UI 컨트롤러 바인딩
+function updateControlsVisibility() {
+  const isBar = currentMode === 'bar';
+  const isLine = currentMode === 'line';
+  const isPie = currentMode === 'pie';
+
+  document.getElementById('series-mode-control')!.style.display = isPie ? 'none' : '';
+  document.getElementById('data-size-control')!.style.display = isPie ? 'none' : '';
+  document.getElementById('theme-control')!.style.display = isPie ? 'none' : '';
+  document.getElementById('line-curve-control')!.style.display = isLine ? '' : 'none';
+  document.getElementById('pie-hole-control')!.style.display = isPie ? '' : 'none';
+  document.getElementById('label-pos-control')!.style.display = isPie ? 'none' : '';
+  document.getElementById('bar-radius-control')!.style.display = isBar ? '' : 'none';
+  document.getElementById('bar-ratio-control')!.style.display = isBar ? '' : 'none';
+  document.getElementById('reset-zoom-btn')!.style.display = isPie ? 'none' : '';
+}
+
+function mountChart() {
+  destroyActiveChart();
+  updateControlsVisibility();
+
+  const animConfig = {
+    enabled: true,
+    duration: 680,
+    easing: currentEasing,
+  };
+
+  const isMulti = currentSeriesMode !== 'single';
+
+  if (currentMode === 'bar') {
+    const barMode: BarGroupMode =
+      currentSeriesMode === 'stacked'
+        ? 'stacked'
+        : currentSeriesMode === 'percent'
+          ? 'percent'
+          : 'grouped';
+
+    const options: BarChartOptions = {
+      data: isMulti ? undefined : currentData,
+      series: isMulti ? currentMultiBar.series : undefined,
+      xLabels: isMulti ? currentMultiBar.xLabels : undefined,
+      padding: { top: 36, right: 20, bottom: 40, left: 45 },
+      bar: {
+        ...getBarThemeOptions(currentTheme, currentRadius, currentWidthRatio),
+        mode: barMode,
+      },
+      legend: getLegendConfig(),
+      animation: animConfig,
+      labels: {
+        visible: currentLabelPos !== 'none',
+        position: currentLabelPos,
+        font: '600 11px Pretendard, sans-serif',
+        color: '#94A3B8',
+        formatter: barMode === 'percent' ? undefined : (val) => `${val}`,
+      },
+      grid: {
+        y: { visible: true, color: '#1E293B', lineWidth: 1, lineDash: [3, 3] },
+      },
+      xAxis: {
+        font: '11px Pretendard, sans-serif',
+        labelColor: '#64748B',
+        color: '#1E293B',
+      },
+      yAxis: {
+        font: '11px Pretendard, sans-serif',
+        labelColor: '#64748B',
+        formatter: (v) => (barMode === 'percent' ? `${v}%` : `${v}`),
+      },
+      zoom: { enabled: true, minPoints: 5 },
+      pan: { enabled: true },
+    };
+
+    measureRender(() => {
+      barChart = new BarChart('#chart-wrapper', options);
+    });
+    totalCountEl.innerText = isMulti ? `${currentCount} × ${currentMultiBar.series.length}` : `${currentData.length}`;
+  } else if (currentMode === 'line') {
+    const lineTheme = getLineThemeOptions(currentTheme, currentCurve);
+    const isStackedLine = currentSeriesMode === 'stacked' || currentSeriesMode === 'percent';
+
+    const options: LineChartOptions = {
+      data: isMulti ? undefined : currentData,
+      series: isMulti ? currentMultiLine.series : undefined,
+      xLabels: isMulti ? currentMultiLine.xLabels : undefined,
+      stacked: isMulti && isStackedLine,
+      padding: { top: 36, right: 20, bottom: 40, left: 45 },
+      line: lineTheme.line,
+      area: lineTheme.area,
+      points: lineTheme.points,
+      legend: getLegendConfig(),
+      animation: animConfig,
+      labels: {
+        visible: currentLabelPos !== 'none',
+        position: currentLabelPos,
+        font: '600 11px Pretendard, sans-serif',
+        color: '#94A3B8',
+        formatter: (val) => `${val}`,
+      },
+      crosshair: {
+        enabled: true,
+        vertical: true,
+        horizontal: true,
+      },
+      grid: {
+        y: { visible: true, color: '#1E293B', lineWidth: 1, lineDash: [3, 3] },
+      },
+      xAxis: {
+        font: '11px Pretendard, sans-serif',
+        labelColor: '#64748B',
+        color: '#1E293B',
+      },
+      yAxis: {
+        font: '11px Pretendard, sans-serif',
+        labelColor: '#64748B',
+        formatter: (v) => `${v}`,
+      },
+      zoom: { enabled: true, minPoints: 5 },
+      pan: { enabled: true },
+    };
+
+    measureRender(() => {
+      lineChart = new LineChart('#chart-wrapper', options);
+    });
+    totalCountEl.innerText = isMulti ? `${currentCount} × ${currentMultiLine.series.length}` : `${currentData.length}`;
+  } else {
+    const pieData = generatePieData();
+    const options: PieChartOptions = {
+      data: pieData,
+      legend: getLegendConfig(),
+      animation: animConfig,
+      pie: {
+        innerRadiusRatio: currentHoleRatio,
+        padAngle: 0.025,
+        hoverExplode: 10,
+      },
+      center:
+        currentHoleRatio >= 0.35
+          ? {
+              title: (_d, total) => `${total}%`,
+              subtitle: '전체 리소스 비중',
+            }
+          : undefined,
+      labels: {
+        visible: true,
+        position: 'outside',
+      },
+    };
+
+    measureRender(() => {
+      pieChart = new PieChart('#chart-wrapper', options);
+    });
+    totalCountEl.innerText = `${pieData.length}`;
+  }
+}
+
+// 초기 마운트
+mountChart();
+
+// 5. UI 이벤트 바인딩
+
+// 차트 타입 버튼
+const chartTypeGroup = document.getElementById('chart-type-group')!;
+chartTypeGroup.querySelectorAll('button').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    chartTypeGroup.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = (btn.dataset.type as ChartMode) || 'bar';
+    mountChart();
+  });
+});
+
+// 시리즈 구성 모드 셀렉트 (Single / Grouped / Stacked / Percent)
+const seriesModeSelect = document.getElementById('series-mode-select') as HTMLSelectElement;
+seriesModeSelect.addEventListener('change', () => {
+  currentSeriesMode = seriesModeSelect.value as SeriesMode;
+  mountChart();
+});
 
 // 데이터 규모 버튼
 const dataSizeGroup = document.getElementById('data-size-group')!;
@@ -175,10 +532,12 @@ dataSizeGroup.querySelectorAll('button').forEach((btn) => {
     btn.classList.add('active');
 
     currentCount = parseInt(btn.dataset.size || '20', 10);
-    const newData = generateData(currentCount);
-    totalCountEl.innerText = `${currentCount}`;
+    currentData = generateData(currentCount);
+    currentMultiBar = generateMultiBarSeries(currentCount);
+    currentMultiLine = generateMultiLineSeries(currentCount);
+    const isMulti = currentSeriesMode !== 'single';
+    totalCountEl.innerText = isMulti ? `${currentCount} × 3` : `${currentCount}`;
 
-    // 500개 이상 대용량일 경우 기본 라벨은 숨기거나 top-outside로 설정
     const shouldShowLabels = currentCount <= 50;
     if (!shouldShowLabels && currentLabelPos !== 'none') {
       (document.getElementById('label-pos-select') as HTMLSelectElement).value = 'none';
@@ -186,14 +545,21 @@ dataSizeGroup.querySelectorAll('button').forEach((btn) => {
     }
 
     measureRender(() => {
-      chart.update({
-        data: newData,
-        labels: {
-          visible: currentLabelPos !== 'none',
-          position: currentLabelPos,
-        },
-      });
-      chart.resetZoom();
+      if (barChart) {
+        barChart.update({
+          data: isMulti ? undefined : currentData,
+          series: isMulti ? currentMultiBar.series : undefined,
+          xLabels: isMulti ? currentMultiBar.xLabels : undefined,
+          labels: { visible: currentLabelPos !== 'none', position: currentLabelPos },
+        });
+      } else if (lineChart) {
+        lineChart.update({
+          data: isMulti ? undefined : currentData,
+          series: isMulti ? currentMultiLine.series : undefined,
+          xLabels: isMulti ? currentMultiLine.xLabels : undefined,
+          labels: { visible: currentLabelPos !== 'none', position: currentLabelPos },
+        });
+      }
     });
   });
 });
@@ -203,9 +569,54 @@ const themeSelect = document.getElementById('theme-select') as HTMLSelectElement
 themeSelect.addEventListener('change', () => {
   currentTheme = themeSelect.value as ThemeType;
   measureRender(() => {
-    chart.update({
-      bar: getThemeOptions(currentTheme, currentRadius, currentWidthRatio),
-    });
+    if (barChart) {
+      barChart.update({
+        bar: getBarThemeOptions(currentTheme, currentRadius, currentWidthRatio),
+      });
+    } else if (lineChart) {
+      const lineTheme = getLineThemeOptions(currentTheme, currentCurve);
+      lineChart.update({
+        line: lineTheme.line,
+        area: lineTheme.area,
+        points: lineTheme.points,
+      });
+    }
+  });
+});
+
+// 라인 곡선 보간 셀렉트
+const curveSelect = document.getElementById('curve-select') as HTMLSelectElement;
+curveSelect.addEventListener('change', () => {
+  currentCurve = curveSelect.value as LineCurveType;
+  measureRender(() => {
+    if (lineChart) {
+      lineChart.update({
+        line: { curve: currentCurve },
+      });
+    }
+  });
+});
+
+// 도넛 내부 반지름 슬라이더
+const holeRange = document.getElementById('hole-range') as HTMLInputElement;
+const holeVal = document.getElementById('hole-val')!;
+holeRange.addEventListener('input', () => {
+  const percent = parseInt(holeRange.value, 10);
+  currentHoleRatio = percent / 100;
+  holeVal.innerText = `${percent}%`;
+  measureRender(() => {
+    if (pieChart) {
+      pieChart.update({
+        pie: { innerRadiusRatio: currentHoleRatio },
+        center:
+          currentHoleRatio >= 0.35
+            ? {
+                title: (_d, total) => `${total}%`,
+                subtitle: '전체 리소스 비중',
+              }
+            : { title: '', subtitle: '' },
+      });
+    }
   });
 });
 
@@ -214,12 +625,12 @@ const labelPosSelect = document.getElementById('label-pos-select') as HTMLSelect
 labelPosSelect.addEventListener('change', () => {
   currentLabelPos = labelPosSelect.value as LabelPosition;
   measureRender(() => {
-    chart.update({
-      labels: {
-        visible: currentLabelPos !== 'none',
-        position: currentLabelPos,
-      },
-    });
+    const labelCfg = {
+      visible: currentLabelPos !== 'none',
+      position: currentLabelPos,
+    };
+    if (barChart) barChart.update({ labels: labelCfg });
+    if (lineChart) lineChart.update({ labels: labelCfg });
   });
 });
 
@@ -230,9 +641,11 @@ radiusRange.addEventListener('input', () => {
   currentRadius = parseInt(radiusRange.value, 10);
   radiusVal.innerText = `${currentRadius}px`;
   measureRender(() => {
-    chart.update({
-      bar: getThemeOptions(currentTheme, currentRadius, currentWidthRatio),
-    });
+    if (barChart) {
+      barChart.update({
+        bar: getBarThemeOptions(currentTheme, currentRadius, currentWidthRatio),
+      });
+    }
   });
 });
 
@@ -244,14 +657,56 @@ ratioRange.addEventListener('input', () => {
   currentWidthRatio = percent / 100;
   ratioVal.innerText = `${percent}%`;
   measureRender(() => {
-    chart.update({
-      bar: getThemeOptions(currentTheme, currentRadius, currentWidthRatio),
-    });
+    if (barChart) {
+      barChart.update({
+        bar: getBarThemeOptions(currentTheme, currentRadius, currentWidthRatio),
+      });
+    }
+  });
+});
+
+// 애니메이션 이징 셀렉트
+const easingSelect = document.getElementById('easing-select') as HTMLSelectElement;
+easingSelect.addEventListener('change', () => {
+  currentEasing = easingSelect.value as EasingType;
+  const animConfig = { enabled: true, duration: 680, easing: currentEasing };
+  if (barChart) {
+    barChart.update({ animation: animConfig });
+    barChart.replayAnimation();
+  }
+  if (lineChart) {
+    lineChart.update({ animation: animConfig });
+    lineChart.replayAnimation();
+  }
+  if (pieChart) {
+    pieChart.update({ animation: animConfig });
+    pieChart.replayAnimation();
+  }
+});
+
+// 애니메이션 다시 재생 버튼
+document.getElementById('replay-anim-btn')!.addEventListener('click', () => {
+  if (barChart) barChart.replayAnimation();
+  if (lineChart) lineChart.replayAnimation();
+  if (pieChart) pieChart.replayAnimation();
+});
+
+// 범례 위치 셀렉트
+const legendPosSelect = document.getElementById('legend-pos-select') as HTMLSelectElement;
+legendPosSelect.addEventListener('change', () => {
+  currentLegendPos = legendPosSelect.value as LegendPosition | 'none';
+  const legendCfg = getLegendConfig();
+  measureRender(() => {
+    if (barChart) barChart.update({ legend: legendCfg });
+    if (lineChart) lineChart.update({ legend: legendCfg });
+    if (pieChart) pieChart.update({ legend: legendCfg });
   });
 });
 
 // 줌 리셋 버튼
-const resetZoomBtn = document.getElementById('reset-zoom-btn')!;
-resetZoomBtn.addEventListener('click', () => {
-  chart.resetZoom();
+document.getElementById('reset-zoom-btn')!.addEventListener('click', () => {
+  measureRender(() => {
+    if (barChart) barChart.resetZoom();
+    if (lineChart) lineChart.resetZoom();
+  });
 });

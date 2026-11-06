@@ -60,7 +60,39 @@ const chart = new BarChart('#chart', {
 });
 ```
 
-### 2. Pie & Donut Chart (파이 & 도넛 차트)
+### 2. Line & Area Chart (라인 & 영역 차트)
+```typescript
+import { LineChart } from '@ju9nu7/nanocharts';
+
+const line = new LineChart('#line-chart', {
+  data: [
+    { label: 'Mon', value: 140 },
+    { label: 'Tue', value: 230 },
+    { label: 'Wed', value: 195 },
+    { label: 'Thu', value: 290 },
+    { label: 'Fri', value: 340 },
+  ],
+  line: {
+    color: '#6366F1',
+    width: 2.5,
+    curve: 'smooth', // 'smooth' | 'linear' | 'step'
+  },
+  area: {
+    visible: true,
+    fill: {
+      type: 'linear',
+      from: 'rgba(99, 102, 241, 0.45)',
+      to: 'rgba(99, 102, 241, 0.0)',
+      direction: 'vertical',
+    },
+  },
+  crosshair: { enabled: true, vertical: true, horizontal: true },
+  zoom: { enabled: true },
+  pan: { enabled: true },
+});
+```
+
+### 3. Pie & Donut Chart (파이 & 도넛 차트)
 ```typescript
 import { PieChart } from '@ju9nu7/nanocharts';
 
@@ -81,6 +113,37 @@ const pie = new PieChart('#pie-chart', {
     subtitle: '전체 점유율',
   },
   labels: { position: 'outside' },
+});
+```
+
+### 4. Multi-Series & Stacked Chart (다중 시리즈 & 누적 차트)
+```typescript
+import { BarChart, LineChart } from '@ju9nu7/nanocharts';
+
+// 1) 그룹형(Grouped) / 누적형(Stacked) / 100% 비율(Percent) 바 차트
+const multiBar = new BarChart('#multi-bar', {
+  xLabels: ['1분기', '2분기', '3분기', '4분기'],
+  series: [
+    { name: 'Frontend', data: [120, 150, 180, 210], color: '#6366F1' },
+    { name: 'Backend', data: [90, 110, 140, 160], color: '#10B981' },
+    { name: 'AI / Cloud', data: [60, 85, 110, 145], color: '#F59E0B' },
+  ],
+  bar: {
+    mode: 'stacked', // 'grouped' | 'stacked' | 'percent'
+    borderRadius: [6, 6, 0, 0],
+  },
+  legend: { visible: true, position: 'top' },
+  animation: { enabled: true, duration: 680, easing: 'easeOutQuart' },
+});
+
+// 2) 다중 라인(Multi-Line) & 누적 영역(Stacked Area) 차트
+const multiLine = new LineChart('#multi-line', {
+  xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  stacked: true, // true 설정 시 누적 영역(Stacked Area) 차트로 동작
+  series: [
+    { name: '모바일 트래픽', data: [140, 230, 195, 290, 340], color: '#6366F1' },
+    { name: '데스크톱 트래픽', data: [95, 130, 160, 185, 210], color: '#22D3EE', dash: [6, 4] },
+  ],
 });
 ```
 
@@ -125,17 +188,40 @@ labels: {
 }
 ```
 
+### 4. 인터랙티브 범례(Legend) & 애니메이션(Animation)
+
+```typescript
+legend: {
+  visible: true,
+  position: 'top',       // 'top' | 'bottom' | 'left' | 'right'
+  align: 'center',       // 'start' | 'center' | 'end'
+  markerShape: 'rounded',// 'circle' | 'rounded' | 'square' | 'line'
+  interactive: true,     // 클릭 시 시리즈/카테고리 데이터 토글 & 양방향 호버 하이라이트
+},
+animation: {
+  enabled: true,
+  duration: 680,
+  easing: 'easeOutQuart', // 'linear' | 'easeOutCubic' | 'easeOutQuart' | 'easeOutExpo' | 'easeOutBack'
+}
+```
+
 ---
 
 ## 🛠 API Options
 
 | 옵션명 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `data` | `DataItem[]` | 표시할 데이터 배열 (`{ label, value, ... }`) |
+| `data` | `DataItem[]` | 단일 시리즈 데이터 배열 (`{ label, value, ... }`) |
+| `series` | `BarSeriesDataset[] \| LineSeriesDataset[]` | 다중 시리즈 데이터셋 배열 (`{ name, data, color, ... }`) |
+| `xLabels` | `string[]` | 다중 시리즈에서 `number[]` 데이터를 사용할 때 지정할 X축 라벨 배열 |
+| `bar.mode` | `'grouped' \| 'stacked' \| 'percent'` | 다중 바 배치 모드 (그룹형 / 누적형 / 100% 비율 누적형) |
 | `bar.fill` | `ColorAccessor` | 단색, 그라데이션 객체, 또는 `(item, index) => string` 콜백 |
 | `bar.borderRadius`| `number \| number[]` | 둥근 모서리 반지름 (예: `8` 또는 `[6, 6, 0, 0]`) |
 | `bar.border` | `BarBorderStyle` | 테두리 색상, 굵기, 대시선 옵션 |
 | `bar.widthRatio` | `number` | 바 두께 비율 (`0.1` ~ `1.0`, 기본 `0.65`) |
+| `stacked` | `boolean` | `LineChart` 다중 시리즈 누적(Stacked Area/Line) 활성화 여부 |
+| `legend` | `boolean \| LegendOptions` | 범례 표시 위치, 마커 모양, 클릭 데이터 토글 옵션 |
+| `animation` | `boolean \| AnimationOptions` | 렌더링 애니메이션 시간(`duration`) 및 이징(`easing`) 옵션 |
 | `labels.position`| `LabelPosition` | `'top-outside'` \| `'inside-top'` \| `'inside-center'` \| `'inside-bottom'` \| `'none'` |
 | `labels.formatter`| `Function` | 텍스트 포맷팅 함수 |
 | `zoom.enabled` | `boolean` | 마우스 휠 줌 활성화 여부 |
