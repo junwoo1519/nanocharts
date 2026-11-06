@@ -6,6 +6,7 @@
  */
 
 import { BorderRadius, GradientConfig } from '../types';
+import { resolveColor } from './tokens';
 
 /**
  * 사용자 입력 모서리 둥글기 값을 표준 4자리 튜플 [TL, TR, BR, BL]로 정규화합니다.
@@ -108,7 +109,7 @@ export function createGradient(
     grad = ctx.createLinearGradient(x, actualY, x, actualY + actualHeight);
   }
 
-  grad.addColorStop(0, config.from);
-  grad.addColorStop(1, config.to);
+  grad.addColorStop(0, resolveColor(config.from));
+  grad.addColorStop(1, resolveColor(config.to));
   return grad;
 }

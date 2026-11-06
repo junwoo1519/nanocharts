@@ -36,6 +36,12 @@ import {
   buildSvgLegendGroup,
   wrapSvgDocument,
 } from '../utils/svg';
+import {
+  computeResponsivePadding,
+  normalizeResponsiveOptions,
+  resolveContainerDimensions,
+} from '../utils/responsive';
+import { buildCssFontString } from '../utils/tokens';
 
 export class BarChart extends EventEmitter {
   /** 차트가 마운트될 부모 DOM 엘리먼트 */
@@ -115,11 +121,33 @@ export class BarChart extends EventEmitter {
 
     this.layerManager = new LayerManager(this.container);
     this.tooltip = new Tooltip(this.container, options.tooltip);
-    this.barSeries = new BarSeries(options.bar, options.labels);
+    const defaultLabelFont = options.font
+      ? buildCssFontString(options.font, options.font.size ?? 11, options.font.weight ?? 600)
+      : undefined;
+    this.barSeries = new BarSeries(
+      options.bar,
+      defaultLabelFont ? { font: defaultLabelFont, ...options.labels } : options.labels
+    );
     const hasMultiSeries = Boolean(options.series && options.series.length > 0);
+    const legendOpts =
+      typeof options.legend === 'boolean'
+        ? {
+            visible: options.legend,
+            fontFamily: options.font?.family,
+            fontSize: options.font?.size ? options.font.size + 1 : undefined,
+            fontWeight: options.font?.weight,
+          }
+        : options.legend || options.font
+          ? {
+              fontFamily: options.font?.family,
+              fontSize: options.font?.size ? options.font.size + 1 : undefined,
+              fontWeight: options.font?.weight,
+              ...options.legend,
+            }
+          : undefined;
     this.legend = new Legend(
       this.container,
-      options.legend,
+      legendOpts,
       {
         onToggle: (item, active) => {
           this.hoveredIndex = null;
@@ -152,19 +180,27 @@ export class BarChart extends EventEmitter {
     // 부모 컨테이너 크기 변화를 실시간 감지하여 자동 리사이징 & 리렌더링
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          if (width !== this.width || height !== this.height) {
-            this.resize(width, height);
+        const rawW = Math.round(entry.contentRect.width);
+        const rawH = Math.round(entry.contentRect.height);
+        if (rawW > 0) {
+          const { height } = resolveContainerDimensions(
+            this.container,
+            this.options.responsive,
+            1.6
+          );
+          const effectiveH = rawH > 10 ? rawH : height;
+          if (rawW !== this.width || effectiveH !== this.height) {
+            this.resize(rawW, effectiveH);
           }
         }
       }
     });
     this.resizeObserver.observe(this.container);
 
-    // 컨테이너가 이미 레이아웃 크기를 가지고 있다면 즉시 첫 렌더링 수행
-    if (this.container.clientWidth > 0 && this.container.clientHeight > 0) {
-      this.resize(this.container.clientWidth, this.container.clientHeight);
+    // 컨테이너가 레이아웃 크기를 가지고 있거나 반응형 자동 높이 계산이 가능한 경우 즉시 첫 렌더링 수행
+    const initialDims = resolveContainerDimensions(this.container, this.options.responsive, 1.6);
+    if (initialDims.width > 0 && initialDims.height > 0) {
+      this.resize(initialDims.width, initialDims.height);
     }
   }
 
@@ -298,19 +334,29 @@ export class BarChart extends EventEmitter {
 
   private getEffectivePadding(): Padding {
     const reserved = this.legend.getReservedPadding();
+    const responsiveBase = computeResponsivePadding({
+      basePadding: this.padding,
+      userPadding: this.options.padding,
+      width: this.width,
+      height: this.height,
+      yScale: this.yScale,
+      yAxis: this.options.yAxis,
+      legend: this.options.legend,
+      responsive: this.options.responsive,
+    });
     return {
-      top: this.padding.top + (reserved.top ?? 0),
-      right: this.padding.right + (reserved.right ?? 0),
-      bottom: this.padding.bottom + (reserved.bottom ?? 0),
-      left: this.padding.left + (reserved.left ?? 0),
+      top: responsiveBase.top + (reserved.top ?? 0),
+      right: responsiveBase.right + (reserved.right ?? 0),
+      bottom: responsiveBase.bottom + (reserved.bottom ?? 0),
+      left: responsiveBase.left + (reserved.left ?? 0),
     };
   }
 
   private syncScaleRanges(): void {
     if (this.width <= 0 || this.height <= 0) return;
     const eff = this.getEffectivePadding();
-    this.xScale.range([eff.left, this.width - eff.right]);
-    this.yScale.range([this.height - eff.bottom, eff.top]);
+    this.xScale.range([eff.left, Math.max(eff.left + 20, this.width - eff.right)]);
+    this.yScale.range([Math.max(eff.top + 20, this.height - eff.bottom), eff.top]);
   }
 
   /**
@@ -410,6 +456,13 @@ export class BarChart extends EventEmitter {
     this.layerManager.resize(width, height);
     this.syncScaleRanges();
 
+    const resp = normalizeResponsiveOptions(this.options.responsive, 1.6);
+    const isCompact = resp.enabled && width < resp.compactBreakpoint;
+    if (resp.onResize) {
+      resp.onResize(width, height, isCompact);
+    }
+    this.emit('resize', { width, height, isCompact });
+
     const shouldAnimate = !this.hasRenderedOnce;
     this.hasRenderedOnce = true;
     this.render(shouldAnimate);
@@ -429,9 +482,13 @@ export class BarChart extends EventEmitter {
     // 1. Background 레이어: 격자선 및 축 렌더링 (애니메이션 중에도 1회만 고정 렌더링)
     const bgCtx = this.layerManager.getContext('background');
     this.layerManager.clear('background');
-    Grid.render(bgCtx, this.options.grid, this.yScale, this.width, effPadding);
-    Axis.renderYAxis(bgCtx, this.options.yAxis, this.yScale, effPadding);
-    Axis.renderXAxis(bgCtx, this.options.xAxis, this.xScale, this.activeData, this.height, effPadding);
+    const axisFont = this.options.font ? buildCssFontString(this.options.font, 11, 500) : undefined;
+    const xAxisOpt = axisFont ? { font: axisFont, ...this.options.xAxis } : this.options.xAxis;
+    const yAxisOpt = axisFont ? { font: axisFont, ...this.options.yAxis } : this.options.yAxis;
+
+    Grid.render(bgCtx, this.options.grid, this.yScale, this.width, effPadding, this.xScale, this.height);
+    Axis.renderYAxis(bgCtx, yAxisOpt, this.yScale, effPadding);
+    Axis.renderXAxis(bgCtx, xAxisOpt, this.xScale, this.activeData, this.height, effPadding);
 
     const seriesCtx = this.layerManager.getContext('series');
 
@@ -518,6 +575,41 @@ export class BarChart extends EventEmitter {
         this.handleZoom(e);
       }, { passive: false });
     }
+
+    // 모바일/태블릿 터치 인터랙션 지원 (터치 호버 툴팁 & 스와이프 팬)
+    interactionCanvas.addEventListener(
+      'touchstart',
+      (e) => {
+        if (e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        const rect = interactionCanvas.getBoundingClientRect();
+        const tx = touch.clientX - rect.left;
+        const ty = touch.clientY - rect.top;
+        this.dragStartX = tx;
+        this.dragStartView = this.xScale.getViewport();
+        this.handleHover(tx, ty);
+      },
+      { passive: true }
+    );
+
+    interactionCanvas.addEventListener(
+      'touchmove',
+      (e) => {
+        if (e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        const rect = interactionCanvas.getBoundingClientRect();
+        const tx = touch.clientX - rect.left;
+        const ty = touch.clientY - rect.top;
+        const [vStart, vEnd] = this.xScale.getViewport();
+        const isZoomedIn = vStart > 0 || vEnd < Math.max(0, this.activeData.length - 1);
+        if (isZoomedIn && this.options.pan?.enabled !== false) {
+          this.handlePan(tx);
+        } else {
+          this.handleHover(tx, ty);
+        }
+      },
+      { passive: true }
+    );
   }
 
   /**
@@ -873,14 +965,25 @@ export class BarChart extends EventEmitter {
     const defs: string[] = [];
     const body: string[] = [];
 
+    const axisFont = this.options.font ? buildCssFontString(this.options.font, 11, 500) : undefined;
+    const xAxisOpt = axisFont ? { font: axisFont, ...this.options.xAxis } : this.options.xAxis;
+    const yAxisOpt = axisFont ? { font: axisFont, ...this.options.yAxis } : this.options.yAxis;
+
     if (exportOptions?.includeGrid !== false) {
-      const gridSvg = buildSvgGridGroup(this.options.grid, this.yScale, svgW, effPadding);
+      const gridSvg = buildSvgGridGroup(
+        this.options.grid,
+        this.yScale,
+        svgW,
+        effPadding,
+        this.xScale,
+        svgH
+      );
       if (gridSvg) body.push(gridSvg);
     }
 
     const axesSvg = buildSvgAxesGroups(
-      this.options.xAxis,
-      this.options.yAxis,
+      xAxisOpt,
+      yAxisOpt,
       this.xScale,
       this.yScale,
       this.activeData,

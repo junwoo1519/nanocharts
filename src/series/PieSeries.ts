@@ -21,6 +21,7 @@ import {
   parseSvgColor,
   svgTextElement,
 } from '../utils/svg';
+import { resolveColor as resolveTokenColor } from '../utils/tokens';
 
 /** 기본 모던 컬러 팔레트 */
 export const DEFAULT_PALETTE = [
@@ -63,12 +64,12 @@ export class PieSeries {
    * 데이터 항목의 채우기 색상을 결정합니다.
    */
   public resolveSliceColor(item: DataItem, index: number): string {
-    if (item.color) return item.color;
+    if (item.color) return resolveTokenColor(item.color);
     if (typeof this.styleOptions.colors === 'function') {
-      return this.styleOptions.colors(item, index);
+      return resolveTokenColor(this.styleOptions.colors(item, index));
     }
     if (Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0) {
-      return this.styleOptions.colors[index % this.styleOptions.colors.length];
+      return resolveTokenColor(this.styleOptions.colors[index % this.styleOptions.colors.length]);
     }
     return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
@@ -92,9 +93,11 @@ export class PieSeries {
     const cx = padding.left + availableWidth / 2;
     const cy = padding.top + availableHeight / 2;
 
-    // 외곽 라벨 영역 공간을 고려한 최대 반지름 설정
-    const labelMargin = this.labelOptions?.position === 'outside' && this.labelOptions.visible ? 35 : 10;
-    const maxRadius = Math.max(20, Math.min(availableWidth, availableHeight) / 2 - labelMargin);
+    // 외곽 라벨 영역 공간을 고려한 반응형 최대 반지름 설정
+    const minDim = Math.min(availableWidth, availableHeight);
+    const isOutsideLabel = this.labelOptions?.position === 'outside' && this.labelOptions.visible;
+    const labelMargin = isOutsideLabel ? (minDim < 280 ? 22 : 35) : 10;
+    const maxRadius = Math.max(20, minDim / 2 - labelMargin);
 
     const innerRatio = Math.max(0, Math.min(0.85, this.styleOptions.innerRadiusRatio ?? 0));
     const innerRadius = maxRadius * innerRatio;
@@ -325,12 +328,12 @@ export class PieSeries {
 
     // 메인 타이틀 (큰 숫자)
     ctx.font = opts?.titleFont || '700 20px Pretendard, -apple-system, sans-serif';
-    ctx.fillStyle = opts?.titleColor || '#FFFFFF';
+    ctx.fillStyle = resolveTokenColor(opts?.titleColor || '#FFFFFF');
     ctx.fillText(titleText, cx, cy - 8);
 
     // 하단 서브타이틀
     ctx.font = opts?.subtitleFont || '500 11px Pretendard, -apple-system, sans-serif';
-    ctx.fillStyle = opts?.subtitleColor || '#94A3B8';
+    ctx.fillStyle = resolveTokenColor(opts?.subtitleColor || '#94A3B8');
     ctx.fillText(subtitleText, cx, cy + 14);
 
     ctx.restore();
@@ -374,7 +377,7 @@ export class PieSeries {
         const lx = cx + Math.cos(midAngle) * r;
         const ly = cy + Math.sin(midAngle) * r;
 
-        ctx.fillStyle = opts.color || '#FFFFFF';
+        ctx.fillStyle = resolveTokenColor(opts.color || '#FFFFFF');
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(text, lx, ly);
@@ -403,7 +406,7 @@ export class PieSeries {
         ctx.stroke();
 
         // 텍스트 그리기
-        ctx.fillStyle = opts.color || '#CBD5E1';
+        ctx.fillStyle = resolveTokenColor(opts.color || '#CBD5E1');
         ctx.textAlign = isRightSide ? 'left' : 'right';
         ctx.textBaseline = 'middle';
         ctx.fillText(text, x2 + (isRightSide ? 4 : -4), y2);

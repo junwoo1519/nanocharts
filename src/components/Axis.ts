@@ -1,6 +1,7 @@
 import { AxisOptions, DataItem, Padding } from '../types';
 import { LinearScale } from '../scale/LinearScale';
 import { BandScale } from '../scale/BandScale';
+import { resolveColor } from '../utils/tokens';
 
 export class Axis {
   static renderYAxis(
@@ -13,7 +14,7 @@ export class Axis {
 
     const ticks = yScale.ticks(5);
     const font = options?.font || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    const labelColor = options?.labelColor || '#94A3B8';
+    const labelColor = resolveColor(options?.labelColor || '#94A3B8');
     const labelOffset = options?.labelOffset ?? 8;
     const x = padding.left - labelOffset;
 
@@ -31,7 +32,7 @@ export class Axis {
 
     // Y축 베이스라인 (옵션)
     if (options?.lineWidth && options.lineWidth > 0) {
-      ctx.strokeStyle = options.color || '#CBD5E1';
+      ctx.strokeStyle = resolveColor(options.color || '#CBD5E1');
       ctx.lineWidth = options.lineWidth;
       const [r0, r1] = yScale.range();
       ctx.beginPath();
@@ -58,7 +59,7 @@ export class Axis {
     if (count <= 0) return;
 
     const font = options?.font || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    const labelColor = options?.labelColor || '#64748B';
+    const labelColor = resolveColor(options?.labelColor || '#64748B');
     const labelOffset = options?.labelOffset ?? 10;
     const y = chartHeight - padding.bottom + labelOffset;
 
@@ -88,7 +89,7 @@ export class Axis {
     }
 
     // X축 기준선
-    const axisColor = options?.color || '#E2E8F0';
+    const axisColor = resolveColor(options?.color || '#E2E8F0');
     const axisWidth = options?.lineWidth ?? 1;
     if (axisWidth > 0) {
       ctx.strokeStyle = axisColor;

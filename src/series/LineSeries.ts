@@ -21,6 +21,7 @@ import type {
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
 import { createGradient } from '../utils/canvas';
+import { adjustColorHsl, resolveColor as resolveTokenColor } from '../utils/tokens';
 import {
   buildSvgLinePathData,
   escapeXml,
@@ -411,7 +412,7 @@ export class LineSeries {
 
     if (this.areaOptions.fill) {
       if (typeof this.areaOptions.fill === 'string') {
-        ctx.fillStyle = this.areaOptions.fill;
+        ctx.fillStyle = resolveTokenColor(this.areaOptions.fill);
       } else {
         ctx.fillStyle = createGradient(
           ctx,
@@ -423,11 +424,11 @@ export class LineSeries {
         );
       }
     } else {
-      // 기본값: 라인 색상에서 투명해지는 수직 그라데이션 자동 생성
-      const baseColor = this.getPrimaryLineColor();
+      // 기본값 또는 채도(Saturation)/명도(Lightness)/불투명도 커스텀이 적용된 수직 그라데이션 자동 생성
+      const { from, to } = this.resolveAreaGradientStops();
       const grad = ctx.createLinearGradient(0, plotTop, 0, plotTop + plotHeight);
-      grad.addColorStop(0, this.withAlpha(baseColor, 0.42));
-      grad.addColorStop(1, this.withAlpha(baseColor, 0.02));
+      grad.addColorStop(0, from);
+      grad.addColorStop(1, to);
       ctx.fillStyle = grad;
     }
 
@@ -461,7 +462,7 @@ export class LineSeries {
 
     const colorOpt = this.lineOptions.color;
     if (typeof colorOpt === 'string') {
-      ctx.strokeStyle = colorOpt;
+      ctx.strokeStyle = resolveTokenColor(colorOpt);
     } else {
       ctx.strokeStyle = createGradient(ctx, plotLeft, plotTop, plotWidth, plotHeight, colorOpt);
     }
@@ -494,17 +495,19 @@ export class LineSeries {
     if (radius <= 0) return;
 
     const { x, y, item, index } = pt;
-    const primaryColor = item.color || this.getPrimaryLineColor();
+    const primaryColor = resolveTokenColor(item.color || this.getPrimaryLineColor());
 
-    const fillColor =
+    const fillColor = resolveTokenColor(
       typeof this.pointOptions.fill === 'function'
         ? this.pointOptions.fill(item, index)
-        : this.pointOptions.fill || '#0B0F19';
+        : this.pointOptions.fill || '#0B0F19'
+    );
 
-    const borderColor =
+    const borderColor = resolveTokenColor(
       typeof this.pointOptions.borderColor === 'function'
         ? this.pointOptions.borderColor(item, index)
-        : this.pointOptions.borderColor || primaryColor;
+        : this.pointOptions.borderColor || primaryColor
+    );
 
     ctx.save();
 
@@ -541,10 +544,11 @@ export class LineSeries {
     const { x, y, item, index } = pt;
     const offset = opts.offset ?? 8;
     const font = opts.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    const color =
+    const color = resolveTokenColor(
       typeof opts.color === 'function'
         ? opts.color(item, index)
-        : opts.color || '#94A3B8';
+        : opts.color || '#94A3B8'
+    );
 
     const text = opts.formatter
       ? opts.formatter(item.value, item, index)
@@ -632,10 +636,10 @@ export class LineSeries {
    * 범례(Legend) 아이콘에 표시할 대표 색상 문자열을 반환합니다.
    */
   public resolveSwatchColor(item: DataItem, index: number): string {
-    if (item.color) return item.color;
+    if (item.color) return resolveTokenColor(item.color);
     const bc = this.pointOptions.borderColor;
-    if (typeof bc === 'function') return bc(item, index);
-    if (typeof bc === 'string') return bc;
+    if (typeof bc === 'function') return resolveTokenColor(bc(item, index));
+    if (typeof bc === 'string') return resolveTokenColor(bc);
     return this.getPrimaryLineColor();
   }
 
@@ -644,7 +648,35 @@ export class LineSeries {
    */
   private getPrimaryLineColor(): string {
     const c = this.lineOptions.color;
-    return typeof c === 'string' ? c : c.from;
+    return resolveTokenColor(typeof c === 'string' ? c : c.from);
+  }
+
+  /**
+   * Area 영역의 채도(Saturation), 명도(Lightness), 상/하단 불투명도 옵션을 반영하여
+   * 그라데이션 `{ from, to }` 색상 문자열을 계산합니다.
+   */
+  private resolveAreaGradientStops(): { from: string; to: string } {
+    const baseColor = this.getPrimaryLineColor();
+    const topOpacity = this.areaOptions.topOpacity ?? 0.42;
+    const bottomOpacity = this.areaOptions.bottomOpacity ?? 0.02;
+
+    const from = adjustColorHsl(baseColor, {
+      saturation: this.areaOptions.topSaturation,
+      saturationDelta: this.areaOptions.saturationDelta,
+      lightness: this.areaOptions.topLightness,
+      lightnessDelta: this.areaOptions.lightnessDelta,
+      alpha: topOpacity,
+    });
+
+    const to = adjustColorHsl(baseColor, {
+      saturation: this.areaOptions.bottomSaturation ?? this.areaOptions.topSaturation,
+      saturationDelta: this.areaOptions.saturationDelta,
+      lightness: this.areaOptions.bottomLightness ?? this.areaOptions.topLightness,
+      lightnessDelta: this.areaOptions.lightnessDelta,
+      alpha: bottomOpacity,
+    });
+
+    return { from, to };
   }
 
   /**
@@ -762,11 +794,12 @@ export class LineSeries {
         areaPathD = `${topPath} L ${fmt(last.x)} ${fmt(baselineY)} L ${fmt(first.x)} ${fmt(baselineY)} Z`;
       }
 
+      const stops = this.resolveAreaGradientStops();
       const areaStyle =
         this.areaOptions.fill || {
           type: 'linear' as const,
-          from: this.withAlpha(this.getPrimaryLineColor(), 0.42),
-          to: this.withAlpha(this.getPrimaryLineColor(), 0.02),
+          from: stops.from,
+          to: stops.to,
           direction: 'vertical' as const,
         };
 

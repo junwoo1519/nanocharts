@@ -19,6 +19,7 @@ import {
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
 import { drawRoundedRect, createGradient } from '../utils/canvas';
+import { resolveColor as resolveTokenColor } from '../utils/tokens';
 import {
   escapeXml,
   fmt,
@@ -397,7 +398,7 @@ export class BarSeries {
     // 3. 외곽 테두리(Border) 렌더링
     const border = this.resolveBorder(geom);
     if (border && border.width > 0) {
-      ctx.strokeStyle = border.color;
+      ctx.strokeStyle = resolveTokenColor(border.color);
       ctx.lineWidth = border.width;
       if (border.dash) {
         ctx.setLineDash(border.dash);
@@ -428,7 +429,7 @@ export class BarSeries {
     if (hoverOpt?.fill && !geom.seriesColor) {
       const fillStyle = typeof hoverOpt.fill === 'function' ? hoverOpt.fill(item, index) : hoverOpt.fill;
       if (typeof fillStyle === 'string') {
-        ctx.fillStyle = fillStyle;
+        ctx.fillStyle = resolveTokenColor(fillStyle);
       } else {
         ctx.fillStyle = createGradient(ctx, x, y, width, height, fillStyle);
       }
@@ -440,7 +441,7 @@ export class BarSeries {
 
     // 호버 외곽 강조 테두리
     const hoverBorder = hoverOpt?.border || { color: 'rgba(255, 255, 255, 0.9)', width: 2 };
-    ctx.strokeStyle = hoverBorder.color;
+    ctx.strokeStyle = resolveTokenColor(hoverBorder.color);
     ctx.lineWidth = hoverBorder.width;
     if (hoverBorder.dash) ctx.setLineDash(hoverBorder.dash);
     ctx.stroke();
@@ -467,10 +468,11 @@ export class BarSeries {
     const pos = opts.position || 'top-outside';
     const offset = opts.offset ?? 6;
     const font = opts.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    const color =
+    const color = resolveTokenColor(
       typeof opts.color === 'function'
         ? opts.color(item, index)
-        : opts.color || (pos.startsWith('inside') ? '#FFFFFF' : '#334155');
+        : opts.color || (pos.startsWith('inside') ? '#FFFFFF' : '#334155')
+    );
 
     ctx.save();
     ctx.font = font;
@@ -532,7 +534,8 @@ export class BarSeries {
     } else if (this.barOptions.fill) {
       style = this.barOptions.fill;
     }
-    return typeof style === 'string' ? style : style.from;
+    const raw = typeof style === 'string' ? style : style.from;
+    return resolveTokenColor(raw);
   }
 
   /**
@@ -561,7 +564,7 @@ export class BarSeries {
     const style = this.resolveColorStyle(geom);
 
     if (typeof style === 'string') {
-      return style;
+      return resolveTokenColor(style);
     }
 
     return createGradient(ctx, x, y, width, height, style);

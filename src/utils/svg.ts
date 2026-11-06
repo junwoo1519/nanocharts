@@ -20,6 +20,9 @@ import type {
 } from '../types';
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
+import { resolveGridLineDash } from '../components/Grid';
+import { parseLegendAnchor } from '../components/Legend';
+import { resolveColor } from './tokens';
 
 /**
  * XML/SVG 특수문자 이스케이프
@@ -45,7 +48,8 @@ export function fmt(n: number): string {
  * `{ color: '#RRGGBB', opacity: number }` 형태로 분리합니다.
  */
 export function parseSvgColor(input: string): { color: string; opacity: number } {
-  const trimmed = (input || '#6366F1').trim();
+  const resolved = resolveColor(input || '#226CFF');
+  const trimmed = resolved.trim();
   if (trimmed === 'transparent' || trimmed === 'none') {
     return { color: 'none', opacity: 0 };
   }
@@ -360,36 +364,118 @@ export function buildSvgPieSlicePathData(
 }
 
 /**
- * 배경 격자선(Grid)을 `<g id="Grid">` 벡터 그룹으로 변환합니다.
+ * 배경 격자선(수평 Y, 수직 X, 줄무늬 배경, 플롯 외곽 박스)을 `<g id="Grid">` 벡터 그룹으로 변환합니다.
  */
 export function buildSvgGridGroup(
   options: GridOptions | undefined,
   yScale: LinearScale,
   chartWidth: number,
-  padding: Padding
+  padding: Padding,
+  xScale?: BandScale,
+  chartHeight?: number
 ): string {
-  const yGrid = options?.y ?? { visible: true, color: '#1E293B', lineWidth: 1, lineDash: [3, 3] };
-  if (yGrid.visible === false) return '';
-
-  const ticks = yScale.ticks(5);
   const left = padding.left;
   const right = chartWidth - padding.right;
-  const parsedColor = parseSvgColor(yGrid.color || '#1E293B');
-  const dashAttr =
-    yGrid.lineDash && yGrid.lineDash.length > 0
-      ? ` stroke-dasharray="${yGrid.lineDash.join(' ')}"`
-      : '';
-  const opacityAttr = parsedColor.opacity < 0.999 ? ` stroke-opacity="${fmt(parsedColor.opacity)}"` : '';
+  const [yRangeBottom, yRangeTop] = yScale.range();
+  const top = Math.min(yRangeTop, yRangeBottom);
+  const bottom = chartHeight ? chartHeight - padding.bottom : Math.max(yRangeTop, yRangeBottom);
+  const plotW = Math.max(0, right - left);
+  const plotH = Math.max(0, bottom - top);
 
-  const lines: string[] = [];
-  for (const tick of ticks) {
-    const y = Math.round(yScale.scale(tick)) + 0.5;
-    lines.push(
-      `<line id="Grid Line (${tick})" x1="${fmt(left)}" y1="${fmt(y)}" x2="${fmt(right)}" y2="${fmt(y)}" stroke="${escapeXml(parsedColor.color)}"${opacityAttr} stroke-width="${fmt(yGrid.lineWidth || 1)}"${dashAttr} />`
+  const ticks = yScale.ticks(5);
+  const els: string[] = [];
+
+  // 1. 줄무늬 배경 (Alternate Band)
+  if (options?.alternateBand?.visible && plotW > 0 && plotH > 0) {
+    const parsedBand = parseSvgColor(options.alternateBand.color || 'rgba(148, 163, 184, 0.06)');
+    const opAttr = parsedBand.opacity < 0.999 ? ` fill-opacity="${fmt(parsedBand.opacity)}"` : '';
+    const dir = options.alternateBand.direction || 'horizontal';
+
+    if (dir === 'vertical' && xScale) {
+      const [start, end] = xScale.getViewport();
+      const step = xScale.step();
+      const bw = xScale.bandwidth();
+      for (let i = start; i <= end; i++) {
+        if (i % 2 === 1) {
+          const slotX = xScale.scale(i) - (step - bw) / 2;
+          const clampedX = Math.max(left, slotX);
+          const clampedW = Math.min(right, slotX + step) - clampedX;
+          if (clampedW > 0) {
+            els.push(
+              `<rect id="Grid Band X (${i})" x="${fmt(clampedX)}" y="${fmt(top)}" width="${fmt(clampedW)}" height="${fmt(plotH)}" fill="${escapeXml(parsedBand.color)}"${opAttr} />`
+            );
+          }
+        }
+      }
+    } else if (ticks.length >= 2) {
+      for (let i = 0; i < ticks.length - 1; i++) {
+        if (i % 2 === 0) {
+          const y1 = yScale.scale(ticks[i]);
+          const y2 = yScale.scale(ticks[i + 1]);
+          const bandTop = Math.min(y1, y2);
+          const bandH = Math.abs(y1 - y2);
+          els.push(
+            `<rect id="Grid Band Y (${i})" x="${fmt(left)}" y="${fmt(bandTop)}" width="${fmt(plotW)}" height="${fmt(bandH)}" fill="${escapeXml(parsedBand.color)}"${opAttr} />`
+          );
+        }
+      }
+    }
+  }
+
+  // 2. 수평(Y) 격자선
+  const yGrid = options?.y ?? { visible: true, color: '#1E293B', lineWidth: 1, lineDash: [3, 3] };
+  if (yGrid.visible !== false) {
+    const parsedColor = parseSvgColor(yGrid.color || '#1E293B');
+    const yDash = resolveGridLineDash(yGrid, [3, 3]);
+    const dashAttr = yDash.length > 0 ? ` stroke-dasharray="${yDash.join(' ')}"` : '';
+    const totalOpacity = parsedColor.opacity * (yGrid.opacity ?? 1);
+    const opacityAttr = totalOpacity < 0.999 ? ` stroke-opacity="${fmt(totalOpacity)}"` : '';
+
+    for (const tick of ticks) {
+      const y = Math.round(yScale.scale(tick)) + 0.5;
+      els.push(
+        `<line id="Grid Line (${tick})" x1="${fmt(left)}" y1="${fmt(y)}" x2="${fmt(right)}" y2="${fmt(y)}" stroke="${escapeXml(parsedColor.color)}"${opacityAttr} stroke-width="${fmt(yGrid.lineWidth || 1)}"${dashAttr} />`
+      );
+    }
+  }
+
+  // 3. 수직(X) 격자선
+  const xGrid = options?.x;
+  if (xGrid?.visible && xScale) {
+    const [start, end] = xScale.getViewport();
+    const bandwidth = xScale.bandwidth();
+    const parsedColor = parseSvgColor(xGrid.color || '#1E293B');
+    const xDash = resolveGridLineDash(xGrid, [3, 3]);
+    const dashAttr = xDash.length > 0 ? ` stroke-dasharray="${xDash.join(' ')}"` : '';
+    const totalOpacity = parsedColor.opacity * (xGrid.opacity ?? 1);
+    const opacityAttr = totalOpacity < 0.999 ? ` stroke-opacity="${fmt(totalOpacity)}"` : '';
+
+    for (let i = start; i <= end; i++) {
+      const x = Math.round(xScale.scale(i) + bandwidth / 2) + 0.5;
+      if (x >= left && x <= right) {
+        els.push(
+          `<line id="Grid Line X (${i})" x1="${fmt(x)}" y1="${fmt(top)}" x2="${fmt(x)}" y2="${fmt(bottom)}" stroke="${escapeXml(parsedColor.color)}"${opacityAttr} stroke-width="${fmt(xGrid.lineWidth || 1)}"${dashAttr} />`
+        );
+      }
+    }
+  }
+
+  // 4. 플롯 외곽 테두리 박스 (Plot Border)
+  const border = options?.border;
+  if (border?.visible && plotW > 0 && plotH > 0) {
+    const parsedBorder = parseSvgColor(border.color || '#CBD5E1');
+    const dashAttr =
+      border.lineDash && border.lineDash.length > 0
+        ? ` stroke-dasharray="${border.lineDash.join(' ')}"`
+        : '';
+    const rxAttr = border.radius && border.radius > 0 ? ` rx="${fmt(border.radius)}"` : '';
+    els.push(
+      `<rect id="Plot Border" x="${fmt(left)}" y="${fmt(top)}" width="${fmt(plotW)}" height="${fmt(plotH)}"${rxAttr} fill="none" stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(border.lineWidth || 1)}"${dashAttr} />`
     );
   }
 
-  return `<g id="Grid">\n    ${lines.join('\n    ')}\n  </g>`;
+  if (els.length === 0) return '';
+  return `<g id="Grid">\n    ${els.join('\n    ')}\n  </g>`;
 }
 
 /**
@@ -510,9 +596,11 @@ export function buildSvgLegendGroup(
   const opts: LegendOptions = typeof legendOpt === 'object' ? legendOpt : {};
   if (opts.visible === false) return '';
 
-  const pos = opts.position || 'top';
+  const { side, align } = parseLegendAnchor(opts.position, opts.align ?? 'end');
   const shape = opts.markerShape || 'rounded';
   const fontSize = opts.fontSize ?? 12;
+  const fontFamily = opts.fontFamily || 'Pretendard, sans-serif';
+  const fontWeight = opts.fontWeight ?? 500;
   const textColor = opts.textColor || '#E2E8F0';
   const inactiveColor = opts.inactiveColor || '#64748B';
   const maxItems = opts.maxItems ?? 12;
@@ -525,10 +613,15 @@ export function buildSvgLegendGroup(
 
   const els: string[] = [];
 
-  if (pos === 'top' || pos === 'bottom') {
+  if (side === 'top' || side === 'bottom') {
     const totalW = itemWidths.reduce((a, b) => a + b, 0);
     let curX = Math.max(16, (chartWidth - totalW) / 2);
-    const centerY = pos === 'top' ? 18 : chartHeight - 16;
+    if (align === 'start') {
+      curX = 16;
+    } else if (align === 'end') {
+      curX = Math.max(16, chartWidth - totalW - 16);
+    }
+    const centerY = side === 'top' ? 18 : chartHeight - 16;
 
     visibleItems.forEach((it, idx) => {
       const isActive = it.active !== false;
@@ -551,7 +644,7 @@ export function buildSvgLegendGroup(
         x: curX + 16,
         y: centerY,
         text: label,
-        font: `500 ${fontSize}px Pretendard, sans-serif`,
+        font: `${fontWeight} ${fontSize}px ${fontFamily}`,
         fill: isActive ? textColor : inactiveColor,
         align: 'left',
         baseline: 'middle',
@@ -561,9 +654,14 @@ export function buildSvgLegendGroup(
       curX += itemWidths[idx];
     });
   } else {
-    const startX = pos === 'left' ? 16 : chartWidth - 115;
+    const startX = side === 'left' ? 16 : chartWidth - 115;
     const totalH = visibleItems.length * 22;
     let curY = Math.max(24, (chartHeight - totalH) / 2);
+    if (align === 'start') {
+      curY = 24;
+    } else if (align === 'end') {
+      curY = Math.max(24, chartHeight - totalH - 12);
+    }
 
     visibleItems.forEach((it) => {
       const isActive = it.active !== false;
@@ -581,7 +679,7 @@ export function buildSvgLegendGroup(
         x: startX + 16,
         y: curY,
         text: label,
-        font: `500 ${fontSize}px Pretendard, sans-serif`,
+        font: `${fontWeight} ${fontSize}px ${fontFamily}`,
         fill: isActive ? textColor : inactiveColor,
         align: 'left',
         baseline: 'middle',

@@ -13,6 +13,51 @@ import type {
   LegendMarkerShape,
   Padding,
 } from '../types';
+import { resolveColor } from '../utils/tokens';
+
+/**
+ * 12방향 `LegendPosition`과 `LegendAlign`을 해석하여 `{ side, align }`을 반환합니다.
+ */
+export function parseLegendAnchor(
+  position?: LegendPosition,
+  fallbackAlign: LegendAlign = 'end'
+): { side: 'top' | 'bottom' | 'left' | 'right'; align: LegendAlign } {
+  const pos = position ?? 'top';
+  switch (pos) {
+    case 'top-left':
+      return { side: 'top', align: 'start' };
+    case 'top-center':
+      return { side: 'top', align: 'center' };
+    case 'top-right':
+      return { side: 'top', align: 'end' };
+    case 'bottom-left':
+      return { side: 'bottom', align: 'start' };
+    case 'bottom-center':
+      return { side: 'bottom', align: 'center' };
+    case 'bottom-right':
+      return { side: 'bottom', align: 'end' };
+    case 'left-top':
+      return { side: 'left', align: 'start' };
+    case 'left-middle':
+    case 'left-center':
+      return { side: 'left', align: 'center' };
+    case 'left-bottom':
+      return { side: 'left', align: 'end' };
+    case 'right-top':
+      return { side: 'right', align: 'start' };
+    case 'right-middle':
+    case 'right-center':
+      return { side: 'right', align: 'center' };
+    case 'right-bottom':
+      return { side: 'right', align: 'end' };
+    case 'top':
+    case 'bottom':
+    case 'left':
+    case 'right':
+    default:
+      return { side: pos as 'top' | 'bottom' | 'left' | 'right', align: fallbackAlign };
+  }
+}
 
 export interface LegendCallbacks {
   /** 범례 항목 클릭으로 활성 상태가 변경되었을 때 호출 */
@@ -82,6 +127,8 @@ export class Legend {
       markerShape: options?.markerShape ?? 'rounded',
       interactive: options?.interactive ?? true,
       fontSize: options?.fontSize ?? 12,
+      fontFamily: options?.fontFamily,
+      fontWeight: options?.fontWeight,
       textColor: options?.textColor ?? '#E2E8F0',
       inactiveColor: options?.inactiveColor ?? '#64748B',
       maxItems: options?.maxItems ?? 12,
@@ -97,8 +144,7 @@ export class Legend {
    */
   private applyRootStyles(): void {
     const el = this.rootEl;
-    const pos: LegendPosition = this.options.position ?? 'top';
-    const align: LegendAlign = this.options.align ?? 'end';
+    const { side, align } = parseLegendAnchor(this.options.position, this.options.align ?? 'end');
 
     el.style.position = 'absolute';
     el.style.zIndex = '10';
@@ -107,7 +153,9 @@ export class Legend {
     el.style.gap = '6px 12px';
     el.style.pointerEvents = 'auto';
     el.style.userSelect = 'none';
-    el.style.fontFamily = "'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    el.style.fontFamily =
+      this.options.fontFamily ||
+      "'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
     // 초기화
     el.style.top = '';
@@ -124,12 +172,12 @@ export class Legend {
       end: 'flex-end',
     };
 
-    if (pos === 'top' || pos === 'bottom') {
+    if (side === 'top' || side === 'bottom') {
       el.style.left = '16px';
       el.style.right = '16px';
       el.style.justifyContent = justifyMap[align];
       el.style.alignItems = 'center';
-      if (pos === 'top') {
+      if (side === 'top') {
         el.style.top = '6px';
       } else {
         el.style.bottom = '6px';
@@ -139,9 +187,9 @@ export class Legend {
       el.style.bottom = '16px';
       el.style.flexDirection = 'column';
       el.style.justifyContent = justifyMap[align];
-      el.style.alignItems = 'flex-start';
+      el.style.alignItems = side === 'right' ? 'flex-start' : 'flex-start';
       el.style.maxWidth = '140px';
-      if (pos === 'left') {
+      if (side === 'left') {
         el.style.left = '8px';
       } else {
         el.style.right = '8px';
@@ -157,8 +205,8 @@ export class Legend {
       return {};
     }
 
-    const pos: LegendPosition = this.options.position ?? 'top';
-    switch (pos) {
+    const { side } = parseLegendAnchor(this.options.position, this.options.align ?? 'end');
+    switch (side) {
       case 'top':
         return { top: 28 };
       case 'bottom':
@@ -278,7 +326,7 @@ export class Legend {
       btn.style.borderRadius = '6px';
       btn.style.cursor = interactive ? 'pointer' : 'default';
       btn.style.fontSize = `${fontSize}px`;
-      btn.style.fontWeight = '500';
+      btn.style.fontWeight = String(this.options.fontWeight ?? '500');
       btn.style.lineHeight = '1.2';
       btn.style.fontFamily = 'inherit';
       btn.style.transition = 'all 0.15s ease';
@@ -348,8 +396,8 @@ export class Legend {
    * 각 범례 항목의 활성/비활성 및 호버 상태에 맞춰 스타일을 갱신합니다.
    */
   private syncItemStyles(): void {
-    const activeTextColor = this.options.textColor ?? '#E2E8F0';
-    const inactiveColor = this.options.inactiveColor ?? '#64748B';
+    const activeTextColor = resolveColor(this.options.textColor ?? '#E2E8F0');
+    const inactiveColor = resolveColor(this.options.inactiveColor ?? '#64748B');
 
     for (const item of this.items) {
       const els = this.itemElements.get(item.key);

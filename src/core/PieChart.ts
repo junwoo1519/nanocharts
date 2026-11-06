@@ -25,6 +25,11 @@ import { Tooltip } from '../components/Tooltip';
 import { Legend } from '../components/Legend';
 import { PieSeries } from '../series/PieSeries';
 import { buildSvgLegendGroup, wrapSvgDocument } from '../utils/svg';
+import {
+  normalizeResponsiveOptions,
+  resolveContainerDimensions,
+} from '../utils/responsive';
+import { buildCssFontString } from '../utils/tokens';
 
 export class PieChart extends EventEmitter {
   private container: HTMLElement;
@@ -68,7 +73,22 @@ export class PieChart extends EventEmitter {
 
     this.layerManager = new LayerManager(this.container);
     this.tooltip = new Tooltip(this.container, options.tooltip);
-    this.pieSeries = new PieSeries(options.pie, options.labels, options.center);
+    const labelFont = options.font
+      ? buildCssFontString(options.font, options.font.size ?? 11, options.font.weight ?? 600)
+      : undefined;
+    const centerOpts =
+      options.center && options.font
+        ? {
+            titleFont: buildCssFontString(options.font, (options.font.size ?? 11) + 9, 700),
+            subtitleFont: buildCssFontString(options.font, options.font.size ?? 11, 500),
+            ...options.center,
+          }
+        : options.center;
+    this.pieSeries = new PieSeries(
+      options.pie,
+      labelFont ? { font: labelFont, ...options.labels } : options.labels,
+      centerOpts
+    );
     this.legend = new Legend(
       this.container,
       this.resolveLegendOptions(options.legend),
@@ -109,18 +129,26 @@ export class PieChart extends EventEmitter {
 
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          if (width !== this.width || height !== this.height) {
-            this.resize(width, height);
+        const rawW = Math.round(entry.contentRect.width);
+        const rawH = Math.round(entry.contentRect.height);
+        if (rawW > 0) {
+          const { height } = resolveContainerDimensions(
+            this.container,
+            this.options.responsive,
+            1.35
+          );
+          const effectiveH = rawH > 10 ? rawH : height;
+          if (rawW !== this.width || effectiveH !== this.height) {
+            this.resize(rawW, effectiveH);
           }
         }
       }
     });
     this.resizeObserver.observe(this.container);
 
-    if (this.container.clientWidth > 0 && this.container.clientHeight > 0) {
-      this.resize(this.container.clientWidth, this.container.clientHeight);
+    const initialDims = resolveContainerDimensions(this.container, this.options.responsive, 1.35);
+    if (initialDims.width > 0 && initialDims.height > 0) {
+      this.resize(initialDims.width, initialDims.height);
     }
   }
 
@@ -129,24 +157,40 @@ export class PieChart extends EventEmitter {
     this.height = height;
     this.layerManager.resize(width, height);
 
+    const resp = normalizeResponsiveOptions(this.options.responsive, 1.35);
+    const isCompact = resp.enabled && width < resp.compactBreakpoint;
+    if (resp.onResize) {
+      resp.onResize(width, height, isCompact);
+    }
+    this.emit('resize', { width, height, isCompact });
+
     const shouldAnimate = !this.hasRenderedOnce;
     this.hasRenderedOnce = true;
     this.render(shouldAnimate);
   }
 
   private resolveLegendOptions(legendOpt?: PieChartOptions['legend']) {
+    const fontFields = this.options.font
+      ? {
+          fontFamily: this.options.font.family,
+          fontSize: this.options.font.size ? this.options.font.size + 1 : undefined,
+          fontWeight: this.options.font.weight,
+        }
+      : {};
     if (typeof legendOpt === 'boolean') {
       return {
         visible: legendOpt,
         position: 'bottom' as const,
         align: 'center' as const,
         markerShape: 'circle' as const,
+        ...fontFields,
       };
     }
     return {
       position: 'bottom' as const,
       align: 'center' as const,
       markerShape: 'circle' as const,
+      ...fontFields,
       ...legendOpt,
     };
   }
@@ -182,11 +226,13 @@ export class PieChart extends EventEmitter {
     });
 
     const reserved = this.legend.getReservedPadding();
+    const isCompact = this.width < 460 || this.height < 280;
+    const padScale = isCompact ? 0.65 : 1;
     const effectivePadding: Padding = {
-      top: this.padding.top + (reserved.top ?? 0),
-      right: this.padding.right + (reserved.right ?? 0),
-      bottom: this.padding.bottom + (reserved.bottom ?? 0),
-      left: this.padding.left + (reserved.left ?? 0),
+      top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
+      right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
+      bottom: Math.round(this.padding.bottom * padScale) + (reserved.bottom ?? 0),
+      left: Math.round(this.padding.left * padScale) + (reserved.left ?? 0),
     };
 
     // 조각 기하학 수치 재계산
@@ -247,6 +293,16 @@ export class PieChart extends EventEmitter {
       this.legend.setHoveredKey(null);
       this.tooltip.hide();
     });
+
+    // 모바일/태블릿 터치 호버 지원
+    const onTouch = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const rect = interactionCanvas.getBoundingClientRect();
+      this.handleHover(touch.clientX - rect.left, touch.clientY - rect.top);
+    };
+    interactionCanvas.addEventListener('touchstart', onTouch, { passive: true });
+    interactionCanvas.addEventListener('touchmove', onTouch, { passive: true });
   }
 
   private showSliceTooltip(tx: number, ty: number, targetSlice: PieSliceGeometry, index: number): void {
@@ -426,11 +482,13 @@ export class PieChart extends EventEmitter {
     });
 
     const reserved = this.legend.getReservedPadding();
+    const isCompact = this.width < 460 || this.height < 280;
+    const padScale = isCompact ? 0.65 : 1;
     const effectivePadding: Padding = {
-      top: this.padding.top + (reserved.top ?? 0),
-      right: this.padding.right + (reserved.right ?? 0),
-      bottom: this.padding.bottom + (reserved.bottom ?? 0),
-      left: this.padding.left + (reserved.left ?? 0),
+      top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
+      right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
+      bottom: Math.round(this.padding.bottom * padScale) + (reserved.bottom ?? 0),
+      left: Math.round(this.padding.left * padScale) + (reserved.left ?? 0),
     };
 
     const slices = this.pieSeries.calculateSlices(activeData, svgW, svgH, effectivePadding);

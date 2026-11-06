@@ -221,17 +221,69 @@ export interface BarStyleOptions {
 }
 
 /**
+ * 차트 전역 폰트(타이포그래피) 설정 옵션
+ */
+export interface ChartFontOptions {
+  /** 기본 폰트 패밀리 (예: `'Pretendard, Inter, sans-serif'`) */
+  family?: string;
+  /** 기본 폰트 크기 (px, 기본값: 11) */
+  size?: number;
+  /** 기본 폰트 두께 (예: `500`, `600`, `'bold'`) */
+  weight?: number | string;
+}
+
+/**
+ * 격자선 선 패턴 프리셋 타입
+ * - `'solid'`: 실선
+ * - `'dashed'`: 파선 ([5, 4])
+ * - `'dotted'`: 점선 ([2, 3])
+ */
+export type GridStrokePattern = 'solid' | 'dashed' | 'dotted';
+
+/**
  * 격자선(Grid) 단일 축 스타일
  */
 export interface GridLineStyle {
-  /** 표시 여부 (기본값: true) */
+  /** 표시 여부 (Y축 기본값: true, X축 기본값: false) */
   visible?: boolean;
   /** 선 색상 (기본값: '#F1F5F9') */
   color?: string;
+  /** 선 불투명도 (0.0 ~ 1.0, 기본값: 1.0) */
+  opacity?: number;
   /** 선 두께 (기본값: 1) */
   lineWidth?: number;
-  /** 점선 간격 (기본값: [3, 3]) */
+  /** 선 스타일 프리셋 ('solid' | 'dashed' | 'dotted') */
+  style?: GridStrokePattern;
+  /** 점선 간격 배열 (예: [3, 3], [] 지정 시 실선) */
   lineDash?: number[];
+}
+
+/**
+ * 차트 플롯 영역 외곽 테두리 박스 스타일
+ */
+export interface GridBorderStyle {
+  /** 플롯 외곽 박스 표시 여부 (기본값: false) */
+  visible?: boolean;
+  /** 테두리 색상 */
+  color?: string;
+  /** 테두리 선 두께 (px, 기본값: 1) */
+  lineWidth?: number;
+  /** 테두리 점선 패턴 배열 */
+  lineDash?: number[];
+  /** 테두리 모서리 둥글기 (px, 기본값: 0) */
+  radius?: number;
+}
+
+/**
+ * 격자 사이 줄무늬 배경(Alternate Band / Zebra Fill) 스타일
+ */
+export interface GridAlternateBandStyle {
+  /** 줄무늬 배경 표시 여부 (기본값: false) */
+  visible?: boolean;
+  /** 짝수 밴드 채우기 색상 (예: `'rgba(148, 163, 184, 0.06)'`) */
+  color?: string;
+  /** 줄무늬 방향 ('horizontal': 가로 줄무늬, 'vertical': 세로 줄무늬, 기본값: 'horizontal') */
+  direction?: 'horizontal' | 'vertical';
 }
 
 /** 배경 그리드 옵션 */
@@ -240,6 +292,10 @@ export interface GridOptions {
   x?: GridLineStyle;
   /** 수평(Y) 격자선 옵션 */
   y?: GridLineStyle;
+  /** 차트 플롯 외곽 테두리 박스 옵션 */
+  border?: GridBorderStyle;
+  /** 격자 줄무늬 배경(Alternate Band) 옵션 */
+  alternateBand?: GridAlternateBandStyle;
 }
 
 /** 축(Axis) 옵션 (X축, Y축 공통) */
@@ -297,13 +353,31 @@ export interface TooltipOptions {
 }
 
 /**
- * 범례(Legend) 배치 위치
- * - `'top'`: 차트 상단
- * - `'bottom'`: 차트 하단
- * - `'left'`: 차트 좌측
- * - `'right'`: 차트 우측
+ * 범례(Legend) 배치 위치 (상좌/상중/상우, 하좌/하중/하우, 좌상/좌중/좌하, 우상/우중/우하 12방향 지원)
+ * - `'top'` / `'top-left'` / `'top-center'` / `'top-right'`: 상단 좌/중/우
+ * - `'bottom'` / `'bottom-left'` / `'bottom-center'` / `'bottom-right'`: 하단 좌/중/우
+ * - `'left'` / `'left-top'` / `'left-middle'` / `'left-center'` / `'left-bottom'`: 좌측 상/중/하
+ * - `'right'` / `'right-top'` / `'right-middle'` / `'right-center'` / `'right-bottom'`: 우측 상/중/하
  */
-export type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
+export type LegendPosition =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
+  | 'left-top'
+  | 'left-middle'
+  | 'left-center'
+  | 'left-bottom'
+  | 'right-top'
+  | 'right-middle'
+  | 'right-center'
+  | 'right-bottom';
 
 /**
  * 범례(Legend) 정렬 방식
@@ -362,6 +436,10 @@ export interface LegendOptions {
   interactive?: boolean;
   /** 글자 크기 (px, 기본값: 12) */
   fontSize?: number;
+  /** 폰트 패밀리 (예: `'Pretendard, Inter, sans-serif'`) */
+  fontFamily?: string;
+  /** 폰트 두께 (예: `500`, `600`, `'bold'`) */
+  fontWeight?: number | string;
   /** 활성 항목 글자 색상 (기본값: '#E2E8F0') */
   textColor?: string;
   /** 비활성(숨김) 항목 글자 색상 (기본값: '#64748B') */
@@ -417,6 +495,37 @@ export interface AnimationOptions {
 }
 
 /**
+ * 반응형(Responsive) 레이아웃 및 브레이크포인트 자동 보정 옵션
+ *
+ * @example
+ * ```ts
+ * const responsive: ResponsiveOptions = {
+ *   enabled: true,
+ *   aspectRatio: 1.6, // 가로:세로 16:10 비율 자동 유지
+ *   minHeight: 220,
+ *   compactBreakpoint: 480
+ * };
+ * ```
+ */
+export interface ResponsiveOptions {
+  /** 반응형 여백/크기 자동 보정 활성화 여부 (기본값: true) */
+  enabled?: boolean;
+  /**
+   * 컨테이너에 명시적 CSS `height`가 없거나 비율 고정 모드를 원할 때 적용할 가로/세로 비율
+   * (예: `1.6` = 16:10 비율, `2.0` = 2:1 와이드 비율)
+   */
+  aspectRatio?: number;
+  /** 자동 높이 산출 시 보장할 최소 높이 (px, 기본값: 200) */
+  minHeight?: number;
+  /** 자동 높이 산출 시 제한할 최대 높이 (px) */
+  maxHeight?: number;
+  /** 모바일/컴팩트 모드로 전환할 기준 가로 너비 (px, 기본값: 480) */
+  compactBreakpoint?: number;
+  /** 컨테이너 리사이즈 시 호출되는 콜백 */
+  onResize?: (width: number, height: number, isCompact: boolean) => void;
+}
+
+/**
  * BarChart 전체 초기화 옵션
  */
 export interface BarChartOptions {
@@ -428,6 +537,10 @@ export interface BarChartOptions {
   xLabels?: string[];
   /** 차트 내부 여백 설정 */
   padding?: Partial<Padding>;
+  /** 차트 전역 폰트(패밀리, 크기, 두께) 설정 */
+  font?: ChartFontOptions;
+  /** 반응형 레이아웃 및 자동 여백/비율 설정 (`true`/`false` 또는 상세 설정 객체, 기본값: true) */
+  responsive?: boolean | ResponsiveOptions;
   /** 바 스타일 옵션 */
   bar?: BarStyleOptions;
   /** 데이터 수치 라벨 옵션 */
@@ -558,6 +671,10 @@ export interface PieChartOptions {
   data: DataItem[];
   /** 차트 내부 여백 설정 */
   padding?: Partial<Padding>;
+  /** 차트 전역 폰트(패밀리, 크기, 두께) 설정 */
+  font?: ChartFontOptions;
+  /** 반응형 레이아웃 및 자동 여백/비율 설정 (`true`/`false` 또는 상세 설정 객체, 기본값: true) */
+  responsive?: boolean | ResponsiveOptions;
   /** 파이/도넛 형태 및 색상 스타일 */
   pie?: PieStyleOptions;
   /** 데이터 라벨 옵션 */
@@ -647,6 +764,22 @@ export interface AreaStyleOptions {
   fill?: ColorStyle;
   /** 전체 채우기 영역의 투명도 (0.0 ~ 1.0, 기본값: 1.0) */
   opacity?: number;
+  /** 그라데이션 상단(시작점) 불투명도 (0.0 ~ 1.0, 기본값: 0.42) */
+  topOpacity?: number;
+  /** 그라데이션 하단(끝점) 불투명도 (0.0 ~ 1.0, 기본값: 0.02) */
+  bottomOpacity?: number;
+  /** 그라데이션 상단 채도(Saturation, 0 ~ 100%, 미지정 시 원본 선 색상 채도 사용) */
+  topSaturation?: number;
+  /** 그라데이션 하단 채도(Saturation, 0 ~ 100%, 미지정 시 상단 채도와 동일) */
+  bottomSaturation?: number;
+  /** 원본 선 색상 대비 채도 증감치 (-100 ~ +100) */
+  saturationDelta?: number;
+  /** 그라데이션 상단 명도(Lightness, 0 ~ 100%, 미지정 시 원본 선 색상 명도 사용) */
+  topLightness?: number;
+  /** 그라데이션 하단 명도(Lightness, 0 ~ 100%, 미지정 시 상단 명도와 동일) */
+  bottomLightness?: number;
+  /** 원본 선 색상 대비 명도 증감치 (-100 ~ +100) */
+  lightnessDelta?: number;
 }
 
 /**
@@ -731,6 +864,10 @@ export interface LineChartOptions {
   stacked?: boolean;
   /** 차트 내부 여백 설정 */
   padding?: Partial<Padding>;
+  /** 차트 전역 폰트(패밀리, 크기, 두께) 설정 */
+  font?: ChartFontOptions;
+  /** 반응형 레이아웃 및 자동 여백/비율 설정 (`true`/`false` 또는 상세 설정 객체, 기본값: true) */
+  responsive?: boolean | ResponsiveOptions;
   /** 선(Line) 스타일 옵션 */
   line?: LineStyleOptions;
   /** 영역(Area) 채우기 스타일 옵션 */
@@ -793,6 +930,123 @@ export interface SvgExportOptions {
   includeLegend?: boolean;
   /** 배경 격자선(Grid)을 SVG 벡터 레이어에 포함할지 여부 (기본값: true) */
   includeGrid?: boolean;
+}
+
+// ==========================================
+// 🔻 Funnel Chart Types
+// ==========================================
+
+/**
+ * 퍼널(Funnel) 차트 진행 방향
+ * - `'vertical'`: 상단에서 하단으로 좁아지는 세로형 퍼널 (기본값)
+ * - `'horizontal'`: 좌측에서 우측으로 좁아지는 가로형 퍼널
+ */
+export type FunnelDirection = 'vertical' | 'horizontal';
+
+/**
+ * 퍼널(Funnel) 단계 도형 형태
+ * - `'trapezoid'`: 다음 단계의 폭과 부드럽게 사다리꼴로 연결되는 형태 (기본값)
+ * - `'bar'`: 각 단계가 독립된 둥근 사각형 바로 중앙 정렬되는 형태
+ */
+export type FunnelShape = 'trapezoid' | 'bar';
+
+/**
+ * 계산된 단일 퍼널 단계(Stage)의 기하학 정보
+ */
+export interface FunnelStageGeometry {
+  /** 단계 인덱스 (0부터 시작) */
+  index: number;
+  /** 원본 데이터 아이템 */
+  item: DataItem;
+  /** 채우기 색상 */
+  color: string;
+  /** 다각형 꼭짓점 좌표 배열 (시계 방향 4개 점: `[{x, y}, ...]`) */
+  points: { x: number; y: number }[];
+  /** 바운딩 박스 시작 X */
+  x: number;
+  /** 바운딩 박스 시작 Y */
+  y: number;
+  /** 바운딩 박스 가로 폭 */
+  width: number;
+  /** 바운딩 박스 세로 높이 */
+  height: number;
+  /** 중심점 X */
+  cx: number;
+  /** 중심점 Y */
+  cy: number;
+  /** 최초(1단계) 값 대비 비율 (0.0 ~ 1.0) */
+  overallRatio: number;
+  /** 직전 단계 값 대비 전환율 (0.0 ~ 1.0, 첫 단계는 1.0) */
+  stepConversionRate: number;
+}
+
+/**
+ * 퍼널 차트 도형 및 전환율 표시 스타일 옵션
+ */
+export interface FunnelStyleOptions {
+  /** 퍼널 진행 방향 ('vertical': 상->하, 'horizontal': 좌->우, 기본값: 'vertical') */
+  direction?: FunnelDirection;
+  /** 퍼널 단계 모양 ('trapezoid': 사다리꼴 연결, 'bar': 단계별 바, 기본값: 'trapezoid') */
+  shape?: FunnelShape;
+  /** 단계 사이의 간격 (px, 기본값: 4) */
+  gap?: number;
+  /** 'bar' 형태일 때 모서리 둥글기 (px, 기본값: 6) */
+  borderRadius?: number;
+  /** 가장 작은 단계가 유지할 최소 크기 비율 (0.08 ~ 0.5, 기본값: 0.16) */
+  minSizeRatio?: number;
+  /** 마지막 단계의 끝부분 폭을 그 단계 자체 비율로 유지할지('pinch': 뾰족하게, 'flat': 평평하게, 기본값: 'flat') */
+  neckStyle?: 'flat' | 'pinch';
+  /** 단계별 컬러 팔레트 */
+  colors?: string[] | ((item: DataItem, index: number) => string);
+  /** 단계 간 전환율(%) 배지 표시 여부 (기본값: true) */
+  showConversion?: boolean;
+  /** 전환율 계산 기준 ('previous': 직전 단계 대비 %, 'first': 첫 단계 대비 %, 기본값: 'previous') */
+  conversionBase?: 'previous' | 'first';
+  /** 외곽 테두리 스타일 */
+  border?: {
+    color?: string;
+    width?: number;
+  };
+}
+
+/**
+ * 퍼널 데이터 라벨 옵션
+ */
+export interface FunnelLabelOptions {
+  /** 라벨 표시 여부 (기본값: true) */
+  visible?: boolean;
+  /** 라벨 위치 ('inside': 도형 중앙, 'outside': 바깥쪽 측면, 'none': 숨김, 기본값: 'inside') */
+  position?: 'inside' | 'outside' | 'none';
+  /** 폰트 스타일 */
+  font?: string;
+  /** 글자 색상 */
+  color?: string;
+  /** 커스텀 라벨 포맷터 */
+  formatter?: (item: DataItem, stage: FunnelStageGeometry) => string;
+}
+
+/**
+ * FunnelChart 전체 초기화 옵션
+ */
+export interface FunnelChartOptions {
+  /** 퍼널 단계별 데이터 배열 */
+  data: DataItem[];
+  /** 차트 내부 여백 설정 */
+  padding?: Partial<Padding>;
+  /** 차트 전역 폰트(패밀리, 크기, 두께) 설정 */
+  font?: ChartFontOptions;
+  /** 반응형 레이아웃 및 자동 여백/비율 설정 (기본값: true) */
+  responsive?: boolean | ResponsiveOptions;
+  /** 퍼널 도형 및 진행 방향 스타일 옵션 */
+  funnel?: FunnelStyleOptions;
+  /** 단계 라벨 옵션 */
+  labels?: FunnelLabelOptions;
+  /** 툴팁 옵션 */
+  tooltip?: TooltipOptions;
+  /** 범례(Legend) 표시 및 데이터 토글 옵션 */
+  legend?: boolean | LegendOptions;
+  /** 렌더링 애니메이션 옵션 */
+  animation?: boolean | AnimationOptions;
 }
 
 

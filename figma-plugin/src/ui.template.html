@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NanoCharts — Figma Vector Studio</title>
+  <title>NanoCharts — Figma Vector & Token Studio</title>
   <style>
     * {
       box-sizing: border-box;
@@ -21,7 +21,7 @@
     }
     /* 좌측 설정 사이드바 */
     .sidebar {
-      width: 310px;
+      width: 345px;
       background: #111827;
       border-right: 1px solid #1E293B;
       display: flex;
@@ -30,7 +30,7 @@
       flex-shrink: 0;
     }
     .sidebar-header {
-      padding: 14px 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid #1E293B;
       display: flex;
       align-items: center;
@@ -46,24 +46,33 @@
     }
     .badge {
       font-size: 10px;
-      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      background: linear-gradient(135deg, #226CFF, #785CFD);
       color: #fff;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 999px;
       font-weight: 600;
     }
     .sidebar-body {
-      padding: 14px 16px;
+      padding: 12px 16px;
       overflow-y: auto;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 11px;
+    }
+    .section-divider {
+      font-size: 10px;
+      font-weight: 700;
+      color: #60A5FA;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-top: 6px;
+      border-top: 1px solid #1E293B;
     }
     .field {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
     .field label {
       font-size: 11px;
@@ -74,6 +83,15 @@
       align-items: center;
     }
     .seg-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: #0B0F19;
+      padding: 3px;
+      border-radius: 7px;
+      border: 1px solid #1E293B;
+    }
+    .seg-group-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 4px;
@@ -97,7 +115,7 @@
       color: #F8FAFC;
     }
     .seg-btn.active {
-      background: #4F46E5;
+      background: #226CFF;
       color: #FFFFFF;
     }
     select, input[type="text"], input[type="number"], textarea {
@@ -106,37 +124,88 @@
       color: #F8FAFC;
       border: 1px solid #1E293B;
       border-radius: 6px;
-      padding: 6px 9px;
-      font-size: 12px;
+      padding: 5px 8px;
+      font-size: 11.5px;
       font-family: inherit;
       outline: none;
     }
     select:focus, input:focus, textarea:focus {
-      border-color: #6366F1;
+      border-color: #226CFF;
     }
     textarea {
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 11px;
-      line-height: 1.45;
+      line-height: 1.42;
       resize: vertical;
-      min-height: 92px;
+      min-height: 76px;
     }
     .row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
     input[type="range"] {
       width: 100%;
-      accent-color: #6366F1;
+      accent-color: #226CFF;
     }
     .checkbox-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-size: 11px;
       color: #CBD5E1;
       cursor: pointer;
+    }
+    .token-box {
+      background: #0B0F19;
+      border: 1px solid #1E293B;
+      border-radius: 8px;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .token-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .token-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      background: #151C2C;
+      border: 1px solid #263147;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #CBD5E1;
+    }
+    .token-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .btn-mini {
+      background: #1E293B;
+      color: #93C5FD;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-mini:hover {
+      background: #334155;
+      color: #FFFFFF;
     }
     /* 우측 프리뷰 & 액션 영역 */
     .main-area {
@@ -153,6 +222,20 @@
       justify-content: space-between;
       align-items: center;
       background: #111827;
+      gap: 8px;
+    }
+    .toolbar-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .var-status-badge {
+      font-size: 11px;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
     }
     .selection-badge {
       font-size: 11px;
@@ -168,18 +251,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 18px;
       overflow: hidden;
     }
     .chart-box {
       width: 100%;
       height: 100%;
-      max-height: 460px;
-      background: #151C2C;
+      max-height: 490px;
+      background: #FFFFFF;
       border: 1px solid #1E293B;
       border-radius: 14px;
       position: relative;
       box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+      transition: background 0.18s;
     }
     #preview-canvas {
       width: 100%;
@@ -204,7 +288,7 @@
       gap: 8px;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      background: linear-gradient(135deg, #226CFF, #785CFD);
       color: #FFFFFF;
       border: none;
       padding: 8px 16px;
@@ -237,52 +321,71 @@
   <!-- 좌측 옵션 컨트롤 -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h1>NanoCharts <span class="badge">Figma Vector</span></h1>
+      <h1>NanoCharts <span class="badge">v0.1.7 Studio</span></h1>
     </div>
 
     <div class="sidebar-body">
-      <!-- 1. 차트 종류 -->
+      <!-- 1. 차트 종류 (Bar / Line / Donut / Funnel) -->
       <div class="field">
         <label>차트 종류</label>
         <div class="seg-group" id="type-group">
           <button class="seg-btn active" data-type="bar">📊 Bar</button>
           <button class="seg-btn" data-type="line">📈 Line</button>
           <button class="seg-btn" data-type="pie">🍩 Donut</button>
+          <button class="seg-btn" data-type="funnel">🔻 Funnel</button>
         </div>
       </div>
 
-      <!-- 2. 시리즈 구성 -->
+      <!-- 2. 시리즈 구성 (Bar/Line 전용) -->
       <div class="field" id="series-mode-field">
         <label>시리즈 배치 모드</label>
         <select id="series-mode">
           <option value="grouped">다중 비교 (Grouped Bar / Multi-Line)</option>
           <option value="stacked">누적형 (Stacked Bar / Stacked Area)</option>
           <option value="percent">100% 비율 누적 (Percent Bar)</option>
-          <option value="single">단일 시리즈 (Single)</option>
+          <option value="single">단일 시리즈 (Single --primary)</option>
         </select>
       </div>
 
-      <!-- 3. 컬러 테마 -->
-      <div class="field">
-        <label>컬러 팔레트 & 그라데이션</label>
-        <select id="theme-select">
-          <option value="indigo-purple">인디고-퍼플 모던 (기본)</option>
-          <option value="cyber-cyan">사이버 청록 & 블루</option>
-          <option value="warm-orange">선셋 오렌지 & 로즈</option>
-        </select>
+      <!-- 3. variables.scss 디자인 토큰 팔레트 & 배경 모드 -->
+      <div class="row-2">
+        <div class="field">
+          <label>토큰 팔레트 (variables.scss)</label>
+          <select id="theme-select">
+            <option value="weseed-categorical">기본 카테고리 (--primary, --teal...)</option>
+            <option value="weseed-primary-scale">Primary 톤온톤 (--primary-high...)</option>
+            <option value="weseed-cool">Cool 블루/청록 (--blue, --sky...)</option>
+            <option value="weseed-warm">Warm 레드/앰버 (--red, --amber...)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>배경 테마 (Surface)</label>
+          <select id="surface-mode">
+            <option value="light">Light (--surface-ultra-low)</option>
+            <option value="dark">Dark (--surface-ultra-high)</option>
+          </select>
+        </div>
       </div>
 
-      <!-- 4. 시리즈 이름 (다중 모드) -->
+      <!-- 활성 토큰 미리보기 및 피그마 변수 동기화 -->
+      <div class="token-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:#94A3B8;font-weight:600;">매핑될 피그마 변수명 (자동 감지)</span>
+          <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 variables.scss 로컬 변수를 일괄 생성합니다">📦 파일에 변수 등록</button>
+        </div>
+        <div class="token-chips" id="active-token-chips"></div>
+      </div>
+
+      <!-- 4. 데이터 & 시리즈 이름 -->
       <div class="field" id="series-names-field">
         <label>시리즈 이름 (쉼표 구분)</label>
         <input type="text" id="series-names-input" value="Frontend, Backend, AI/Cloud" />
       </div>
 
-      <!-- 5. 데이터 입력 -->
       <div class="field">
         <label>
           <span>데이터 편집 (라벨: 값1, 값2...)</span>
-          <span style="color:#6366F1;cursor:pointer;" id="random-data-btn">🎲 랜덤 생성</span>
+          <span style="color:#5991FF;cursor:pointer;" id="random-data-btn">🎲 랜덤 생성</span>
         </label>
         <textarea id="data-textarea">1월: 120, 85, 45
 2월: 155, 110, 60
@@ -292,7 +395,7 @@
 6월: 260, 175, 140</textarea>
       </div>
 
-      <!-- 6. 세부 비주얼 조정 -->
+      <!-- 5. 차트별 전용 컨트롤 -->
       <div class="row-2" id="bar-controls">
         <div class="field">
           <label>모서리 둥글기 <span id="radius-txt">6px</span></label>
@@ -304,29 +407,182 @@
         </div>
       </div>
 
-      <div class="field" id="line-controls" style="display:none;">
-        <label>라인 곡선 형태</label>
-        <select id="curve-select">
-          <option value="smooth">부드러운 곡선 (smooth)</option>
-          <option value="linear">직선 (linear)</option>
-          <option value="step">계단형 (step)</option>
-        </select>
+      <!-- Line & Area 전용 (채도/명도 그라데이션 커스텀 포함) -->
+      <div id="line-controls" style="display:none;flex-direction:column;gap:8px;">
+        <div class="row-2">
+          <div class="field">
+            <label>라인 곡선 형태</label>
+            <select id="curve-select">
+              <option value="smooth">부드러운 곡선 (smooth)</option>
+              <option value="linear">직선 (linear)</option>
+              <option value="step">계단형 (step)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Area 상단 투명도 <span id="area-op-txt">45%</span></label>
+            <input type="range" id="area-op-slider" min="5" max="90" value="45" step="5" />
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Area 채도(S) 증감 <span id="area-sat-txt">0%</span></label>
+            <input type="range" id="area-sat-slider" min="-80" max="80" value="0" step="5" />
+          </div>
+          <div class="field">
+            <label>Area 명도(L) 증감 <span id="area-light-txt">0%</span></label>
+            <input type="range" id="area-light-slider" min="-50" max="50" value="0" step="5" />
+          </div>
+        </div>
       </div>
 
+      <!-- Pie / Donut 전용 -->
       <div class="field" id="pie-controls" style="display:none;">
         <label>도넛 내부 구멍 비율 <span id="hole-txt">60%</span></label>
         <input type="range" id="hole-slider" min="0" max="80" value="60" step="5" />
       </div>
 
-      <!-- 7. 피그마 프레임 추출 크기 & 옵션 -->
+      <!-- Funnel 전용 (상하/좌우 방향 및 사다리꼴/바 모양) -->
+      <div id="funnel-controls" style="display:none;flex-direction:column;gap:8px;">
+        <div class="row-2">
+          <div class="field">
+            <label>퍼널 진행 방향</label>
+            <select id="funnel-dir-select">
+              <option value="vertical">상 ➔ 하 (Vertical 기본)</option>
+              <option value="horizontal">좌 ➔ 우 (Horizontal)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>퍼널 도형 모양</label>
+            <select id="funnel-shape-select">
+              <option value="trapezoid">사다리꼴 연결 (Trapezoid)</option>
+              <option value="bar">단계별 바 (Bar)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>단계 간격 (Gap) <span id="funnel-gap-txt">4px</span></label>
+            <input type="range" id="funnel-gap-slider" min="0" max="16" value="4" />
+          </div>
+          <div class="field">
+            <label>라벨 표시 위치</label>
+            <select id="funnel-label-pos">
+              <option value="inside">도형 내부 (Inside)</option>
+              <option value="outside">바깥 측면 (Outside)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 범례(Legend) 12방향 배치 & 폰트(Typography) 설정 -->
+      <div class="section-divider">범례(12방향) & 타이포그래피</div>
+      <div class="row-2">
+        <div class="field">
+          <label>범례 위치 (상/하/좌/우 세분화)</label>
+          <select id="legend-pos-select">
+            <option value="top-left">↖ 상좌 (top-left)</option>
+            <option value="top-center">⬆ 상중 (top-center)</option>
+            <option value="top-right" selected>↗ 상우 (top-right)</option>
+            <option value="bottom-left">↙ 하좌 (bottom-left)</option>
+            <option value="bottom-center">⬇ 하중 (bottom-center)</option>
+            <option value="bottom-right">↘ 하우 (bottom-right)</option>
+            <option value="left-top">⬅ 좌상 (left-top)</option>
+            <option value="left-middle">⬅ 좌중 (left-middle)</option>
+            <option value="left-bottom">⬅ 좌하 (left-bottom)</option>
+            <option value="right-top">➡ 우상 (right-top)</option>
+            <option value="right-middle">➡ 우중 (right-middle)</option>
+            <option value="right-bottom">➡ 우하 (right-bottom)</option>
+            <option value="none">🚫 숨김 (None)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>폰트 패밀리 (Font)</label>
+          <select id="font-family-select">
+            <option value="Pretendard, Inter, sans-serif">Pretendard (기본)</option>
+            <option value="Inter, -apple-system, sans-serif">Inter</option>
+            <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+            <option value="Roboto, sans-serif">Roboto</option>
+            <option value="Montserrat, sans-serif">Montserrat</option>
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            <option value="custom">직접 입력...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="custom-font-field" style="display:none;">
+        <label>커스텀 폰트명 입력</label>
+        <input type="text" id="custom-font-input" placeholder="예: Spoqa Han Sans Neo, sans-serif" value="Spoqa Han Sans Neo, sans-serif" />
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>기본 폰트 크기 <span id="font-size-txt">11px</span></label>
+          <input type="range" id="font-size-slider" min="9" max="16" value="11" />
+        </div>
+        <div class="field">
+          <label>폰트 두께 (Weight)</label>
+          <select id="font-weight-select">
+            <option value="400">Regular (400)</option>
+            <option value="500" selected>Medium (500)</option>
+            <option value="600">SemiBold (600)</option>
+            <option value="700">Bold (700)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 7. 그리드(Grid) 선 커스텀 -->
+      <div id="grid-controls" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="section-divider">그리드(Grid) 선 & 테두리 커스텀</div>
+        <div class="row-2">
+          <div class="field">
+            <label>그리드 선 패턴</label>
+            <select id="grid-style-select">
+              <option value="dashed" selected>파선 (Dashed)</option>
+              <option value="dotted">점선 (Dotted)</option>
+              <option value="solid">실선 (Solid)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>그리드 선 두께 <span id="grid-width-txt">1px</span></label>
+            <input type="range" id="grid-width-slider" min="1" max="3" value="1" step="0.5" />
+          </div>
+        </div>
+        <div class="row-2">
+          <label class="checkbox-row">
+            <input type="checkbox" id="chk-grid-y" checked /> 가로 그리드(Y)
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="chk-grid-x" /> 세로 그리드(X)
+          </label>
+        </div>
+        <div class="row-2">
+          <label class="checkbox-row">
+            <input type="checkbox" id="chk-grid-border" /> 외곽 박스(Plot Border)
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="chk-grid-band" /> 줄무늬 배경(Band)
+          </label>
+        </div>
+      </div>
+
+      <!-- 8. 반응형 프리셋 및 피그마 프레임 추출 크기 -->
+      <div class="section-divider">반응형 크기 & 내보내기</div>
+      <div class="field">
+        <div class="seg-group-3" id="size-preset-group">
+          <button class="seg-btn active" data-w="640" data-h="400">🖥 Desktop</button>
+          <button class="seg-btn" data-w="480" data-h="320">📱 Tablet</button>
+          <button class="seg-btn" data-w="320" data-h="240">📲 Mobile</button>
+        </div>
+      </div>
+
       <div class="row-2">
         <div class="field">
           <label>추출 너비 (W)</label>
-          <input type="number" id="export-w" value="640" min="240" max="2400" step="20" />
+          <input type="number" id="export-w" value="640" min="200" max="2400" step="20" />
         </div>
         <div class="field">
           <label>추출 높이 (H)</label>
-          <input type="number" id="export-h" value="400" min="200" max="1600" step="20" />
+          <input type="number" id="export-h" value="400" min="160" max="1600" step="20" />
         </div>
       </div>
 
@@ -335,28 +591,35 @@
           <input type="checkbox" id="chk-labels" checked /> 수치 라벨 표시
         </label>
         <label class="checkbox-row">
-          <input type="checkbox" id="chk-bg" checked /> 다크 카드 배경 포함
+          <input type="checkbox" id="chk-bg" checked /> 카드 배경 포함
         </label>
       </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="chk-bind-vars" checked /> 🔗 프로젝트 피그마 변수(Variables)에 자동 바인딩
+      </label>
     </div>
   </aside>
 
   <!-- 우측 실시간 Canvas 2D 프리뷰 및 삽입 액션 -->
   <main class="main-area">
     <div class="preview-toolbar">
-      <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (Canvas 2D Engine)</div>
-      <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
+      <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
+      <div class="toolbar-badges">
+        <div class="var-status-badge" id="var-status-badge">🔗 variables.scss 기본 토큰 사용 중</div>
+        <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
+      </div>
     </div>
 
     <div class="preview-stage">
-      <div class="chart-box">
+      <div class="chart-box" id="chart-box">
         <div id="preview-canvas"></div>
       </div>
     </div>
 
     <div class="footer-bar">
       <div class="footer-hint">
-        💡 삽입 시 피그마의 <strong>Frame, Vector, Rectangle, Text</strong> 레이어로 분해되어 개별 편집이 가능합니다.
+        💡 삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
       </div>
       <div class="action-btns">
         <button class="btn-secondary" id="update-selected-btn">🔄 선택된 차트 업데이트</button>
@@ -368,32 +631,102 @@
   <script type="module">
     /* __NANOCHARTS_INLINE_BUNDLE__ */
 
+    const TOKEN_PALETTES = {
+      'weseed-categorical': [
+        'primary',
+        'teal',
+        'indigo',
+        'amber',
+        'pink',
+        'cyan',
+        'green',
+        'purple',
+        'orange',
+        'red',
+      ],
+      'weseed-primary-scale': [
+        'primary',
+        'primary-high',
+        'primary-mid',
+        'primary-low',
+        'primary-higher',
+        'primary-highest',
+      ],
+      'weseed-cool': ['blue', 'sky', 'cyan', 'teal', 'indigo', 'purple'],
+      'weseed-warm': ['red', 'orange', 'amber', 'yellow', 'pink', 'violet'],
+    };
+
+    let projectTokenHexMap = {};
+    let currentHexToTokenMap = {};
+
     let state = {
       chartType: 'bar',
       seriesMode: 'grouped',
-      theme: 'indigo-purple',
+      theme: 'weseed-categorical',
+      surfaceMode: 'light',
       seriesNames: 'Frontend, Backend, AI/Cloud',
       rawText: `1월: 120, 85, 45\n2월: 155, 110, 60\n3월: 135, 95, 75\n4월: 190, 130, 90\n5월: 225, 150, 115\n6월: 260, 175, 140`,
       radius: 6,
       widthRatio: 0.65,
       curve: 'smooth',
+      areaTopOpacity: 0.45,
+      areaSatDelta: 0,
+      areaLightDelta: 0,
       holeRatio: 0.6,
+      funnelDirection: 'vertical',
+      funnelShape: 'trapezoid',
+      funnelGap: 4,
+      funnelLabelPos: 'inside',
+      legendPos: 'top-right',
+      fontFamilyPreset: 'Pretendard, Inter, sans-serif',
+      customFontFamily: 'Spoqa Han Sans Neo, sans-serif',
+      fontSize: 11,
+      fontWeight: '500',
+      gridStyle: 'dashed',
+      gridWidth: 1,
+      gridY: true,
+      gridX: false,
+      gridBorder: false,
+      gridBand: false,
       exportW: 640,
       exportH: 400,
       showLabels: true,
       includeBg: true,
-    };
-
-    const PALETTES = {
-      'indigo-purple': ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'],
-      'cyber-cyan': ['#06B6D4', '#3B82F6', '#8B5CF6', '#14B8A6', '#F43F5E'],
-      'warm-orange': ['#F97316', '#F43F5E', '#EAB308', '#A855F7', '#06B6D4'],
+      bindVariables: true,
     };
 
     let activeChart = null;
     const containerEl = document.getElementById('preview-canvas');
+    const chartBoxEl = document.getElementById('chart-box');
+
+    function useTokenColor(tokenKey) {
+      const hex = (projectTokenHexMap[tokenKey] || DESIGN_TOKENS[tokenKey] || '#226CFF').toUpperCase();
+      if (!currentHexToTokenMap[hex]) {
+        currentHexToTokenMap[hex] = tokenKey;
+      }
+      return hex;
+    }
+
+    function renderTokenChips(tokenNames) {
+      const wrap = document.getElementById('active-token-chips');
+      wrap.innerHTML = tokenNames
+        .slice(0, 6)
+        .map((t) => {
+          const hex = (projectTokenHexMap[t] || DESIGN_TOKENS[t] || '#226CFF').toUpperCase();
+          return `<span class="token-chip"><span class="token-dot" style="background:${hex};"></span>--${t}</span>`;
+        })
+        .join('');
+    }
+
+    function getActiveFontFamily() {
+      return state.fontFamilyPreset === 'custom'
+        ? state.customFontFamily || 'Pretendard, sans-serif'
+        : state.fontFamilyPreset;
+    }
 
     function parseInputData() {
+      currentHexToTokenMap = {};
+
       const names = state.seriesNames
         .split(',')
         .map((s) => s.trim())
@@ -419,12 +752,16 @@
       });
 
       const maxCols = Math.max(1, ...rows.map((r) => r.length));
-      const palette = PALETTES[state.theme] || PALETTES['indigo-purple'];
+      const tokenList = TOKEN_PALETTES[state.theme] || TOKEN_PALETTES['weseed-categorical'];
+      const palette = tokenList.map((t) => useTokenColor(t));
 
+      renderTokenChips(tokenList);
+
+      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
       const singleData = xLabels.map((label, i) => ({
         label,
         value: rows[i]?.[0] ?? 0,
-        color: palette[i % palette.length],
+        color: isEachColored ? palette[i % palette.length] : palette[0],
       }));
 
       const multiSeries = [];
@@ -445,13 +782,76 @@
       const isBar = state.chartType === 'bar';
       const isLine = state.chartType === 'line';
       const isPie = state.chartType === 'pie';
+      const isFunnel = state.chartType === 'funnel';
 
-      document.getElementById('series-mode-field').style.display = isPie ? 'none' : '';
+      document.getElementById('series-mode-field').style.display = isPie || isFunnel ? 'none' : '';
       document.getElementById('series-names-field').style.display =
-        isPie || state.seriesMode === 'single' ? 'none' : '';
+        isPie || isFunnel || state.seriesMode === 'single' ? 'none' : '';
       document.getElementById('bar-controls').style.display = isBar ? '' : 'none';
-      document.getElementById('line-controls').style.display = isLine ? '' : 'none';
+      document.getElementById('line-controls').style.display = isLine ? 'flex' : 'none';
       document.getElementById('pie-controls').style.display = isPie ? '' : 'none';
+      document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
+      document.getElementById('grid-controls').style.display = isBar || isLine ? 'flex' : 'none';
+      document.getElementById('custom-font-field').style.display =
+        state.fontFamilyPreset === 'custom' ? '' : 'none';
+    }
+
+    function getSurfaceTokens() {
+      const isDark = state.surfaceMode === 'dark';
+      const bgHex = useTokenColor(isDark ? 'surface-ultra-high' : 'surface-ultra-low');
+      const gridHex = useTokenColor(isDark ? 'on-surface-higher' : 'outline');
+      const axisLineHex = useTokenColor(isDark ? 'on-surface-higher' : 'outline-low');
+      const labelHex = useTokenColor(isDark ? 'surface-mid' : 'on-surface');
+      const strongTextHex = useTokenColor(isDark ? 'surface-ultra-low' : 'on-surface-highest');
+      const insideLabelHex = useTokenColor('on-primary-ultra-low');
+
+      return { bgHex, gridHex, axisLineHex, labelHex, strongTextHex, insideLabelHex };
+    }
+
+    function buildCommonOptions(strongTextHex, gridHex, axisLineHex) {
+      const fontOpt = {
+        family: getActiveFontFamily(),
+        size: state.fontSize,
+        weight: state.fontWeight,
+      };
+      const legendOpt =
+        state.legendPos === 'none'
+          ? false
+          : {
+              visible: true,
+              position: state.legendPos,
+              textColor: strongTextHex,
+              fontFamily: fontOpt.family,
+              fontSize: fontOpt.size + 1,
+              fontWeight: fontOpt.weight,
+            };
+      const gridOpt = {
+        y: {
+          visible: state.gridY,
+          color: gridHex,
+          lineWidth: state.gridWidth,
+          style: state.gridStyle,
+        },
+        x: {
+          visible: state.gridX,
+          color: gridHex,
+          lineWidth: state.gridWidth,
+          style: state.gridStyle,
+        },
+        border: {
+          visible: state.gridBorder,
+          color: axisLineHex,
+          lineWidth: state.gridWidth,
+        },
+        alternateBand: {
+          visible: state.gridBand,
+          color:
+            state.surfaceMode === 'dark'
+              ? 'rgba(255, 255, 255, 0.03)'
+              : 'rgba(55, 93, 137, 0.04)',
+        },
+      };
+      return { fontOpt, legendOpt, gridOpt };
     }
 
     function renderPreview() {
@@ -463,6 +863,13 @@
       updateControlVisibility();
 
       const { xLabels, singleData, multiSeries, palette } = parseInputData();
+      const { bgHex, gridHex, axisLineHex, labelHex, strongTextHex, insideLabelHex } = getSurfaceTokens();
+      const { fontOpt, legendOpt, gridOpt } = buildCommonOptions(strongTextHex, gridHex, axisLineHex);
+
+      chartBoxEl.style.background = bgHex;
+      chartBoxEl.style.maxWidth = `${Math.min(540, Math.max(240, state.exportW))}px`;
+      chartBoxEl.style.maxHeight = `${Math.min(480, Math.max(180, state.exportH))}px`;
+
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
 
       if (state.chartType === 'bar') {
@@ -477,23 +884,24 @@
           data: isMulti ? undefined : singleData,
           series: isMulti ? multiSeries : undefined,
           xLabels: isMulti ? xLabels : undefined,
-          padding: { top: 36, right: 20, bottom: 38, left: 45 },
+          font: fontOpt,
+          responsive: { enabled: true },
           bar: {
             mode,
             widthRatio: state.widthRatio,
             borderRadius: [state.radius, state.radius, 0, 0],
             fill: palette[0],
           },
-          legend: { visible: true, position: 'top' },
+          legend: legendOpt,
           labels: {
             visible: state.showLabels,
             position: mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside',
-            color: mode === 'stacked' || mode === 'percent' ? '#FFFFFF' : '#94A3B8',
+            color: mode === 'stacked' || mode === 'percent' ? insideLabelHex : strongTextHex,
           },
-          grid: { y: { visible: true, color: '#1E293B', lineDash: [3, 3] } },
-          xAxis: { labelColor: '#64748B', color: '#1E293B' },
+          grid: gridOpt,
+          xAxis: { labelColor: labelHex, color: axisLineHex },
           yAxis: {
-            labelColor: '#64748B',
+            labelColor: labelHex,
             formatter: (v) => (mode === 'percent' ? `${v}%` : `${v}`),
           },
         });
@@ -504,26 +912,58 @@
           series: isMulti ? multiSeries : undefined,
           xLabels: isMulti ? xLabels : undefined,
           stacked: isMulti && isStacked,
-          padding: { top: 36, right: 20, bottom: 38, left: 45 },
+          font: fontOpt,
+          responsive: { enabled: true },
           line: {
             color: palette[0],
             width: 2.5,
             curve: state.curve,
           },
-          area: { visible: true },
-          legend: { visible: true, position: 'top' },
+          points: {
+            fill: bgHex,
+          },
+          area: {
+            visible: true,
+            topOpacity: state.areaTopOpacity,
+            bottomOpacity: 0.02,
+            saturationDelta: state.areaSatDelta,
+            lightnessDelta: state.areaLightDelta,
+          },
+          legend: legendOpt,
           labels: {
             visible: state.showLabels,
             position: 'top-outside',
-            color: '#94A3B8',
+            color: strongTextHex,
           },
-          grid: { y: { visible: true, color: '#1E293B', lineDash: [3, 3] } },
-          xAxis: { labelColor: '#64748B', color: '#1E293B' },
-          yAxis: { labelColor: '#64748B' },
+          grid: gridOpt,
+          xAxis: { labelColor: labelHex, color: axisLineHex },
+          yAxis: { labelColor: labelHex },
+        });
+      } else if (state.chartType === 'funnel') {
+        activeChart = new FunnelChart(containerEl, {
+          data: singleData,
+          font: fontOpt,
+          responsive: { enabled: true },
+          funnel: {
+            direction: state.funnelDirection,
+            shape: state.funnelShape,
+            gap: state.funnelGap,
+            borderRadius: state.radius,
+            colors: palette,
+            showConversion: true,
+          },
+          labels: {
+            visible: state.showLabels,
+            position: state.funnelLabelPos,
+            color: state.funnelLabelPos === 'inside' ? insideLabelHex : strongTextHex,
+          },
+          legend: legendOpt,
         });
       } else {
         activeChart = new PieChart(containerEl, {
           data: singleData,
+          font: fontOpt,
+          responsive: { enabled: true },
           pie: {
             innerRadiusRatio: state.holeRatio,
             padAngle: 0.025,
@@ -534,23 +974,27 @@
               ? {
                   title: (_d, total) => `${total.toLocaleString()}`,
                   subtitle: 'Total',
+                  titleColor: strongTextHex,
+                  subtitleColor: labelHex,
                 }
               : undefined,
           labels: {
             visible: state.showLabels,
             position: 'outside',
+            color: strongTextHex,
           },
-          legend: { visible: true, position: 'bottom' },
+          legend: legendOpt,
         });
       }
     }
 
     function sendSvgToFigma(replaceSelected) {
       if (!activeChart) return;
+      const { bgHex } = getSurfaceTokens();
       const svg = activeChart.toSVG({
         width: state.exportW,
         height: state.exportH,
-        backgroundColor: state.includeBg ? '#151C2C' : undefined,
+        backgroundColor: state.includeBg ? bgHex : undefined,
         backgroundRadius: state.includeBg ? 16 : 0,
       });
 
@@ -558,6 +1002,7 @@
         bar: `NanoChart — Bar (${state.seriesMode})`,
         line: `NanoChart — Line (${state.seriesMode})`,
         pie: `NanoChart — Donut`,
+        funnel: `NanoChart — Funnel (${state.funnelDirection})`,
       };
 
       parent.postMessage(
@@ -567,6 +1012,8 @@
             svg,
             chartTitle: titleMap[state.chartType] || 'NanoChart',
             replaceSelected,
+            bindVariables: state.bindVariables,
+            hexToTokenMap: currentHexToTokenMap,
             state,
           },
         },
@@ -594,6 +1041,23 @@
       renderPreview();
     });
 
+    document.getElementById('surface-mode').addEventListener('change', (e) => {
+      state.surfaceMode = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('sync-tokens-btn').addEventListener('click', () => {
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: 'SYNC_VARIABLES_SCSS',
+            tokensToSync: DESIGN_TOKENS,
+          },
+        },
+        '*'
+      );
+    });
+
     document.getElementById('series-names-input').addEventListener('input', (e) => {
       state.seriesNames = e.target.value;
       renderPreview();
@@ -605,14 +1069,25 @@
     });
 
     document.getElementById('random-data-btn').addEventListener('click', () => {
-      const months = ['1월', '2월', '3월', '4월', '5월', '6월'];
-      const lines = months.map((m) => {
-        const v1 = Math.floor(Math.random() * 180) + 60;
-        const v2 = Math.floor(Math.random() * 140) + 45;
-        const v3 = Math.floor(Math.random() * 100) + 30;
-        return `${m}: ${v1}, ${v2}, ${v3}`;
-      });
-      state.rawText = lines.join('\n');
+      if (state.chartType === 'funnel') {
+        const stages = ['방문', '회원가입', '장바구니', '결제시도', '구매완료'];
+        let cur = Math.floor(Math.random() * 800) + 1200;
+        const lines = stages.map((st) => {
+          const val = cur;
+          cur = Math.max(80, Math.floor(cur * (0.55 + Math.random() * 0.28)));
+          return `${st}: ${val}`;
+        });
+        state.rawText = lines.join('\n');
+      } else {
+        const months = ['1월', '2월', '3월', '4월', '5월', '6월'];
+        const lines = months.map((m) => {
+          const v1 = Math.floor(Math.random() * 180) + 60;
+          const v2 = Math.floor(Math.random() * 140) + 45;
+          const v3 = Math.floor(Math.random() * 100) + 30;
+          return `${m}: ${v1}, ${v2}, ${v3}`;
+        });
+        state.rawText = lines.join('\n');
+      }
       document.getElementById('data-textarea').value = state.rawText;
       renderPreview();
     });
@@ -635,6 +1110,27 @@
       renderPreview();
     });
 
+    document.getElementById('area-op-slider').addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10);
+      state.areaTopOpacity = pct / 100;
+      document.getElementById('area-op-txt').innerText = `${pct}%`;
+      renderPreview();
+    });
+
+    document.getElementById('area-sat-slider').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      state.areaSatDelta = val;
+      document.getElementById('area-sat-txt').innerText = `${val > 0 ? '+' : ''}${val}%`;
+      renderPreview();
+    });
+
+    document.getElementById('area-light-slider').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      state.areaLightDelta = val;
+      document.getElementById('area-light-txt').innerText = `${val > 0 ? '+' : ''}${val}%`;
+      renderPreview();
+    });
+
     document.getElementById('hole-slider').addEventListener('input', (e) => {
       const pct = parseInt(e.target.value, 10);
       state.holeRatio = pct / 100;
@@ -642,12 +1138,104 @@
       renderPreview();
     });
 
+    document.getElementById('funnel-dir-select').addEventListener('change', (e) => {
+      state.funnelDirection = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('funnel-shape-select').addEventListener('change', (e) => {
+      state.funnelShape = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('funnel-gap-slider').addEventListener('input', (e) => {
+      state.funnelGap = parseInt(e.target.value, 10);
+      document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap}px`;
+      renderPreview();
+    });
+
+    document.getElementById('funnel-label-pos').addEventListener('change', (e) => {
+      state.funnelLabelPos = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('legend-pos-select').addEventListener('change', (e) => {
+      state.legendPos = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('font-family-select').addEventListener('change', (e) => {
+      state.fontFamilyPreset = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('custom-font-input').addEventListener('input', (e) => {
+      state.customFontFamily = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('font-size-slider').addEventListener('input', (e) => {
+      state.fontSize = parseInt(e.target.value, 10);
+      document.getElementById('font-size-txt').innerText = `${state.fontSize}px`;
+      renderPreview();
+    });
+
+    document.getElementById('font-weight-select').addEventListener('change', (e) => {
+      state.fontWeight = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('grid-style-select').addEventListener('change', (e) => {
+      state.gridStyle = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('grid-width-slider').addEventListener('input', (e) => {
+      state.gridWidth = parseFloat(e.target.value);
+      document.getElementById('grid-width-txt').innerText = `${state.gridWidth}px`;
+      renderPreview();
+    });
+
+    document.getElementById('chk-grid-y').addEventListener('change', (e) => {
+      state.gridY = e.target.checked;
+      renderPreview();
+    });
+
+    document.getElementById('chk-grid-x').addEventListener('change', (e) => {
+      state.gridX = e.target.checked;
+      renderPreview();
+    });
+
+    document.getElementById('chk-grid-border').addEventListener('change', (e) => {
+      state.gridBorder = e.target.checked;
+      renderPreview();
+    });
+
+    document.getElementById('chk-grid-band').addEventListener('change', (e) => {
+      state.gridBand = e.target.checked;
+      renderPreview();
+    });
+
+    document.querySelectorAll('#size-preset-group .seg-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#size-preset-group .seg-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.exportW = parseInt(btn.dataset.w, 10) || 640;
+        state.exportH = parseInt(btn.dataset.h, 10) || 400;
+        document.getElementById('export-w').value = state.exportW;
+        document.getElementById('export-h').value = state.exportH;
+        renderPreview();
+      });
+    });
+
     document.getElementById('export-w').addEventListener('change', (e) => {
-      state.exportW = Math.max(240, parseInt(e.target.value, 10) || 640);
+      state.exportW = Math.max(200, parseInt(e.target.value, 10) || 640);
+      renderPreview();
     });
 
     document.getElementById('export-h').addEventListener('change', (e) => {
-      state.exportH = Math.max(200, parseInt(e.target.value, 10) || 400);
+      state.exportH = Math.max(160, parseInt(e.target.value, 10) || 400);
+      renderPreview();
     });
 
     document.getElementById('chk-labels').addEventListener('change', (e) => {
@@ -659,6 +1247,10 @@
       state.includeBg = e.target.checked;
     });
 
+    document.getElementById('chk-bind-vars').addEventListener('change', (e) => {
+      state.bindVariables = e.target.checked;
+    });
+
     document.getElementById('insert-new-btn').addEventListener('click', () => {
       sendSvgToFigma(false);
     });
@@ -667,12 +1259,20 @@
       sendSvgToFigma(true);
     });
 
-    // 피그마에서 기존 NanoChart 프레임을 선택했을 때 저장된 설정 복원
     window.onmessage = (event) => {
       const msg = event.data?.pluginMessage;
       if (!msg) return;
 
-      if (msg.type === 'SELECTION_SAVED_CHART') {
+      if (msg.type === 'PROJECT_VARIABLES_STATE') {
+        projectTokenHexMap = msg.tokenHexMap || {};
+        const varBadge = document.getElementById('var-status-badge');
+        if (msg.matchedCount > 0) {
+          varBadge.innerText = `🔗 현재 프로젝트 변수 ${msg.matchedCount}개 감지됨 (자동 매핑)`;
+        } else {
+          varBadge.innerText = `🔗 variables.scss 기본 토큰 사용 중`;
+        }
+        renderPreview();
+      } else if (msg.type === 'SELECTION_SAVED_CHART') {
         const badge = document.getElementById('selection-badge');
         const updateBtn = document.getElementById('update-selected-btn');
 
@@ -682,12 +1282,14 @@
           updateBtn.style.display = 'inline-block';
 
           state = { ...state, ...msg.state };
-          // UI 입력값 동기화
           document.querySelectorAll('#type-group .seg-btn').forEach((b) => {
             b.classList.toggle('active', b.dataset.type === state.chartType);
           });
           document.getElementById('series-mode').value = state.seriesMode;
-          document.getElementById('theme-select').value = state.theme;
+          if (TOKEN_PALETTES[state.theme]) {
+            document.getElementById('theme-select').value = state.theme;
+          }
+          document.getElementById('surface-mode').value = state.surfaceMode || 'light';
           document.getElementById('series-names-input').value = state.seriesNames;
           document.getElementById('data-textarea').value = state.rawText;
           document.getElementById('radius-slider').value = state.radius;
@@ -695,12 +1297,37 @@
           document.getElementById('ratio-slider').value = Math.round(state.widthRatio * 100);
           document.getElementById('ratio-txt').innerText = `${Math.round(state.widthRatio * 100)}%`;
           document.getElementById('curve-select').value = state.curve;
+          document.getElementById('area-op-slider').value = Math.round((state.areaTopOpacity ?? 0.45) * 100);
+          document.getElementById('area-op-txt').innerText = `${Math.round((state.areaTopOpacity ?? 0.45) * 100)}%`;
+          document.getElementById('area-sat-slider').value = state.areaSatDelta ?? 0;
+          document.getElementById('area-sat-txt').innerText = `${state.areaSatDelta ?? 0}%`;
+          document.getElementById('area-light-slider').value = state.areaLightDelta ?? 0;
+          document.getElementById('area-light-txt').innerText = `${state.areaLightDelta ?? 0}%`;
           document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
           document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          document.getElementById('funnel-dir-select').value = state.funnelDirection || 'vertical';
+          document.getElementById('funnel-shape-select').value = state.funnelShape || 'trapezoid';
+          document.getElementById('funnel-gap-slider').value = state.funnelGap ?? 4;
+          document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap ?? 4}px`;
+          document.getElementById('funnel-label-pos').value = state.funnelLabelPos || 'inside';
+          document.getElementById('legend-pos-select').value = state.legendPos || 'top-right';
+          document.getElementById('font-family-select').value = state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
+          document.getElementById('custom-font-input').value = state.customFontFamily || '';
+          document.getElementById('font-size-slider').value = state.fontSize ?? 11;
+          document.getElementById('font-size-txt').innerText = `${state.fontSize ?? 11}px`;
+          document.getElementById('font-weight-select').value = String(state.fontWeight || '500');
+          document.getElementById('grid-style-select').value = state.gridStyle || 'dashed';
+          document.getElementById('grid-width-slider').value = state.gridWidth ?? 1;
+          document.getElementById('grid-width-txt').innerText = `${state.gridWidth ?? 1}px`;
+          document.getElementById('chk-grid-y').checked = state.gridY !== false;
+          document.getElementById('chk-grid-x').checked = Boolean(state.gridX);
+          document.getElementById('chk-grid-border').checked = Boolean(state.gridBorder);
+          document.getElementById('chk-grid-band').checked = Boolean(state.gridBand);
           document.getElementById('export-w').value = state.exportW;
           document.getElementById('export-h').value = state.exportH;
           document.getElementById('chk-labels').checked = state.showLabels;
           document.getElementById('chk-bg').checked = state.includeBg;
+          document.getElementById('chk-bind-vars').checked = state.bindVariables !== false;
           renderPreview();
         } else {
           badge.style.display = 'none';
