@@ -773,4 +773,27 @@ export interface LineChartOptions {
   };
 }
 
+// ==========================================
+// 🎨 SVG / Figma Vector Export Types
+// ==========================================
+
+/**
+ * 피그마(`figma.createNodeFromSvg`) 및 일러스트레이터 호환 순수 벡터(SVG) 추출 옵션
+ */
+export interface SvgExportOptions {
+  /** 추출할 SVG 가로 크기 (px, 미지정 시 현재 차트 컨테이너 너비 사용) */
+  width?: number;
+  /** 추출할 SVG 세로 크기 (px, 미지정 시 현재 차트 컨테이너 높이 사용) */
+  height?: number;
+  /** 배경 채우기 색상 (예: `'#151C2C'`, 미지정 또는 `'transparent'` 시 투명 배경) */
+  backgroundColor?: string;
+  /** 배경 사각형 모서리 둥글기 (px, 기본값: 0) */
+  backgroundRadius?: number;
+  /** 범례(Legend)를 SVG 벡터 레이어에 포함할지 여부 (기본값: true) */
+  includeLegend?: boolean;
+  /** 배경 격자선(Grid)을 SVG 벡터 레이어에 포함할지 여부 (기본값: true) */
+  includeGrid?: boolean;
+}
+
+
 

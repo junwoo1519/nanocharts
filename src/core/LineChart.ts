@@ -19,6 +19,7 @@ import type {
   LinePointStyleOptions,
   LineStyleOptions,
   Padding,
+  SvgExportOptions,
   TooltipEntry,
 } from '../types';
 import { LayerManager } from './LayerManager';
@@ -32,6 +33,12 @@ import { Tooltip } from '../components/Tooltip';
 import { Legend } from '../components/Legend';
 import { LineSeries, NormalizedLineSeries } from '../series/LineSeries';
 import { DEFAULT_PALETTE } from '../series/PieSeries';
+import {
+  buildSvgAxesGroups,
+  buildSvgGridGroup,
+  buildSvgLegendGroup,
+  wrapSvgDocument,
+} from '../utils/svg';
 
 export class LineChart extends EventEmitter {
   /** 차트가 마운트될 부모 DOM 엘리먼트 */
@@ -899,6 +906,93 @@ export class LineChart extends EventEmitter {
   public resetZoom(): void {
     this.xScale.setViewport(0, Math.max(0, this.activeData.length - 1));
     this.render(false);
+  }
+
+  /**
+   * 현재 라인/영역 차트를 피그마(`figma.createNodeFromSvg`)에서 레이어별로 편집 가능한 순수 벡터(SVG) 문자열로 추출합니다.
+   * 
+   * @param exportOptions 추출 크기, 배경색, 범례/그리드 포함 여부 설정
+   * @returns 표준 SVG XML 문자열
+   */
+  public toSVG(exportOptions?: SvgExportOptions): string {
+    const svgW = exportOptions?.width || this.width || 640;
+    const svgH = exportOptions?.height || this.height || 400;
+    const effPadding = this.getEffectivePadding();
+
+    this.xScale.range([effPadding.left, svgW - effPadding.right]);
+    this.yScale.range([svgH - effPadding.bottom, effPadding.top]);
+
+    const defs: string[] = [];
+    const body: string[] = [];
+
+    if (exportOptions?.includeGrid !== false) {
+      const gridSvg = buildSvgGridGroup(this.options.grid, this.yScale, svgW, effPadding);
+      if (gridSvg) body.push(gridSvg);
+    }
+
+    const axesSvg = buildSvgAxesGroups(
+      this.options.xAxis,
+      this.options.yAxis,
+      this.xScale,
+      this.yScale,
+      this.activeData,
+      svgH,
+      effPadding
+    );
+    if (axesSvg) body.push(axesSvg);
+
+    if (this.isMultiSeries()) {
+      this.activeSeries.forEach((s, idx) => {
+        const seriesSvg = s.renderer.toSvgElements({
+          seriesName: s.name,
+          seriesIdSuffix: String(idx),
+          data: s.items,
+          xScale: this.xScale,
+          yScale: this.yScale,
+          padding: effPadding,
+          width: svgW,
+          height: svgH,
+          defs,
+          stackedValues: s.stackedValues,
+          baseValues: s.baseValues,
+        });
+        if (seriesSvg) body.push(seriesSvg);
+      });
+    } else {
+      const seriesSvg = this.lineSeries.toSvgElements({
+        seriesName: 'Main',
+        seriesIdSuffix: 'main',
+        data: this.activeData,
+        xScale: this.xScale,
+        yScale: this.yScale,
+        padding: effPadding,
+        width: svgW,
+        height: svgH,
+        defs,
+      });
+      if (seriesSvg) body.push(seriesSvg);
+    }
+
+    if (exportOptions?.includeLegend !== false && this.legend.isVisible()) {
+      const legendSvg = buildSvgLegendGroup(
+        this.legend.getItems(),
+        this.legend.getOptions(),
+        svgW,
+        svgH
+      );
+      if (legendSvg) body.push(legendSvg);
+    }
+
+    this.syncScaleRanges();
+
+    return wrapSvgDocument({
+      width: svgW,
+      height: svgH,
+      defs,
+      body,
+      backgroundColor: exportOptions?.backgroundColor,
+      backgroundRadius: exportOptions?.backgroundRadius,
+    });
   }
 
   /**

@@ -178,6 +178,23 @@ export class Legend {
   }
 
   /**
+   * 현재 범례 아이템 목록을 반환합니다 (SVG 추출 연동용).
+   */
+  public getItems(): LegendItem[] {
+    return this.items.map((it) => ({
+      ...it,
+      active: !this.hiddenKeys.has(it.key),
+    }));
+  }
+
+  /**
+   * 현재 정규화된 범례 옵션을 반환합니다.
+   */
+  public getOptions(): LegendOptions {
+    return { ...this.options, visible: this.visible };
+  }
+
+  /**
    * 특정 범례 키가 현재 활성화(표시) 상태인지 확인합니다.
    */
   public isKeyActive(key: string): boolean {

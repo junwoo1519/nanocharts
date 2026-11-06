@@ -80,6 +80,9 @@ npm run dev
 # 프로덕션 빌드 (TypeScript 컴파일 + Vite 라이브러리 번들링 + DTS 선언 생성)
 npm run build
 
+# 피그마 플러그인(figma-plugin/) 번들 빌드
+npm run build:figma
+
 # 배포 파일 목록 사전 검증 (Dry run)
 npm pack --dry-run
 

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NanoCharts — Figma Vector Studio</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0B0F19;
+      color: #E2E8F0;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    /* 좌측 설정 사이드바 */
+    .sidebar {
+      width: 310px;
+      background: #111827;
+      border-right: 1px solid #1E293B;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1E293B;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 10px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .sidebar-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94A3B8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .seg-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: #0B0F19;
+      padding: 3px;
+      border-radius: 7px;
+      border: 1px solid #1E293B;
+    }
+    .seg-btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .seg-btn:hover {
+      color: #F8FAFC;
+    }
+    .seg-btn.active {
+      background: #4F46E5;
+      color: #FFFFFF;
+    }
+    select, input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      background: #0B0F19;
+      color: #F8FAFC;
+      border: 1px solid #1E293B;
+      border-radius: 6px;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+    }
+    select:focus, input:focus, textarea:focus {
+      border-color: #6366F1;
+    }
+    textarea {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      resize: vertical;
+      min-height: 92px;
+    }
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #6366F1;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #CBD5E1;
+      cursor: pointer;
+    }
+    /* 우측 프리뷰 & 액션 영역 */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0B0F19;
+      height: 100%;
+    }
+    .preview-toolbar {
+      padding: 10px 18px;
+      border-bottom: 1px solid #1E293B;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #111827;
+    }
+    .selection-badge {
+      font-size: 11px;
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: none;
+    }
+    .preview-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .chart-box {
+      width: 100%;
+      height: 100%;
+      max-height: 460px;
+      background: #151C2C;
+      border: 1px solid #1E293B;
+      border-radius: 14px;
+      position: relative;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+    }
+    #preview-canvas {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .footer-bar {
+      padding: 12px 18px;
+      border-top: 1px solid #1E293B;
+      background: #111827;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-hint {
+      font-size: 11px;
+      color: #64748B;
+    }
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: #FFFFFF;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover {
+      opacity: 0.92;
+    }
+    .btn-secondary {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: 1px solid #334155;
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+<body>
+  <!-- 좌측 옵션 컨트롤 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>NanoCharts <span class="badge">Figma Vector</span></h1>
+    </div>
+
+    <div class="sidebar-body">
+      <!-- 1. 차트 종류 -->
+      <div class="field">
+        <label>차트 종류</label>
+        <div class="seg-group" id="type-group">
+          <button class="seg-btn active" data-type="bar">📊 Bar</button>
+          <button class="seg-btn" data-type="line">📈 Line</button>
+          <button class="seg-btn" data-type="pie">🍩 Donut</button>
+        </div>
+      </div>
+
+      <!-- 2. 시리즈 구성 -->
+      <div class="field" id="series-mode-field">
+        <label>시리즈 배치 모드</label>
+        <select id="series-mode">
+          <option value="grouped">다중 비교 (Grouped Bar / Multi-Line)</option>
+          <option value="stacked">누적형 (Stacked Bar / Stacked Area)</option>
+          <option value="percent">100% 비율 누적 (Percent Bar)</option>
+          <option value="single">단일 시리즈 (Single)</option>
+        </select>
+      </div>
+
+      <!-- 3. 컬러 테마 -->
+      <div class="field">
+        <label>컬러 팔레트 & 그라데이션</label>
+        <select id="theme-select">
+          <option value="indigo-purple">인디고-퍼플 모던 (기본)</option>
+          <option value="cyber-cyan">사이버 청록 & 블루</option>
+          <option value="warm-orange">선셋 오렌지 & 로즈</option>
+        </select>
+      </div>
+
+      <!-- 4. 시리즈 이름 (다중 모드) -->
+      <div class="field" id="series-names-field">
+        <label>시리즈 이름 (쉼표 구분)</label>
+        <input type="text" id="series-names-input" value="Frontend, Backend, AI/Cloud" />
+      </div>
+
+      <!-- 5. 데이터 입력 -->
+      <div class="field">
+        <label>
+          <span>데이터 편집 (라벨: 값1, 값2...)</span>
+          <span style="color:#6366F1;cursor:pointer;" id="random-data-btn">🎲 랜덤 생성</span>
+        </label>
+        <textarea id="data-textarea">1월: 120, 85, 45
+2월: 155, 110, 60
+3월: 135, 95, 75
+4월: 190, 130, 90
+5월: 225, 150, 115
+6월: 260, 175, 140</textarea>
+      </div>
+
+      <!-- 6. 세부 비주얼 조정 -->
+      <div class="row-2" id="bar-controls">
+        <div class="field">
+          <label>모서리 둥글기 <span id="radius-txt">6px</span></label>
+          <input type="range" id="radius-slider" min="0" max="16" value="6" />
+        </div>
+        <div class="field">
+          <label>바 폭 비율 <span id="ratio-txt">65%</span></label>
+          <input type="range" id="ratio-slider" min="25" max="90" value="65" step="5" />
+        </div>
+      </div>
+
+      <div class="field" id="line-controls" style="display:none;">
+        <label>라인 곡선 형태</label>
+        <select id="curve-select">
+          <option value="smooth">부드러운 곡선 (smooth)</option>
+          <option value="linear">직선 (linear)</option>
+          <option value="step">계단형 (step)</option>
+        </select>
+      </div>
+
+      <div class="field" id="pie-controls" style="display:none;">
+        <label>도넛 내부 구멍 비율 <span id="hole-txt">60%</span></label>
+        <input type="range" id="hole-slider" min="0" max="80" value="60" step="5" />
+      </div>
+
+      <!-- 7. 피그마 프레임 추출 크기 & 옵션 -->
+      <div class="row-2">
+        <div class="field">
+          <label>추출 너비 (W)</label>
+          <input type="number" id="export-w" value="640" min="240" max="2400" step="20" />
+        </div>
+        <div class="field">
+          <label>추출 높이 (H)</label>
+          <input type="number" id="export-h" value="400" min="200" max="1600" step="20" />
+        </div>
+      </div>
+
+      <div class="row-2">
+        <label class="checkbox-row">
+          <input type="checkbox" id="chk-labels" checked /> 수치 라벨 표시
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="chk-bg" checked /> 다크 카드 배경 포함
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 우측 실시간 Canvas 2D 프리뷰 및 삽입 액션 -->
+  <main class="main-area">
+    <div class="preview-toolbar">
+      <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (Canvas 2D Engine)</div>
+      <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
+    </div>
+
+    <div class="preview-stage">
+      <div class="chart-box">
+        <div id="preview-canvas"></div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <div class="footer-hint">
+        💡 삽입 시 피그마의 <strong>Frame, Vector, Rectangle, Text</strong> 레이어로 분해되어 개별 편집이 가능합니다.
+      </div>
+      <div class="action-btns">
+        <button class="btn-secondary" id="update-selected-btn">🔄 선택된 차트 업데이트</button>
+        <button class="btn-primary" id="insert-new-btn">➕ 피그마에 벡터(SVG)로 삽입</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    /* __NANOCHARTS_INLINE_BUNDLE__ */
+
+    let state = {
+      chartType: 'bar',
+      seriesMode: 'grouped',
+      theme: 'indigo-purple',
+      seriesNames: 'Frontend, Backend, AI/Cloud',
+      rawText: `1월: 120, 85, 45\n2월: 155, 110, 60\n3월: 135, 95, 75\n4월: 190, 130, 90\n5월: 225, 150, 115\n6월: 260, 175, 140`,
+      radius: 6,
+      widthRatio: 0.65,
+      curve: 'smooth',
+      holeRatio: 0.6,
+      exportW: 640,
+      exportH: 400,
+      showLabels: true,
+      includeBg: true,
+    };
+
+    const PALETTES = {
+      'indigo-purple': ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'],
+      'cyber-cyan': ['#06B6D4', '#3B82F6', '#8B5CF6', '#14B8A6', '#F43F5E'],
+      'warm-orange': ['#F97316', '#F43F5E', '#EAB308', '#A855F7', '#06B6D4'],
+    };
+
+    let activeChart = null;
+    const containerEl = document.getElementById('preview-canvas');
+
+    function parseInputData() {
+      const names = state.seriesNames
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const lines = state.rawText
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+
+      const xLabels = [];
+      const rows = [];
+
+      lines.forEach((line, idx) => {
+        const parts = line.split(':');
+        const label = parts.length > 1 ? parts[0].trim() : `#${idx + 1}`;
+        const valStr = parts.length > 1 ? parts.slice(1).join(':') : parts[0];
+        const nums = valStr
+          .split(',')
+          .map((n) => parseFloat(n.trim()))
+          .filter((n) => !Number.isNaN(n));
+        xLabels.push(label);
+        rows.push(nums.length > 0 ? nums : [0]);
+      });
+
+      const maxCols = Math.max(1, ...rows.map((r) => r.length));
+      const palette = PALETTES[state.theme] || PALETTES['indigo-purple'];
+
+      const singleData = xLabels.map((label, i) => ({
+        label,
+        value: rows[i]?.[0] ?? 0,
+        color: palette[i % palette.length],
+      }));
+
+      const multiSeries = [];
+      for (let c = 0; c < maxCols; c++) {
+        const sName = names[c] || `Series ${c + 1}`;
+        const color = palette[c % palette.length];
+        multiSeries.push({
+          name: sName,
+          data: rows.map((r) => r[c] ?? 0),
+          color,
+        });
+      }
+
+      return { xLabels, singleData, multiSeries, palette };
+    }
+
+    function updateControlVisibility() {
+      const isBar = state.chartType === 'bar';
+      const isLine = state.chartType === 'line';
+      const isPie = state.chartType === 'pie';
+
+      document.getElementById('series-mode-field').style.display = isPie ? 'none' : '';
+      document.getElementById('series-names-field').style.display =
+        isPie || state.seriesMode === 'single' ? 'none' : '';
+      document.getElementById('bar-controls').style.display = isBar ? '' : 'none';
+      document.getElementById('line-controls').style.display = isLine ? '' : 'none';
+      document.getElementById('pie-controls').style.display = isPie ? '' : 'none';
+    }
+
+    function renderPreview() {
+      if (activeChart) {
+        activeChart.destroy();
+        activeChart = null;
+      }
+      containerEl.innerHTML = '';
+      updateControlVisibility();
+
+      const { xLabels, singleData, multiSeries, palette } = parseInputData();
+      const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
+
+      if (state.chartType === 'bar') {
+        const mode =
+          state.seriesMode === 'stacked'
+            ? 'stacked'
+            : state.seriesMode === 'percent'
+              ? 'percent'
+              : 'grouped';
+
+        activeChart = new BarChart(containerEl, {
+          data: isMulti ? undefined : singleData,
+          series: isMulti ? multiSeries : undefined,
+          xLabels: isMulti ? xLabels : undefined,
+          padding: { top: 36, right: 20, bottom: 38, left: 45 },
+          bar: {
+            mode,
+            widthRatio: state.widthRatio,
+            borderRadius: [state.radius, state.radius, 0, 0],
+            fill: palette[0],
+          },
+          legend: { visible: true, position: 'top' },
+          labels: {
+            visible: state.showLabels,
+            position: mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside',
+            color: mode === 'stacked' || mode === 'percent' ? '#FFFFFF' : '#94A3B8',
+          },
+          grid: { y: { visible: true, color: '#1E293B', lineDash: [3, 3] } },
+          xAxis: { labelColor: '#64748B', color: '#1E293B' },
+          yAxis: {
+            labelColor: '#64748B',
+            formatter: (v) => (mode === 'percent' ? `${v}%` : `${v}`),
+          },
+        });
+      } else if (state.chartType === 'line') {
+        const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
+        activeChart = new LineChart(containerEl, {
+          data: isMulti ? undefined : singleData,
+          series: isMulti ? multiSeries : undefined,
+          xLabels: isMulti ? xLabels : undefined,
+          stacked: isMulti && isStacked,
+          padding: { top: 36, right: 20, bottom: 38, left: 45 },
+          line: {
+            color: palette[0],
+            width: 2.5,
+            curve: state.curve,
+          },
+          area: { visible: true },
+          legend: { visible: true, position: 'top' },
+          labels: {
+            visible: state.showLabels,
+            position: 'top-outside',
+            color: '#94A3B8',
+          },
+          grid: { y: { visible: true, color: '#1E293B', lineDash: [3, 3] } },
+          xAxis: { labelColor: '#64748B', color: '#1E293B' },
+          yAxis: { labelColor: '#64748B' },
+        });
+      } else {
+        activeChart = new PieChart(containerEl, {
+          data: singleData,
+          pie: {
+            innerRadiusRatio: state.holeRatio,
+            padAngle: 0.025,
+            colors: palette,
+          },
+          center:
+            state.holeRatio >= 0.35
+              ? {
+                  title: (_d, total) => `${total.toLocaleString()}`,
+                  subtitle: 'Total',
+                }
+              : undefined,
+          labels: {
+            visible: state.showLabels,
+            position: 'outside',
+          },
+          legend: { visible: true, position: 'bottom' },
+        });
+      }
+    }
+
+    function sendSvgToFigma(replaceSelected) {
+      if (!activeChart) return;
+      const svg = activeChart.toSVG({
+        width: state.exportW,
+        height: state.exportH,
+        backgroundColor: state.includeBg ? '#151C2C' : undefined,
+        backgroundRadius: state.includeBg ? 16 : 0,
+      });
+
+      const titleMap = {
+        bar: `NanoChart — Bar (${state.seriesMode})`,
+        line: `NanoChart — Line (${state.seriesMode})`,
+        pie: `NanoChart — Donut`,
+      };
+
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: 'INSERT_SVG',
+            svg,
+            chartTitle: titleMap[state.chartType] || 'NanoChart',
+            replaceSelected,
+            state,
+          },
+        },
+        '*'
+      );
+    }
+
+    // 이벤트 바인딩
+    document.querySelectorAll('#type-group .seg-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#type-group .seg-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.chartType = btn.dataset.type;
+        renderPreview();
+      });
+    });
+
+    document.getElementById('series-mode').addEventListener('change', (e) => {
+      state.seriesMode = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+      state.theme = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('series-names-input').addEventListener('input', (e) => {
+      state.seriesNames = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('data-textarea').addEventListener('input', (e) => {
+      state.rawText = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('random-data-btn').addEventListener('click', () => {
+      const months = ['1월', '2월', '3월', '4월', '5월', '6월'];
+      const lines = months.map((m) => {
+        const v1 = Math.floor(Math.random() * 180) + 60;
+        const v2 = Math.floor(Math.random() * 140) + 45;
+        const v3 = Math.floor(Math.random() * 100) + 30;
+        return `${m}: ${v1}, ${v2}, ${v3}`;
+      });
+      state.rawText = lines.join('\n');
+      document.getElementById('data-textarea').value = state.rawText;
+      renderPreview();
+    });
+
+    document.getElementById('radius-slider').addEventListener('input', (e) => {
+      state.radius = parseInt(e.target.value, 10);
+      document.getElementById('radius-txt').innerText = `${state.radius}px`;
+      renderPreview();
+    });
+
+    document.getElementById('ratio-slider').addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10);
+      state.widthRatio = pct / 100;
+      document.getElementById('ratio-txt').innerText = `${pct}%`;
+      renderPreview();
+    });
+
+    document.getElementById('curve-select').addEventListener('change', (e) => {
+      state.curve = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('hole-slider').addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10);
+      state.holeRatio = pct / 100;
+      document.getElementById('hole-txt').innerText = `${pct}%`;
+      renderPreview();
+    });
+
+    document.getElementById('export-w').addEventListener('change', (e) => {
+      state.exportW = Math.max(240, parseInt(e.target.value, 10) || 640);
+    });
+
+    document.getElementById('export-h').addEventListener('change', (e) => {
+      state.exportH = Math.max(200, parseInt(e.target.value, 10) || 400);
+    });
+
+    document.getElementById('chk-labels').addEventListener('change', (e) => {
+      state.showLabels = e.target.checked;
+      renderPreview();
+    });
+
+    document.getElementById('chk-bg').addEventListener('change', (e) => {
+      state.includeBg = e.target.checked;
+    });
+
+    document.getElementById('insert-new-btn').addEventListener('click', () => {
+      sendSvgToFigma(false);
+    });
+
+    document.getElementById('update-selected-btn').addEventListener('click', () => {
+      sendSvgToFigma(true);
+    });
+
+    // 피그마에서 기존 NanoChart 프레임을 선택했을 때 저장된 설정 복원
+    window.onmessage = (event) => {
+      const msg = event.data?.pluginMessage;
+      if (!msg) return;
+
+      if (msg.type === 'SELECTION_SAVED_CHART') {
+        const badge = document.getElementById('selection-badge');
+        const updateBtn = document.getElementById('update-selected-btn');
+
+        if (msg.hasSavedChart && msg.state) {
+          badge.style.display = 'inline-block';
+          badge.innerText = `선택됨: ${msg.nodeName || 'NanoChart'}`;
+          updateBtn.style.display = 'inline-block';
+
+          state = { ...state, ...msg.state };
+          // UI 입력값 동기화
+          document.querySelectorAll('#type-group .seg-btn').forEach((b) => {
+            b.classList.toggle('active', b.dataset.type === state.chartType);
+          });
+          document.getElementById('series-mode').value = state.seriesMode;
+          document.getElementById('theme-select').value = state.theme;
+          document.getElementById('series-names-input').value = state.seriesNames;
+          document.getElementById('data-textarea').value = state.rawText;
+          document.getElementById('radius-slider').value = state.radius;
+          document.getElementById('radius-txt').innerText = `${state.radius}px`;
+          document.getElementById('ratio-slider').value = Math.round(state.widthRatio * 100);
+          document.getElementById('ratio-txt').innerText = `${Math.round(state.widthRatio * 100)}%`;
+          document.getElementById('curve-select').value = state.curve;
+          document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
+          document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          document.getElementById('export-w').value = state.exportW;
+          document.getElementById('export-h').value = state.exportH;
+          document.getElementById('chk-labels').checked = state.showLabels;
+          document.getElementById('chk-bg').checked = state.includeBg;
+          renderPreview();
+        } else {
+          badge.style.display = 'none';
+          updateBtn.style.display = 'none';
+        }
+      }
+    };
+
+    renderPreview();
+  </script>
+</body>
+</html>

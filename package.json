@@ -26,6 +26,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:figma": "npm run build && node scripts/build-figma-plugin.mjs",
     "preview": "vite preview",
     "prepublishOnly": "npm run build"
   },

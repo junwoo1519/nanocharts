@@ -17,3 +17,4 @@ export { Tooltip } from './components/Tooltip';
 export { Legend } from './components/Legend';
 export * from './types';
 export * from './utils/canvas';
+export * from './utils/svg';

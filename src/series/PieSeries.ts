@@ -14,6 +14,13 @@ import {
   PieCenterContentOptions,
   PieSliceGeometry,
 } from '../types';
+import {
+  buildSvgPieSlicePathData,
+  escapeXml,
+  fmt,
+  parseSvgColor,
+  svgTextElement,
+} from '../utils/svg';
 
 /** 기본 모던 컬러 팔레트 */
 export const DEFAULT_PALETTE = [
@@ -404,5 +411,158 @@ export class PieSeries {
     });
 
     ctx.restore();
+  }
+
+  /**
+   * 피그마(`figma.createNodeFromSvg`) 호환 파이/도넛 조각, 중앙 텍스트, 리더라인 라벨 SVG 벡터 그룹을 생성합니다.
+   */
+  public toSvgElements(slices: PieSliceGeometry[]): string {
+    if (slices.length === 0) return '';
+
+    const sliceEls: string[] = [];
+    const labelEls: string[] = [];
+    const border = this.styleOptions.border;
+    let strokeAttr = '';
+    if (border && border.width && border.width > 0) {
+      const parsedBorder = parseSvgColor(border.color || '#151C2C');
+      strokeAttr = ` stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(border.width)}"`;
+    }
+
+    slices.forEach((slice) => {
+      const pathD = buildSvgPieSlicePathData(
+        slice.cx,
+        slice.cy,
+        slice.innerRadius,
+        slice.outerRadius,
+        slice.startAngle,
+        slice.endAngle
+      );
+      if (!pathD) return;
+      const parsedFill = parseSvgColor(slice.color);
+      const pctText = `${(slice.percentage * 100).toFixed(1)}%`;
+      sliceEls.push(
+        `<path id="Slice: ${escapeXml(slice.item.label)} (${pctText})" d="${pathD}" fill="${escapeXml(parsedFill.color)}"${strokeAttr} />`
+      );
+    });
+
+    const groups: string[] = [];
+    if (sliceEls.length > 0) {
+      groups.push(`<g id="Pie Slices">\n    ${sliceEls.join('\n    ')}\n  </g>`);
+    }
+
+    // 도넛 중앙 텍스트
+    if (slices[0] && slices[0].innerRadius > 15) {
+      const { cx, cy } = slices[0];
+      const data = slices.map((s) => s.item);
+      const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+      const opts = this.centerOptions;
+
+      const titleText =
+        typeof opts?.title === 'function'
+          ? opts.title(data, total)
+          : opts?.title !== undefined
+            ? opts.title
+            : total.toLocaleString();
+
+      const subtitleText =
+        typeof opts?.subtitle === 'function'
+          ? opts.subtitle(data, total)
+          : opts?.subtitle !== undefined
+            ? opts.subtitle
+            : 'Total';
+
+      const centerEls: string[] = [];
+      if (titleText) {
+        centerEls.push(
+          svgTextElement({
+            id: 'Center Title',
+            x: cx,
+            y: cy - 8,
+            text: titleText,
+            font: opts?.titleFont || '700 20px Pretendard, sans-serif',
+            fill: opts?.titleColor || '#FFFFFF',
+            align: 'center',
+            baseline: 'middle',
+          })
+        );
+      }
+      if (subtitleText) {
+        centerEls.push(
+          svgTextElement({
+            id: 'Center Subtitle',
+            x: cx,
+            y: cy + 14,
+            text: subtitleText,
+            font: opts?.subtitleFont || '500 11px Pretendard, sans-serif',
+            fill: opts?.subtitleColor || '#94A3B8',
+            align: 'center',
+            baseline: 'middle',
+          })
+        );
+      }
+      if (centerEls.length > 0) {
+        groups.push(`<g id="Donut Center">\n    ${centerEls.join('\n    ')}\n  </g>`);
+      }
+    }
+
+    // 데이터 라벨 및 리더 라인
+    const lOpts = this.labelOptions;
+    if (lOpts?.visible && lOpts.position !== 'none') {
+      const font = lOpts.font || '600 11px Pretendard, sans-serif';
+      slices.forEach((slice) => {
+        if (slice.percentage < 0.04) return;
+        const { midAngle, innerRadius, outerRadius, cx, cy, item, percentage } = slice;
+        const text = lOpts.formatter
+          ? lOpts.formatter(item, percentage)
+          : `${item.label} ${(percentage * 100).toFixed(0)}%`;
+
+        if (lOpts.position === 'inside') {
+          const r = (innerRadius + outerRadius) / 2;
+          const lx = cx + Math.cos(midAngle) * r;
+          const ly = cy + Math.sin(midAngle) * r;
+          labelEls.push(
+            svgTextElement({
+              id: `Label: ${item.label}`,
+              x: lx,
+              y: ly,
+              text,
+              font,
+              fill: lOpts.color || '#FFFFFF',
+              align: 'center',
+              baseline: 'middle',
+            })
+          );
+        } else {
+          const lineStartRadius = outerRadius + 4;
+          const lineBreakRadius = outerRadius + 14;
+          const x0 = cx + Math.cos(midAngle) * lineStartRadius;
+          const y0 = cy + Math.sin(midAngle) * lineStartRadius;
+          const x1 = cx + Math.cos(midAngle) * lineBreakRadius;
+          const y1 = cy + Math.sin(midAngle) * lineBreakRadius;
+          const isRightSide = Math.cos(midAngle) >= 0;
+          const x2 = x1 + (isRightSide ? 14 : -14);
+          const y2 = y1;
+
+          const leaderPath = `<path id="Leader: ${escapeXml(item.label)}" d="M ${fmt(x0)} ${fmt(y0)} L ${fmt(x1)} ${fmt(y1)} L ${fmt(x2)} ${fmt(y2)}" fill="none" stroke="#94A3B8" stroke-opacity="0.4" stroke-width="1" />`;
+          const textEl = svgTextElement({
+            id: `Label: ${item.label}`,
+            x: x2 + (isRightSide ? 4 : -4),
+            y: y2,
+            text,
+            font,
+            fill: lOpts.color || '#CBD5E1',
+            align: isRightSide ? 'left' : 'right',
+            baseline: 'middle',
+          });
+          labelEls.push(`<g id="Slice Label: ${escapeXml(item.label)}">${leaderPath}${textEl}</g>`);
+        }
+      });
+
+      if (labelEls.length > 0) {
+        groups.push(`<g id="Pie Labels">\n    ${labelEls.join('\n    ')}\n  </g>`);
+      }
+    }
+
+    return groups.join('\n  ');
   }
 }

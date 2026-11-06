@@ -21,6 +21,14 @@ import type {
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
 import { createGradient } from '../utils/canvas';
+import {
+  buildSvgLinePathData,
+  escapeXml,
+  fmt,
+  parseSvgColor,
+  resolveSvgPaintAttrs,
+  svgTextElement,
+} from '../utils/svg';
 
 /**
  * LTTB (Largest-Triangle-Three-Buckets) 시각적 다운샘플링 알고리즘
@@ -664,5 +672,213 @@ export class LineSeries {
       return `rgba(${nums}, ${alpha})`;
     }
     return trimmed;
+  }
+
+  /**
+   * 피그마(`figma.createNodeFromSvg`) 호환 라인/영역/포인트/라벨 SVG 벡터 그룹을 생성합니다.
+   */
+  public toSvgElements(params: {
+    seriesName?: string;
+    seriesIdSuffix?: string;
+    data: DataItem[];
+    xScale: BandScale;
+    yScale: LinearScale;
+    padding: Padding;
+    width: number;
+    height: number;
+    defs: string[];
+    stackedValues?: number[];
+    baseValues?: number[];
+  }): string {
+    const {
+      seriesName = 'Series',
+      seriesIdSuffix = '0',
+      data,
+      xScale,
+      yScale,
+      padding,
+      width,
+      height,
+      defs,
+      stackedValues,
+      baseValues,
+    } = params;
+
+    const [start, end] = xScale.getViewport();
+    if (data.length === 0 || start > end) return '';
+
+    const drawStart = Math.max(0, start);
+    const drawEnd = Math.min(data.length - 1, end);
+
+    const rawPoints: LinePointGeometry[] = [];
+    const rawBasePoints: LinePointGeometry[] = [];
+
+    for (let i = drawStart; i <= drawEnd; i++) {
+      const item = data[i];
+      if (!item) continue;
+      const topVal = stackedValues ? stackedValues[i] : undefined;
+      rawPoints.push(this.getPointGeometry(item, i, xScale, yScale, topVal));
+      if (baseValues) {
+        rawBasePoints.push(this.getPointGeometry(item, i, xScale, yScale, baseValues[i] ?? 0));
+      }
+    }
+
+    if (rawPoints.length === 0) return '';
+
+    const shouldSample = Boolean(
+      this.samplingThreshold && rawPoints.length > this.samplingThreshold && !baseValues
+    );
+    const points = shouldSample
+      ? downsampleLTTB(rawPoints, this.samplingThreshold as number)
+      : rawPoints;
+
+    const plotLeft = padding.left;
+    const plotRight = width - padding.right;
+    const plotTop = padding.top;
+    const plotBottom = height - padding.bottom;
+    const plotWidth = Math.max(1, plotRight - plotLeft);
+    const plotHeight = Math.max(1, plotBottom - plotTop);
+
+    const curve = this.lineOptions.curve || 'smooth';
+    const tension = this.lineOptions.tension ?? 0.35;
+
+    const els: string[] = [];
+
+    // 1. Area Fill Path
+    if (this.areaOptions.visible && points.length >= 2) {
+      const topPath = buildSvgLinePathData(points, curve, tension, false);
+      let areaPathD = '';
+
+      if (rawBasePoints.length === points.length && rawBasePoints.length > 0) {
+        const reversedBase = [...rawBasePoints].reverse();
+        const bottomPath = buildSvgLinePathData(reversedBase, curve, tension, true);
+        areaPathD = `${topPath} ${bottomPath} Z`;
+      } else {
+        const domain = yScale.domain();
+        const baselineVal = domain[0] < 0 && domain[1] > 0 ? 0 : domain[0];
+        const baselineY = yScale.scale(baselineVal);
+        const first = points[0];
+        const last = points[points.length - 1];
+        areaPathD = `${topPath} L ${fmt(last.x)} ${fmt(baselineY)} L ${fmt(first.x)} ${fmt(baselineY)} Z`;
+      }
+
+      const areaStyle =
+        this.areaOptions.fill || {
+          type: 'linear' as const,
+          from: this.withAlpha(this.getPrimaryLineColor(), 0.42),
+          to: this.withAlpha(this.getPrimaryLineColor(), 0.02),
+          direction: 'vertical' as const,
+        };
+
+      const areaPaint = resolveSvgPaintAttrs(
+        'fill',
+        areaStyle,
+        defs,
+        `area-grad-${seriesIdSuffix}`,
+        plotLeft,
+        plotTop,
+        plotWidth,
+        plotHeight,
+        this.areaOptions.opacity ?? 1
+      );
+
+      els.push(`<path id="Area: ${escapeXml(seriesName)}" d="${areaPathD}" ${areaPaint} />`);
+    }
+
+    // 2. Line Stroke Path
+    if (points.length >= 2) {
+      const linePathD = buildSvgLinePathData(points, curve, tension, false);
+      const linePaint = resolveSvgPaintAttrs(
+        'stroke',
+        this.lineOptions.color,
+        defs,
+        `line-grad-${seriesIdSuffix}`,
+        plotLeft,
+        plotTop,
+        plotWidth,
+        plotHeight
+      );
+      const dashAttr =
+        this.lineOptions.dash && this.lineOptions.dash.length > 0
+          ? ` stroke-dasharray="${this.lineOptions.dash.join(' ')}"`
+          : '';
+      els.push(
+        `<path id="Line: ${escapeXml(seriesName)}" d="${linePathD}" fill="none" ${linePaint} stroke-width="${fmt(this.lineOptions.width)}" stroke-linecap="round" stroke-linejoin="round"${dashAttr} />`
+      );
+    }
+
+    // 3. Points & Labels
+    const visibleCount = end - start + 1;
+    const showStaticPoints = this.pointOptions.visible && visibleCount <= 80;
+    const showLabels = this.labelOptions?.visible && visibleCount <= 45;
+
+    if (showStaticPoints) {
+      const ptEls: string[] = [];
+      const radius = this.pointOptions.radius ?? 4;
+      const borderWidth = this.pointOptions.borderWidth ?? 2;
+
+      for (const pt of points) {
+        if (pt.index < start || pt.index > end) continue;
+        const primaryColor = pt.item.color || this.getPrimaryLineColor();
+        const fillColor =
+          typeof this.pointOptions.fill === 'function'
+            ? this.pointOptions.fill(pt.item, pt.index)
+            : this.pointOptions.fill || '#0B0F19';
+        const borderColor =
+          typeof this.pointOptions.borderColor === 'function'
+            ? this.pointOptions.borderColor(pt.item, pt.index)
+            : this.pointOptions.borderColor || primaryColor;
+
+        const parsedFill = parseSvgColor(fillColor);
+        const parsedBorder = parseSvgColor(borderColor);
+
+        ptEls.push(
+          `<circle id="Point: ${escapeXml(pt.item.label)} (${pt.item.value})" cx="${fmt(pt.x)}" cy="${fmt(pt.y)}" r="${fmt(radius)}" fill="${escapeXml(parsedFill.color)}" stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(borderWidth)}" />`
+        );
+      }
+
+      if (ptEls.length > 0) {
+        els.push(`<g id="Points: ${escapeXml(seriesName)}">\n      ${ptEls.join('\n      ')}\n    </g>`);
+      }
+    }
+
+    if (showLabels && this.labelOptions && this.labelOptions.position !== 'none') {
+      const lblEls: string[] = [];
+      const offset = this.labelOptions.offset ?? 8;
+      const font = this.labelOptions.font || '600 11px Pretendard, sans-serif';
+      const isBottom =
+        this.labelOptions.position === 'bottom-outside' ||
+        this.labelOptions.position === 'inside-bottom';
+
+      for (const pt of points) {
+        if (pt.index < start || pt.index > end) continue;
+        const color =
+          typeof this.labelOptions.color === 'function'
+            ? this.labelOptions.color(pt.item, pt.index)
+            : this.labelOptions.color || '#94A3B8';
+        const text = this.labelOptions.formatter
+          ? this.labelOptions.formatter(pt.item.value, pt.item, pt.index)
+          : pt.item.value.toLocaleString();
+
+        lblEls.push(
+          svgTextElement({
+            id: `Label: ${pt.item.label} (${text})`,
+            x: pt.x,
+            y: isBottom ? pt.y + offset : pt.y - offset,
+            text,
+            font,
+            fill: color,
+            align: 'center',
+            baseline: isBottom ? 'top' : 'bottom',
+          })
+        );
+      }
+
+      if (lblEls.length > 0) {
+        els.push(`<g id="Labels: ${escapeXml(seriesName)}">\n      ${lblEls.join('\n      ')}\n    </g>`);
+      }
+    }
+
+    return `<g id="Series: ${escapeXml(seriesName)}">\n    ${els.join('\n    ')}\n  </g>`;
   }
 }

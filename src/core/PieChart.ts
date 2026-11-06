@@ -16,6 +16,7 @@ import type {
   PieChartOptions,
   Padding,
   PieSliceGeometry,
+  SvgExportOptions,
 } from '../types';
 import { LayerManager } from './LayerManager';
 import { EventEmitter } from './EventEmitter';
@@ -23,6 +24,7 @@ import { Animator } from './Animator';
 import { Tooltip } from '../components/Tooltip';
 import { Legend } from '../components/Legend';
 import { PieSeries } from '../series/PieSeries';
+import { buildSvgLegendGroup, wrapSvgDocument } from '../utils/svg';
 
 export class PieChart extends EventEmitter {
   private container: HTMLElement;
@@ -399,6 +401,62 @@ export class PieChart extends EventEmitter {
     if (options.padding) this.padding = { ...this.padding, ...options.padding };
 
     this.render(hasNewData);
+  }
+
+  /**
+   * 현재 파이/도넛 차트를 피그마(`figma.createNodeFromSvg`)에서 레이어별로 편집 가능한 순수 벡터(SVG) 문자열로 추출합니다.
+   * 
+   * @param exportOptions 추출 크기, 배경색, 범례 포함 여부 설정
+   * @returns 표준 SVG XML 문자열
+   */
+  public toSVG(exportOptions?: SvgExportOptions): string {
+    const svgW = exportOptions?.width || this.width || 560;
+    const svgH = exportOptions?.height || this.height || 400;
+
+    const rawData = this.options.data || [];
+    const activeData: DataItem[] = [];
+    rawData.forEach((item, idx) => {
+      const key = this.getItemLegendKey(item, idx);
+      if (this.legend.isKeyActive(key)) {
+        activeData.push({
+          ...item,
+          color: this.pieSeries.resolveSliceColor(item, idx),
+        });
+      }
+    });
+
+    const reserved = this.legend.getReservedPadding();
+    const effectivePadding: Padding = {
+      top: this.padding.top + (reserved.top ?? 0),
+      right: this.padding.right + (reserved.right ?? 0),
+      bottom: this.padding.bottom + (reserved.bottom ?? 0),
+      left: this.padding.left + (reserved.left ?? 0),
+    };
+
+    const slices = this.pieSeries.calculateSlices(activeData, svgW, svgH, effectivePadding);
+    const body: string[] = [];
+
+    const pieSvg = this.pieSeries.toSvgElements(slices);
+    if (pieSvg) body.push(pieSvg);
+
+    if (exportOptions?.includeLegend !== false && this.legend.isVisible()) {
+      const legendSvg = buildSvgLegendGroup(
+        this.legend.getItems(),
+        this.legend.getOptions(),
+        svgW,
+        svgH
+      );
+      if (legendSvg) body.push(legendSvg);
+    }
+
+    return wrapSvgDocument({
+      width: svgW,
+      height: svgH,
+      defs: [],
+      body,
+      backgroundColor: exportOptions?.backgroundColor,
+      backgroundRadius: exportOptions?.backgroundRadius,
+    });
   }
 
   public destroy(): void {

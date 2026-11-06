@@ -205,6 +205,24 @@ animation: {
 }
 ```
 
+### 5. 피그마(Figma) 호환 순수 벡터(SVG) 추출 (`toSVG`)
+
+모든 차트 인스턴스(`BarChart`, `LineChart`, `PieChart`)는 현재 렌더링 상태를 피그마(`figma.createNodeFromSvg`)에서 Frame, Vector, Rectangle, Text 레이어로 분해하여 개별 편집할 수 있는 표준 SVG 문자열로 추출하는 `toSVG()` 메서드를 제공합니다.
+
+```typescript
+const svgString = chart.toSVG({
+  width: 640,
+  height: 400,
+  backgroundColor: '#151C2C',
+  backgroundRadius: 16,
+  includeLegend: true,
+  includeGrid: true,
+});
+
+// Figma 플러그인(code.ts) 내부에서 즉시 벡터 레이어로 삽입:
+const node = figma.createNodeFromSvg(svgString);
+```
+
 ---
 
 ## 🛠 API Options

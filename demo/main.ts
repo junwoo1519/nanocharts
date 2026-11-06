@@ -710,3 +710,33 @@ document.getElementById('reset-zoom-btn')!.addEventListener('click', () => {
     if (lineChart) lineChart.resetZoom();
   });
 });
+
+// Figma 호환 순수 벡터(SVG) 클립보드 복사 버튼
+const copySvgBtn = document.getElementById('copy-svg-btn')!;
+copySvgBtn.addEventListener('click', async () => {
+  let svg = '';
+  const exportOpts = { backgroundColor: '#151C2C', backgroundRadius: 16 };
+  if (barChart) svg = barChart.toSVG(exportOpts);
+  else if (lineChart) svg = lineChart.toSVG(exportOpts);
+  else if (pieChart) svg = pieChart.toSVG(exportOpts);
+
+  if (!svg) return;
+
+  try {
+    await navigator.clipboard.writeText(svg);
+    const origText = copySvgBtn.innerText;
+    copySvgBtn.innerText = '✅ 복사됨! (Figma에 Ctrl+V)';
+    setTimeout(() => {
+      copySvgBtn.innerText = origText;
+    }, 2200);
+  } catch {
+    // 클립보드 권한 실패 시 파일 다운로드 폴백
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nanocharts-${currentMode}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+});

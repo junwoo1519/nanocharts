@@ -19,6 +19,14 @@ import {
 import { BandScale } from '../scale/BandScale';
 import { LinearScale } from '../scale/LinearScale';
 import { drawRoundedRect, createGradient } from '../utils/canvas';
+import {
+  escapeXml,
+  fmt,
+  parseSvgColor,
+  resolveSvgPaintAttrs,
+  svgRoundedRectElement,
+  svgTextElement,
+} from '../utils/svg';
 
 /**
  * 정규화된 다중 바 시리즈 내부 데이터 구조
@@ -528,24 +536,29 @@ export class BarSeries {
   }
 
   /**
+   * 바의 원본 ColorStyle 객체(단색 문자열 또는 GradientConfig)를 반환합니다.
+   */
+  public resolveColorStyle(geom: BarGeometry): ColorStyle {
+    const { item, index, seriesColor } = geom;
+    if (item.color) return item.color;
+    if (seriesColor) {
+      return typeof seriesColor === 'function' ? seriesColor(item, index) : seriesColor;
+    }
+    if (typeof this.barOptions.fill === 'function') {
+      return this.barOptions.fill(item, index);
+    }
+    return this.barOptions.fill || '#4F46E5';
+  }
+
+  /**
    * 바의 채우기 스타일(단색, 그라데이션, 함수 콜백)을 최종 캔버스 FillStyle로 변환
    */
   private resolveColor(
     ctx: CanvasRenderingContext2D,
     geom: BarGeometry
   ): string | CanvasGradient {
-    const { x, y, width, height, item, index, seriesColor } = geom;
-    let style: ColorStyle = item.color || '#4F46E5';
-
-    if (item.color) {
-      style = item.color;
-    } else if (seriesColor) {
-      style = typeof seriesColor === 'function' ? seriesColor(item, index) : seriesColor;
-    } else if (typeof this.barOptions.fill === 'function') {
-      style = this.barOptions.fill(item, index);
-    } else if (this.barOptions.fill) {
-      style = this.barOptions.fill;
-    }
+    const { x, y, width, height } = geom;
+    const style = this.resolveColorStyle(geom);
 
     if (typeof style === 'string') {
       return style;
@@ -568,5 +581,154 @@ export class BarSeries {
       return this.barOptions.border(item, index);
     }
     return this.barOptions.border;
+  }
+
+  /**
+   * 피그마(`figma.createNodeFromSvg`) 호환 SVG 벡터 그룹(`<g id="Bars">`, `<g id="Data Labels">`)을 생성합니다.
+   */
+  public toSvgElements(
+    data: DataItem[],
+    activeSeries: NormalizedBarSeries[],
+    isMulti: boolean,
+    xScale: BandScale,
+    yScale: LinearScale,
+    defs: string[]
+  ): string {
+    const [start, end] = xScale.getViewport();
+    if (start > end) return '';
+
+    const barEls: string[] = [];
+    const labelEls: string[] = [];
+    const isStacked = this.getMode() !== 'grouped';
+
+    const buildSingleGeomSvg = (geom: BarGeometry, gradSuffix: string, drawLabel: boolean) => {
+      if (geom.width <= 0 || geom.height <= 0) return;
+
+      const style = this.resolveColorStyle(geom);
+      const fillAttrs = resolveSvgPaintAttrs(
+        'fill',
+        style,
+        defs,
+        `bar-grad-${gradSuffix}`,
+        geom.x,
+        geom.y,
+        geom.width,
+        geom.height
+      );
+
+      const border = this.resolveBorder(geom);
+      let strokeAttrs = '';
+      if (border && border.width > 0) {
+        const parsedBorder = parseSvgColor(border.color);
+        const dashAttr = border.dash && border.dash.length > 0 ? ` stroke-dasharray="${border.dash.join(' ')}"` : '';
+        strokeAttrs = `stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(border.width)}"${dashAttr}`;
+      }
+
+      const radius =
+        geom.borderRadiusOverride !== undefined ? geom.borderRadiusOverride : this.barOptions.borderRadius;
+      const barId = geom.seriesName
+        ? `Bar: ${geom.seriesName} - ${geom.item.label} (${geom.item.value})`
+        : `Bar: ${geom.item.label} (${geom.item.value})`;
+
+      const rectEl = svgRoundedRectElement({
+        id: barId,
+        x: geom.x,
+        y: geom.y,
+        width: geom.width,
+        height: geom.height,
+        radius,
+        fillAttrs,
+        strokeAttrs,
+      });
+      if (rectEl) barEls.push(rectEl);
+
+      if (drawLabel && this.labelOptions?.visible && geom.width >= 14) {
+        const pos = this.labelOptions.position || 'top-outside';
+        if (pos !== 'none') {
+          const offset = this.labelOptions.offset ?? 6;
+          const font = this.labelOptions.font || '600 11px Pretendard, sans-serif';
+          const color =
+            typeof this.labelOptions.color === 'function'
+              ? this.labelOptions.color(geom.item, geom.index)
+              : this.labelOptions.color || (pos.startsWith('inside') ? '#FFFFFF' : '#94A3B8');
+
+          const text =
+            geom.percentage !== undefined && this.getMode() === 'percent' && !this.labelOptions.formatter
+              ? `${geom.percentage.toFixed(0)}%`
+              : this.labelOptions.formatter
+                ? this.labelOptions.formatter(geom.item.value, geom.item, geom.index)
+                : geom.item.value.toLocaleString();
+
+          const centerX = geom.x + geom.width / 2;
+          let labelY = geom.y;
+          let baseline: 'top' | 'middle' | 'bottom' = 'bottom';
+
+          switch (pos) {
+            case 'top-outside':
+              baseline = 'bottom';
+              labelY = geom.y - offset;
+              break;
+            case 'inside-top':
+              baseline = 'top';
+              labelY = geom.y + offset;
+              break;
+            case 'inside-center':
+              baseline = 'middle';
+              labelY = geom.y + geom.height / 2;
+              break;
+            case 'inside-bottom':
+              baseline = 'bottom';
+              labelY = geom.y + geom.height - offset;
+              break;
+            case 'bottom-outside':
+              baseline = 'top';
+              labelY = geom.y + geom.height + offset;
+              break;
+          }
+
+          labelEls.push(
+            svgTextElement({
+              id: `Label: ${geom.item.label} (${text})`,
+              x: centerX,
+              y: labelY,
+              text,
+              font,
+              fill: color,
+              align: 'center',
+              baseline,
+            })
+          );
+        }
+      }
+    };
+
+    if (isMulti) {
+      for (let i = start; i <= end; i++) {
+        const geoms = this.getMultiBarGeometriesAtSlot(i, activeSeries, xScale, yScale, 1);
+        geoms.forEach((geom, gIdx) => {
+          const shouldDrawLabel =
+            isStacked && (this.labelOptions?.position || 'top-outside') === 'top-outside'
+              ? gIdx === geoms.length - 1
+              : !isStacked || geom.height >= 15;
+          buildSingleGeomSvg(geom, `${i}-${gIdx}`, shouldDrawLabel);
+        });
+      }
+    } else {
+      for (let i = start; i <= end; i++) {
+        const item = data[i];
+        if (!item) continue;
+        const geom = this.getBarGeometry(item, i, xScale, yScale, 1);
+        buildSingleGeomSvg(geom, `${i}`, true);
+      }
+    }
+
+    const groups: string[] = [];
+    if (barEls.length > 0) {
+      groups.push(`<g id="Bars">\n    ${barEls.join('\n    ')}\n  </g>`);
+    }
+    if (labelEls.length > 0) {
+      groups.push(`<g id="Data Labels">\n    ${labelEls.join('\n    ')}\n  </g>`);
+    }
+    return groups.join('\n  ');
   }
 }
