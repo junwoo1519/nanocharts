@@ -181,10 +181,13 @@ export class FunnelChart extends EventEmitter {
     this.legend.setItems(items);
   }
 
-  private getEffectivePadding(): Padding {
+  public getEffectivePadding(targetW?: number, targetH?: number): Padding {
+    const w = targetW || this.width || 640;
+    const h = targetH || this.height || 400;
     const reserved = this.legend.getReservedPadding();
-    const isCompact = this.width < 460 || this.height < 280;
-    const padScale = isCompact ? 0.72 : 1;
+    const wScale = Math.max(0.68, Math.min(1.0, ((w - 200) / (600 - 200)) * 0.32 + 0.68));
+    const hScale = Math.max(0.68, Math.min(1.0, ((h - 160) / (380 - 160)) * 0.32 + 0.68));
+    const padScale = Math.min(wScale, hScale);
     return {
       top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
       right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
@@ -377,7 +380,7 @@ export class FunnelChart extends EventEmitter {
       }
     });
 
-    const effPadding = this.getEffectivePadding();
+    const effPadding = this.getEffectivePadding(svgW, svgH);
     const exportStages = this.funnelSeries.calculateStages(
       activeData,
       svgW,

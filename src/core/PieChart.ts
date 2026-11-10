@@ -210,6 +210,21 @@ export class PieChart extends EventEmitter {
     this.legend.setItems(items);
   }
 
+  public getEffectivePadding(targetW?: number, targetH?: number): Padding {
+    const w = targetW || this.width || 640;
+    const h = targetH || this.height || 400;
+    const reserved = this.legend.getReservedPadding();
+    const wScale = Math.max(0.65, Math.min(1.0, ((w - 200) / (600 - 200)) * 0.35 + 0.65));
+    const hScale = Math.max(0.65, Math.min(1.0, ((h - 160) / (380 - 160)) * 0.35 + 0.65));
+    const padScale = Math.min(wScale, hScale);
+    return {
+      top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
+      right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
+      bottom: Math.round(this.padding.bottom * padScale) + (reserved.bottom ?? 0),
+      left: Math.round(this.padding.left * padScale) + (reserved.left ?? 0),
+    };
+  }
+
   public render(animate: boolean = false): void {
     if (this.width <= 0 || this.height <= 0) return;
 
@@ -225,17 +240,8 @@ export class PieChart extends EventEmitter {
       }
     });
 
-    const reserved = this.legend.getReservedPadding();
-    const isCompact = this.width < 460 || this.height < 280;
-    const padScale = isCompact ? 0.65 : 1;
-    const effectivePadding: Padding = {
-      top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
-      right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
-      bottom: Math.round(this.padding.bottom * padScale) + (reserved.bottom ?? 0),
-      left: Math.round(this.padding.left * padScale) + (reserved.left ?? 0),
-    };
-
     // 조각 기하학 수치 재계산
+    const effectivePadding = this.getEffectivePadding(this.width, this.height);
     this.slices = this.pieSeries.calculateSlices(
       activeData,
       this.width,
@@ -481,16 +487,7 @@ export class PieChart extends EventEmitter {
       }
     });
 
-    const reserved = this.legend.getReservedPadding();
-    const isCompact = this.width < 460 || this.height < 280;
-    const padScale = isCompact ? 0.65 : 1;
-    const effectivePadding: Padding = {
-      top: Math.round(this.padding.top * padScale) + (reserved.top ?? 0),
-      right: Math.round(this.padding.right * padScale) + (reserved.right ?? 0),
-      bottom: Math.round(this.padding.bottom * padScale) + (reserved.bottom ?? 0),
-      left: Math.round(this.padding.left * padScale) + (reserved.left ?? 0),
-    };
-
+    const effectivePadding = this.getEffectivePadding(svgW, svgH);
     const slices = this.pieSeries.calculateSlices(activeData, svgW, svgH, effectivePadding);
     const body: string[] = [];
 

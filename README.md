@@ -299,6 +299,78 @@ const node = figma.createNodeFromSvg(svgString);
 
 ---
 
+## 🧩 Figma Plugin & 디자인 시스템 변수(Variables) 연동
+
+`figma-plugin/` 디렉토리에는 `@ju9nu7/nanocharts` 엔진이 내장된 **피그마 벡터 차트 스튜디오 플러그인**이 포함되어 있습니다.
+
+### 1. 디자이너 5대 피그마 Variable 컬렉션 100% 호환
+차트를 피그마에 벡터(SVG)로 삽입할 때 16진수(HEX)나 픽셀 하드코딩 대신 프로젝트의 **Figma Local Variables**에 자동으로 바인딩됩니다:
+
+| 컬렉션 이름 | 지원 변수 범위 | 자동 바인딩 대상 |
+| :--- | :--- | :--- |
+| **`1.Color Palette`** | `Primary/500`, `point red/500`, `Common/white`, `Transparency/50` 등 (266개) | 팔레트 직접 입력 및 별칭(Alias) 역추적 |
+| **`2.Color token`** | `primary/-`, `on-primary/*`, `surface/*`, `on-surface/*`, `outline/*`, `overlay/white/*`, `overlay/gray/*`, `overlay/black/*`, `transparent` (75개) | 차트 시리즈, 배경, 축/그리드, 라벨, 줄무늬 배경(반투명 Alpha 포함) |
+| **`3.Color token - point`** | `red/*` ~ `pink/*` (112개) + `on-red/*` ~ `on-pink/*` (112개) 총 224개 | 포인트 컬러 시리즈 및 상태별 강조 색상 |
+| **`4.Radius`** | `rounded-xxs`(2px) ~ `rounded-full`(999px) (8개) | 바 차트 개별 막대의 상단 모서리(`topLeftRadius`, `topRightRadius`) 및 카드 배경 프레임 |
+| **`5.Spacing`** | `padding/p-0_5` ~ `p-10`(12개) + `gap/gap-0_5` ~ `gap-10`(12개) (24개) | 차트 루트 프레임의 상하좌우 여백(`padding*`) 및 요소 간격(`itemSpacing`) |
+
+### 2. 디자이너 최초 1회 플러그인 등록 방법
+1. 피그마 데스크톱 앱 실행 → 상단 메뉴 **`Plugins`** → **`Development`** → **`Import plugin from manifest...`** 클릭
+2. `figma-plugin/manifest.json` 파일 선택
+3. 최초 1회만 등록해 두면 이후에는 **GitHub(`junwoo1519/nanocharts`) 및 npm CDN(`@ju9nu7/nanocharts`)을 통해 원격 자동 업데이트(OTA)** 되므로 디자이너가 다시 Import 할 필요가 없습니다.
+
+---
+
+## 📦 빌드 및 배포 명령어 (Build & Release Guide)
+
+> **💡 Windows PowerShell 참고**: PowerShell 보안 정책으로 `npm.ps1` 실행이 차단된 환경에서는 `npm` 대신 **`npm.cmd`**를 사용하세요.
+
+### 1. 로컬 개발 및 빌드 명령어
+
+```bash
+# 로컬 데모 개발 서버 실행 (Vite)
+npm.cmd run dev
+
+# 라이브러리 프로덕션 빌드 (dist/ 생성)
+npm.cmd run build
+
+# 라이브러리 + 피그마 플러그인(figma-plugin/dist/) 통합 빌드
+npm.cmd run build:figma
+```
+
+### 2. 피그마 플러그인 원격 자동 업데이트 배포 (GitHub OTA)
+코드를 수정한 뒤 디자이너의 피그마 플러그인에 **파일 전달 없이 즉시 최신 버전을 반영**하려면 아래 명령어를 실행합니다:
+
+```bash
+# 방법 A: 원클릭 스크립트 (빌드 + git add + commit + push 자동 실행)
+npm.cmd run deploy:figma
+
+# 방법 B: 수동으로 커밋 메시지를 지정하여 푸시할 때
+npm.cmd run build:figma
+git add .
+git commit -m "feat: 차트 기능 및 피그마 플러그인 업데이트"
+git push origin main
+```
+
+### 3. npm 패키지 정식 배포 (`@ju9nu7/nanocharts`)
+npm 레지스트리는 이미 배포된 버전 번호로 덮어쓰기를 허용하지 않으므로(`403 Forbidden` 방지), **반드시 버전을 먼저 올린 후 배포**합니다:
+
+```bash
+# 1단계: 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
+npm.cmd version patch --no-git-tag-version
+
+# 2단계: 라이브러리 + 피그마 번들 통합 빌드
+npm.cmd run build:figma
+
+# 3단계: 배포될 파일 목록 사전 확인 (선택 사항)
+npm.cmd pack --dry-run
+
+# 4단계: npm 공개 배포 실행 (prepublishOnly 훅으로 빌드 자동 검증 포함)
+npm.cmd publish --access public
+```
+
+---
+
 ## 📄 License
 
 MIT License © 2026

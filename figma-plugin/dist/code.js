@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.8","buildId":"0.1.8-1794288707068","buildTime":1794288707068,"builtAt":"2026-11-10T05:31:47.068Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.8","buildId":"0.1.8-1794289933806","buildTime":1794289933806,"builtAt":"2026-11-10T05:52:13.806Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -1169,45 +1169,306 @@ async function syncVariablesScssToFigma(tokens) {
     return createdOrUpdated;
 }
 /**
- * 생성된 피그마 차트 프레임과 내부 벡터/텍스트 레이어에 반응형 제약 조건(Constraints)을 설정합니다.
+ * 그룹(`GROUP`) 내부의 모든 말단(Leaf) 도형/텍스트 노드를 재귀적으로 수집합니다.
  */
-function applyResponsiveFigmaConstraints(node, ancestorGroupName = '') {
-    const currentGroup = node.type === 'GROUP' || node.type === 'FRAME' ? node.name || ancestorGroupName : ancestorGroupName;
-    if ('constraints' in node && node.parent && node.parent.type !== 'PAGE') {
-        try {
-            const name = node.name || '';
-            if (name === 'Chart Background') {
-                node.constraints = { horizontal: 'STRETCH', vertical: 'STRETCH' };
-            }
-            else if (currentGroup === 'Grid' || name.startsWith('Grid Line')) {
-                node.constraints = { horizontal: 'STRETCH', vertical: 'SCALE' };
-            }
-            else if (currentGroup === 'Y-Axis' || name.startsWith('Y-Tick') || name === 'Y-Axis Line') {
-                node.constraints = { horizontal: 'MIN', vertical: 'SCALE' };
-            }
-            else if (name === 'X-Axis Baseline') {
-                node.constraints = { horizontal: 'STRETCH', vertical: 'MAX' };
-            }
-            else if (currentGroup === 'X-Axis' || name.startsWith('X-Tick')) {
-                node.constraints = { horizontal: 'SCALE', vertical: 'MAX' };
-            }
-            else if (currentGroup.startsWith('Legend')) {
-                node.constraints = { horizontal: 'SCALE', vertical: 'MIN' };
-            }
-            else {
-                node.constraints = { horizontal: 'SCALE', vertical: 'SCALE' };
-            }
-        }
-        catch (_a) {
-            // 일부 특수 노드에서 constraints 설정 불가 시 무시
+function collectLeafNodes(node, out = []) {
+    if (!node)
+        return out;
+    if (node.type === 'GROUP' && Array.isArray(node.children)) {
+        for (const child of [...node.children]) {
+            collectLeafNodes(child, out);
         }
     }
-    if (Array.isArray(node.children)) {
-        for (const child of node.children) {
-            applyResponsiveFigmaConstraints(child, currentGroup);
+    else {
+        out.push(node);
+    }
+    return out;
+}
+/**
+ * 텍스트 또는 포인트 원형 노드가 프레임 리사이즈 시 찌그러지거나 중심에서 벗어나지 않도록
+ * 투명 Pin-Frame(`SCALE`) 내부의 `CENTER` 제약 조건으로 감싸 배치합니다.
+ */
+function appendPinnedNode(parentFrame, leaf, localX, localY, pinHConstraint, pinVConstraint, innerHConstraint = 'CENTER', innerVConstraint = 'CENTER') {
+    const w = Math.max(1, leaf.width || 1);
+    const h = Math.max(1, leaf.height || 1);
+    const cx = localX + w / 2;
+    const cy = localY + h / 2;
+    const pin = figma.createFrame();
+    pin.name = leaf.name || 'Pin';
+    pin.fills = [];
+    pin.clipsContent = false;
+    pin.resizeWithoutConstraints(2, 2);
+    pin.x = cx - 1;
+    pin.y = cy - 1;
+    parentFrame.appendChild(pin);
+    pin.constraints = { horizontal: pinHConstraint, vertical: pinVConstraint };
+    pin.appendChild(leaf);
+    leaf.x = 1 - w / 2;
+    leaf.y = 1 - h / 2;
+    try {
+        leaf.constraints = { horizontal: innerHConstraint, vertical: innerVConstraint };
+    }
+    catch (_a) {
+        // 일부 노드에서 constraints 미지원 시 무시
+    }
+}
+/**
+ * 피그마에서 프레임을 좌우/상하로 자유롭게 늘이거나 줄여도 축, 바, 라인 포인트, 라벨, 범례가
+ * 절대 깨지거나 겹치지 않도록 서브 프레임(`Plot Area`, `Y-Axis`, `X-Axis`, `Legend`) 계층과
+ * 정밀 Constraints를 구성합니다.
+ */
+function buildResponsiveFigmaLayout(rootFrame, chartType = 'bar', padding, legendPos = 'top-right') {
+    if (!rootFrame || !Array.isArray(rootFrame.children))
+        return;
+    const W = Math.max(100, rootFrame.width || 640);
+    const H = Math.max(100, rootFrame.height || 400);
+    const pad = padding || { top: 46, right: 28, bottom: 42, left: 52 };
+    const plotLeft = Math.max(0, pad.left);
+    const plotTop = Math.max(0, pad.top);
+    const plotRight = Math.max(0, pad.right);
+    const plotBottom = Math.max(0, pad.bottom);
+    const plotW = Math.max(20, W - plotLeft - plotRight);
+    const plotH = Math.max(20, H - plotTop - plotBottom);
+    const topChildren = [...rootFrame.children];
+    const plotGroupNodes = [];
+    let yAxisGroup = null;
+    let xAxisGroup = null;
+    let legendGroup = null;
+    for (const child of topChildren) {
+        const name = child.name || '';
+        if (name === 'Chart Background') {
+            try {
+                child.constraints = { horizontal: 'STRETCH', vertical: 'STRETCH' };
+            }
+            catch (_a) {
+                // 무시
+            }
+        }
+        else if (name === 'Y-Axis') {
+            yAxisGroup = child;
+        }
+        else if (name === 'X-Axis') {
+            xAxisGroup = child;
+        }
+        else if (name === 'Legend') {
+            legendGroup = child;
+        }
+        else {
+            plotGroupNodes.push(child);
+        }
+    }
+    // 1. Y-Axis 서브 프레임 (좌측 고정, 상하 플롯 영역과 1:1 스트레치)
+    if (yAxisGroup) {
+        const yFrame = figma.createFrame();
+        yFrame.name = 'Y-Axis';
+        yFrame.fills = [];
+        yFrame.clipsContent = false;
+        yFrame.resizeWithoutConstraints(Math.max(10, plotLeft), plotH);
+        yFrame.x = 0;
+        yFrame.y = plotTop;
+        rootFrame.appendChild(yFrame);
+        yFrame.constraints = { horizontal: 'MIN', vertical: 'STRETCH' };
+        const leaves = collectLeafNodes(yAxisGroup);
+        for (const leaf of leaves) {
+            const localX = leaf.x;
+            const localY = leaf.y - plotTop;
+            if (leaf.type === 'TEXT') {
+                appendPinnedNode(yFrame, leaf, localX, localY, 'MAX', 'SCALE', 'MAX', 'CENTER');
+            }
+            else {
+                yFrame.appendChild(leaf);
+                leaf.x = localX;
+                leaf.y = localY;
+                try {
+                    leaf.constraints = { horizontal: 'MAX', vertical: 'STRETCH' };
+                }
+                catch (_b) {
+                    // 무시
+                }
+            }
+        }
+        try {
+            yAxisGroup.remove();
+        }
+        catch (_c) {
+            // 빈 그룹 자동 제거됨
+        }
+    }
+    // 2. Plot Area 서브 프레임 (파이/도넛은 정원 유지를 위해 CENTER, 바/라인/퍼널은 STRETCH)
+    if (plotGroupNodes.length > 0) {
+        const plotFrame = figma.createFrame();
+        plotFrame.name = chartType === 'pie' ? 'Pie Plot Area' : 'Plot Area';
+        plotFrame.fills = [];
+        plotFrame.clipsContent = false;
+        plotFrame.resizeWithoutConstraints(plotW, plotH);
+        plotFrame.x = plotLeft;
+        plotFrame.y = plotTop;
+        rootFrame.appendChild(plotFrame);
+        if (chartType === 'pie') {
+            plotFrame.constraints = { horizontal: 'CENTER', vertical: 'CENTER' };
+            for (const grp of plotGroupNodes) {
+                const leaves = collectLeafNodes(grp);
+                for (const leaf of leaves) {
+                    const lx = leaf.x - plotLeft;
+                    const ly = leaf.y - plotTop;
+                    plotFrame.appendChild(leaf);
+                    leaf.x = lx;
+                    leaf.y = ly;
+                    try {
+                        leaf.constraints = { horizontal: 'CENTER', vertical: 'CENTER' };
+                    }
+                    catch (_d) {
+                        // 무시
+                    }
+                }
+                try {
+                    if (grp.parent)
+                        grp.remove();
+                }
+                catch (_e) {
+                    // 무시
+                }
+            }
+        }
+        else {
+            plotFrame.constraints = { horizontal: 'STRETCH', vertical: 'STRETCH' };
+            for (const grp of plotGroupNodes) {
+                const subFrame = figma.createFrame();
+                subFrame.name = grp.name || 'Series Layer';
+                subFrame.fills = [];
+                subFrame.clipsContent = false;
+                subFrame.resizeWithoutConstraints(plotW, plotH);
+                subFrame.x = 0;
+                subFrame.y = 0;
+                plotFrame.appendChild(subFrame);
+                subFrame.constraints = { horizontal: 'STRETCH', vertical: 'STRETCH' };
+                const leaves = collectLeafNodes(grp);
+                for (const leaf of leaves) {
+                    const lx = leaf.x - plotLeft;
+                    const ly = leaf.y - plotTop;
+                    const lname = leaf.name || '';
+                    if (leaf.type === 'TEXT' || leaf.type === 'ELLIPSE' || lname.startsWith('Point:')) {
+                        appendPinnedNode(subFrame, leaf, lx, ly, 'SCALE', 'SCALE', 'CENTER', 'CENTER');
+                    }
+                    else {
+                        subFrame.appendChild(leaf);
+                        leaf.x = lx;
+                        leaf.y = ly;
+                        try {
+                            if (lname === 'Plot Border') {
+                                leaf.constraints = { horizontal: 'STRETCH', vertical: 'STRETCH' };
+                            }
+                            else if (lname.startsWith('Grid Line (')) {
+                                leaf.constraints = { horizontal: 'STRETCH', vertical: 'SCALE' };
+                            }
+                            else {
+                                leaf.constraints = { horizontal: 'SCALE', vertical: 'SCALE' };
+                            }
+                        }
+                        catch (_f) {
+                            // 무시
+                        }
+                    }
+                }
+                try {
+                    if (grp.parent)
+                        grp.remove();
+                }
+                catch (_g) {
+                    // 무시
+                }
+            }
+        }
+    }
+    // 3. X-Axis 서브 프레임 (좌우가 Plot Area와 정확히 1:1 STRETCH, 하단 고정)
+    if (xAxisGroup) {
+        const xFrame = figma.createFrame();
+        xFrame.name = 'X-Axis';
+        xFrame.fills = [];
+        xFrame.clipsContent = false;
+        xFrame.resizeWithoutConstraints(plotW, Math.max(10, plotBottom));
+        xFrame.x = plotLeft;
+        xFrame.y = plotTop + plotH;
+        rootFrame.appendChild(xFrame);
+        xFrame.constraints = { horizontal: 'STRETCH', vertical: 'MAX' };
+        const leaves = collectLeafNodes(xAxisGroup);
+        for (const leaf of leaves) {
+            const lx = leaf.x - plotLeft;
+            const ly = leaf.y - (plotTop + plotH);
+            if (leaf.type === 'TEXT') {
+                appendPinnedNode(xFrame, leaf, lx, ly, 'SCALE', 'MIN', 'CENTER', 'MIN');
+            }
+            else {
+                xFrame.appendChild(leaf);
+                leaf.x = lx;
+                leaf.y = ly;
+                try {
+                    leaf.constraints = { horizontal: 'STRETCH', vertical: 'MIN' };
+                }
+                catch (_h) {
+                    // 무시
+                }
+            }
+        }
+        try {
+            if (xAxisGroup.parent)
+                xAxisGroup.remove();
+        }
+        catch (_j) {
+            // 무시
+        }
+    }
+    // 4. Legend 서브 프레임 (설정된 12방향 앵커 위치에 고정하여 텍스트/마커 왜곡 방지)
+    if (legendGroup) {
+        const lgX = legendGroup.x;
+        const lgY = legendGroup.y;
+        const lgW = Math.max(10, legendGroup.width || 100);
+        const lgH = Math.max(10, legendGroup.height || 24);
+        const lgFrame = figma.createFrame();
+        lgFrame.name = 'Legend';
+        lgFrame.fills = [];
+        lgFrame.clipsContent = false;
+        lgFrame.resizeWithoutConstraints(lgW, lgH);
+        lgFrame.x = lgX;
+        lgFrame.y = lgY;
+        rootFrame.appendChild(lgFrame);
+        let hConst = 'MAX';
+        if (legendPos.includes('left'))
+            hConst = 'MIN';
+        else if (legendPos.includes('center') || legendPos === 'top' || legendPos === 'bottom')
+            hConst = 'CENTER';
+        let vConst = 'MIN';
+        if (legendPos.includes('bottom'))
+            vConst = 'MAX';
+        else if (legendPos.includes('middle') || legendPos === 'left' || legendPos === 'right')
+            vConst = 'CENTER';
+        lgFrame.constraints = { horizontal: hConst, vertical: vConst };
+        const leaves = collectLeafNodes(legendGroup);
+        for (const leaf of leaves) {
+            const lx = leaf.x - lgX;
+            const ly = leaf.y - lgY;
+            lgFrame.appendChild(leaf);
+            leaf.x = lx;
+            leaf.y = ly;
+            try {
+                leaf.constraints = { horizontal: 'MIN', vertical: 'MIN' };
+            }
+            catch (_k) {
+                // 무시
+            }
+        }
+        try {
+            if (legendGroup.parent)
+                legendGroup.remove();
+        }
+        catch (_l) {
+            // 무시
         }
     }
 }
+let lastObservedSelectionId = '';
+let lastObservedW = 0;
+let lastObservedH = 0;
 /**
  * 현재 피그마 캔버스에서 선택된 노드가 NanoCharts로 생성된 프레임인지 확인하고 UI에 상태를 전달합니다.
  */
@@ -1222,6 +1483,9 @@ function notifySelectionState() {
                     const parsedState = JSON.parse(rawState);
                     const currentW = Math.round(node.width || parsedState.exportW || 640);
                     const currentH = Math.round(node.height || parsedState.exportH || 400);
+                    lastObservedSelectionId = node.id || '';
+                    lastObservedW = currentW;
+                    lastObservedH = currentH;
                     figma.ui.postMessage({
                         type: 'SELECTION_SAVED_CHART',
                         hasSavedChart: true,
@@ -1238,6 +1502,7 @@ function notifySelectionState() {
             }
         }
     }
+    lastObservedSelectionId = '';
     figma.ui.postMessage({
         type: 'SELECTION_SAVED_CHART',
         hasSavedChart: false,
@@ -1246,7 +1511,33 @@ function notifySelectionState() {
 figma.on('selectionchange', () => {
     notifySelectionState();
 });
+// 피그마 캔버스에서 선택된 NanoChart 프레임의 크기를 마우스로 조절할 때 UI 프리뷰와 실시간 동기화
+setInterval(() => {
+    try {
+        const selection = figma.currentPage.selection;
+        if (!selection || selection.length !== 1)
+            return;
+        const node = selection[0];
+        if (!node || node.id !== lastObservedSelectionId)
+            return;
+        const curW = Math.round(node.width || 0);
+        const curH = Math.round(node.height || 0);
+        if (curW >= 120 && curH >= 120 && (Math.abs(curW - lastObservedW) >= 2 || Math.abs(curH - lastObservedH) >= 2)) {
+            lastObservedW = curW;
+            lastObservedH = curH;
+            figma.ui.postMessage({
+                type: 'SELECTION_FRAME_RESIZED',
+                frameWidth: curW,
+                frameHeight: curH,
+            });
+        }
+    }
+    catch (_a) {
+        // 무시
+    }
+}, 300);
 figma.ui.onmessage = async (msg) => {
+    var _a, _b;
     if (msg.type === 'INSERT_SVG' && msg.svg) {
         try {
             const { cleanSvg, cornerRadiiByNodeName } = prepareSvgAndExtractCornersForFigma(msg.svg);
@@ -1256,8 +1547,6 @@ figma.ui.onmessage = async (msg) => {
             if (msg.state && typeof newFrame.setPluginData === 'function') {
                 newFrame.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(msg.state));
             }
-            // 피그마 프레임 리사이징 대응 반응형 Constraints 자동 설정
-            applyResponsiveFigmaConstraints(newFrame);
             // 피그마 변수(Color, 4.Radius, 5.Spacing Variables) 자동 매칭 및 바인딩 실행
             const hexMap = msg.hexToTokenMap || {};
             const shouldBind = msg.bindVariables !== false;
@@ -1265,6 +1554,10 @@ figma.ui.onmessage = async (msg) => {
             const { radiusVarByName, radiusVarByValue } = await scanProjectRadiusVariables();
             const { spacingVarByName, paddingVarByValue, gapVarByValue } = await scanProjectSpacingVariables();
             let boundCount = await bindFigmaVariablesToTreeAsync(newFrame, hexMap, reverseDesignTokens, variableMap, hexToVariableMap, cornerRadiiByNodeName, radiusVarByName, radiusVarByValue, msg.radiusToken, shouldBind);
+            // 피그마 좌우/상하 자유 리사이즈 시에도 차트가 절대 깨지지 않도록 서브 프레임(Plot Area, Y-Axis, X-Axis, Legend) 계층 구성
+            const chartType = ((_a = msg.state) === null || _a === void 0 ? void 0 : _a.chartType) || 'bar';
+            const legendPos = ((_b = msg.state) === null || _b === void 0 ? void 0 : _b.legendPos) || 'top-right';
+            buildResponsiveFigmaLayout(newFrame, chartType, msg.padding, legendPos);
             // 루트 차트 프레임에 5.Spacing (padding/* 및 gap/*) 변수 및 배경 모서리(rounded-xxl) 바인딩
             if (shouldBind && typeof newFrame.setBoundVariable === 'function') {
                 const padKey = (msg.paddingToken || 'padding/p-6').toLowerCase();
@@ -1277,7 +1570,7 @@ figma.ui.onmessage = async (msg) => {
                             newFrame.setBoundVariable(field, padVar);
                             boundCount++;
                         }
-                        catch (_a) {
+                        catch (_c) {
                             // 프레임 패딩 바인딩 미지원 시 무시
                         }
                     }
@@ -1291,7 +1584,7 @@ figma.ui.onmessage = async (msg) => {
                         newFrame.setBoundVariable('itemSpacing', gapVar);
                         boundCount++;
                     }
-                    catch (_b) {
+                    catch (_d) {
                         // 간격 바인딩 미지원 시 무시
                     }
                 }
@@ -1302,7 +1595,7 @@ figma.ui.onmessage = async (msg) => {
                             newFrame.setBoundVariable(field, frameRadVar);
                             boundCount++;
                         }
-                        catch (_c) {
+                        catch (_e) {
                             // 모서리 바인딩 미지원 시 무시
                         }
                     }
@@ -1328,12 +1621,17 @@ figma.ui.onmessage = async (msg) => {
                 figma.currentPage.appendChild(newFrame);
             }
             figma.currentPage.selection = [newFrame];
-            figma.viewport.scrollAndZoomIntoView([newFrame]);
-            if (boundCount > 0) {
-                figma.notify(`✨ 벡터 레이어 삽입 완료! (${boundCount}개 컬러 속성이 16진수 대신 피그마 변수로 바인딩됨)`);
-            }
-            else {
-                figma.notify('✨ NanoCharts 벡터 레이어가 피그마에 삽입되었습니다!');
+            lastObservedSelectionId = newFrame.id || '';
+            lastObservedW = Math.round(newFrame.width || 640);
+            lastObservedH = Math.round(newFrame.height || 400);
+            if (!msg.silent) {
+                figma.viewport.scrollAndZoomIntoView([newFrame]);
+                if (boundCount > 0) {
+                    figma.notify(`✨ 벡터 레이어 삽입 완료! (${boundCount}개 속성이 피그마 변수로 바인딩됨)`);
+                }
+                else {
+                    figma.notify('✨ NanoCharts 반응형 벡터 레이어가 피그마에 삽입되었습니다!');
+                }
             }
             notifySelectionState();
         }
@@ -1366,7 +1664,7 @@ figma.ui.onmessage = async (msg) => {
                     });
                 }
             }
-            catch (_d) {
+            catch (_f) {
                 // 캐시 저장 실패 시에도 현재 세션 UI는 즉시 최신으로 교체
             }
             figma.showUI(msg.uiHtml, {

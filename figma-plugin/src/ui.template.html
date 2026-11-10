@@ -264,17 +264,96 @@
       justify-content: center;
       padding: 18px;
       overflow: hidden;
+      position: relative;
+      user-select: none;
     }
     .chart-box {
-      width: 100%;
-      height: 100%;
-      max-height: 490px;
+      width: 540px;
+      height: 380px;
+      min-width: 220px;
+      min-height: 160px;
       background: #FFFFFF;
-      border: 1px solid #1E293B;
+      border: 1px solid #334155;
       border-radius: 14px;
       position: relative;
       box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
       transition: background 0.18s;
+    }
+    .resize-handle-right {
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      right: -7px;
+      width: 14px;
+      cursor: ew-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    .resize-handle-right::after {
+      content: '';
+      width: 4px;
+      height: 38px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.65);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .resize-handle-right:hover::after {
+      background: #38BDF8;
+      transform: scaleY(1.2);
+    }
+    .resize-handle-bottom {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -7px;
+      height: 14px;
+      cursor: ns-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    .resize-handle-bottom::after {
+      content: '';
+      width: 38px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.65);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .resize-handle-bottom:hover::after {
+      background: #38BDF8;
+      transform: scaleX(1.2);
+    }
+    .resize-handle-corner {
+      position: absolute;
+      right: -7px;
+      bottom: -7px;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      border-right: 3px solid #38BDF8;
+      border-bottom: 3px solid #38BDF8;
+      border-bottom-right-radius: 4px;
+      z-index: 25;
+    }
+    .live-size-pill {
+      position: absolute;
+      top: -26px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #334155;
+      color: #93C5FD;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      pointer-events: none;
     }
     #preview-canvas {
       width: 100%;
@@ -706,9 +785,13 @@
       </div>
     </div>
 
-    <div class="preview-stage">
+    <div class="preview-stage" id="preview-stage">
       <div class="chart-box" id="chart-box">
+        <div class="live-size-pill" id="live-size-pill">640 × 400 px · ↔ 우측/하단 핸들을 드래그하여 유동 반응형 조절</div>
         <div id="preview-canvas"></div>
+        <div class="resize-handle-right" id="resize-handle-right" title="좌우로 드래그하여 유동 반응형 너비 조절"></div>
+        <div class="resize-handle-bottom" id="resize-handle-bottom" title="상하로 드래그하여 유동 반응형 높이 조절"></div>
+        <div class="resize-handle-corner" id="resize-handle-corner" title="대각선 드래그하여 가로·세로 동시 조절"></div>
       </div>
     </div>
 
@@ -1138,8 +1221,16 @@
       const padOpt = computeChartPadding();
 
       chartBoxEl.style.background = bgHex;
-      chartBoxEl.style.maxWidth = `${Math.min(540, Math.max(240, state.exportW))}px`;
-      chartBoxEl.style.maxHeight = `${Math.min(480, Math.max(180, state.exportH))}px`;
+      const stageW = Math.max(260, (document.getElementById('preview-stage')?.clientWidth || 580) - 36);
+      const stageH = Math.max(200, (document.getElementById('preview-stage')?.clientHeight || 480) - 44);
+      const boxW = Math.min(stageW, Math.max(220, state.exportW));
+      const boxH = Math.min(stageH, Math.max(160, state.exportH));
+      chartBoxEl.style.width = `${boxW}px`;
+      chartBoxEl.style.height = `${boxH}px`;
+      const sizePillEl = document.getElementById('live-size-pill');
+      if (sizePillEl) {
+        sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · ↔ 우측/하단 핸들 드래그로 유동 반응형 조절`;
+      }
 
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
 
@@ -1157,7 +1248,7 @@
           xLabels: isMulti ? xLabels : undefined,
           padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: false },
+          responsive: { enabled: true },
           bar: {
             mode,
             widthRatio: state.widthRatio,
@@ -1187,7 +1278,7 @@
           stacked: isMulti && isStacked,
           padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: false },
+          responsive: { enabled: true },
           line: {
             color: palette[0],
             width: 2.5,
@@ -1219,7 +1310,7 @@
           data: singleData,
           padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: false },
+          responsive: { enabled: true },
           funnel: {
             direction: state.funnelDirection,
             shape: state.funnelShape,
@@ -1242,7 +1333,7 @@
           data: singleData,
           padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: false },
+          responsive: { enabled: true },
           pie: {
             innerRadiusRatio: state.holeRatio,
             padAngle: padRad,
@@ -1267,9 +1358,13 @@
       }
     }
 
-    function sendSvgToFigma(replaceSelected) {
+    function sendSvgToFigma(replaceSelected, silent = false) {
       if (!activeChart) return;
       const { bgHex } = getSurfaceTokens();
+      const effPadding =
+        typeof activeChart.getEffectivePadding === 'function'
+          ? activeChart.getEffectivePadding(state.exportW, state.exportH)
+          : computeChartPadding();
       const svg = activeChart.toSVG({
         width: state.exportW,
         height: state.exportH,
@@ -1291,11 +1386,13 @@
             svg,
             chartTitle: titleMap[state.chartType] || 'NanoChart',
             replaceSelected,
+            silent,
             bindVariables: state.bindVariables,
             hexToTokenMap: currentHexToTokenMap,
             radiusToken: state.radiusToken,
             paddingToken: state.paddingToken,
             gapToken: state.chartType === 'funnel' ? state.funnelGapToken || state.gapToken : state.gapToken,
+            padding: effPadding,
             allTokens: DESIGN_TOKENS,
             state,
           },
@@ -1715,8 +1812,84 @@
           badge.style.display = 'none';
           updateBtn.style.display = 'none';
         }
+      } else if (msg.type === 'SELECTION_FRAME_RESIZED') {
+        state.exportW = Math.max(200, msg.frameWidth || state.exportW);
+        state.exportH = Math.max(160, msg.frameHeight || state.exportH);
+        document.getElementById('export-w').value = state.exportW;
+        document.getElementById('export-h').value = state.exportH;
+        const stageW = Math.max(260, (document.getElementById('preview-stage')?.clientWidth || 580) - 36);
+        const stageH = Math.max(200, (document.getElementById('preview-stage')?.clientHeight || 480) - 44);
+        chartBoxEl.style.width = `${Math.min(stageW, state.exportW)}px`;
+        chartBoxEl.style.height = `${Math.min(stageH, state.exportH)}px`;
+        const sizePillEl = document.getElementById('live-size-pill');
+        if (sizePillEl) {
+          sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · 피그마 프레임 리사이즈 실시간 반영됨`;
+        }
+        if (activeChart && typeof activeChart.resize === 'function') {
+          activeChart.resize(chartBoxEl.clientWidth, chartBoxEl.clientHeight);
+        }
       }
     };
+
+    // =========================================================================
+    // 프리뷰 차트 박스 마우스 드래그 유동 반응형 리사이즈 (좌우 / 상하 / 대각선)
+    // =========================================================================
+    (function setupFluidPreviewResize() {
+      let dragMode = null; // 'right' | 'bottom' | 'corner'
+      let startX = 0;
+      let startY = 0;
+      let startW = 540;
+      let startH = 380;
+
+      const onStart = (mode, e) => {
+        e.preventDefault();
+        dragMode = mode;
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = chartBoxEl.clientWidth || state.exportW;
+        startH = chartBoxEl.clientHeight || state.exportH;
+      };
+
+      document.getElementById('resize-handle-right')?.addEventListener('mousedown', (e) => onStart('right', e));
+      document.getElementById('resize-handle-bottom')?.addEventListener('mousedown', (e) => onStart('bottom', e));
+      document.getElementById('resize-handle-corner')?.addEventListener('mousedown', (e) => onStart('corner', e));
+
+      window.addEventListener('mousemove', (e) => {
+        if (!dragMode) return;
+        const stageEl = document.getElementById('preview-stage');
+        const maxW = Math.max(260, (stageEl?.clientWidth || 580) - 32);
+        const maxH = Math.max(200, (stageEl?.clientHeight || 480) - 42);
+
+        let nextW = startW;
+        let nextH = startH;
+        if (dragMode === 'right' || dragMode === 'corner') {
+          // 중앙 정렬 박스이므로 우측 핸들 드래그량 * 2로 대칭 확장/축소
+          nextW = Math.round(Math.max(220, Math.min(maxW, startW + (e.clientX - startX) * 2)));
+          state.exportW = nextW;
+          document.getElementById('export-w').value = nextW;
+          chartBoxEl.style.width = `${nextW}px`;
+        }
+        if (dragMode === 'bottom' || dragMode === 'corner') {
+          nextH = Math.round(Math.max(160, Math.min(maxH, startH + (e.clientY - startY) * 2)));
+          state.exportH = nextH;
+          document.getElementById('export-h').value = nextH;
+          chartBoxEl.style.height = `${nextH}px`;
+        }
+
+        document.querySelectorAll('#size-preset-group .seg-btn').forEach((b) => b.classList.remove('active'));
+        const sizePillEl = document.getElementById('live-size-pill');
+        if (sizePillEl) {
+          sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · 유동 반응형 실시간 리사이즈 중`;
+        }
+        if (activeChart && typeof activeChart.resize === 'function') {
+          activeChart.resize(nextW, nextH);
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        dragMode = null;
+      });
+    })();
 
     populateProjectVariableControls();
     renderPreview();

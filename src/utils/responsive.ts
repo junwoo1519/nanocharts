@@ -102,14 +102,16 @@ export function computeResponsivePadding(params: {
   }
 
   const isCompact = width < norm.compactBreakpoint;
-  const isVerySmall = width < 340 || height < 220;
-  const scaleFactor = isVerySmall ? 0.72 : isCompact ? 0.84 : 1;
+  // 고정 단계(step) 대신 컨테이너 가로/세로 크기에 비례하여 연속적(Fluid)으로 스케일 계산 (0.68 ~ 1.0)
+  const widthRatio = Math.max(0.68, Math.min(1.0, (width - 200) / (640 - 200) * 0.32 + 0.68));
+  const heightRatio = Math.max(0.72, Math.min(1.0, (height - 160) / (400 - 160) * 0.28 + 0.72));
+  const scaleFactor = Math.min(widthRatio, heightRatio);
 
-  // 1. 상/하/우 기본 여백을 화면 크기에 비례하여 스케일링
-  let top = userPadding?.top ?? Math.round(basePadding.top * scaleFactor);
-  let right = userPadding?.right ?? Math.round(basePadding.right * scaleFactor);
-  let bottom = userPadding?.bottom ?? Math.round(basePadding.bottom * scaleFactor);
-  let left = userPadding?.left ?? Math.round(basePadding.left * scaleFactor);
+  // 1. 상/하/우 기본 여백을 화면 크기에 비례하여 유동적으로 스케일링
+  let top = userPadding?.top !== undefined ? Math.round(userPadding.top * scaleFactor) : Math.round(basePadding.top * scaleFactor);
+  let right = userPadding?.right !== undefined ? Math.round(userPadding.right * scaleFactor) : Math.round(basePadding.right * scaleFactor);
+  let bottom = userPadding?.bottom !== undefined ? Math.round(userPadding.bottom * scaleFactor) : Math.round(basePadding.bottom * scaleFactor);
+  let left = userPadding?.left !== undefined ? Math.round(userPadding.left * scaleFactor) : Math.round(basePadding.left * scaleFactor);
 
   // 2. 범례(Legend)가 상단 또는 하단에 활성화된 경우 겹침 방지 여백 확보
   const legendVisible =

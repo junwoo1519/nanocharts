@@ -332,13 +332,13 @@ export class BarChart extends EventEmitter {
     this.legend.setItems(items);
   }
 
-  private getEffectivePadding(): Padding {
+  public getEffectivePadding(targetW?: number, targetH?: number): Padding {
     const reserved = this.legend.getReservedPadding();
     const responsiveBase = computeResponsivePadding({
       basePadding: this.padding,
       userPadding: this.options.padding,
-      width: this.width,
-      height: this.height,
+      width: targetW || this.width,
+      height: targetH || this.height,
       yScale: this.yScale,
       yAxis: this.options.yAxis,
       legend: this.options.legend,
@@ -957,7 +957,7 @@ export class BarChart extends EventEmitter {
   public toSVG(exportOptions?: SvgExportOptions): string {
     const svgW = exportOptions?.width || this.width || 640;
     const svgH = exportOptions?.height || this.height || 400;
-    const effPadding = this.getEffectivePadding();
+    const effPadding = this.getEffectivePadding(svgW, svgH);
 
     this.xScale.range([effPadding.left, svgW - effPadding.right]);
     this.yScale.range([svgH - effPadding.bottom, effPadding.top]);
