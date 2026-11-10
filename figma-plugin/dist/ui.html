@@ -568,6 +568,139 @@
     .btn-secondary:hover {
       background: #334155;
     }
+    .btn-code {
+      background: rgba(59, 130, 246, 0.14);
+      color: #93C5FD;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-code:hover {
+      background: rgba(59, 130, 246, 0.26);
+      color: #FFFFFF;
+      border-color: #60A5FA;
+    }
+    /* 개발자용 코드 내보내기 모달 */
+    .code-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.76);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 24px;
+    }
+    .code-modal-backdrop.open {
+      display: flex;
+    }
+    .code-modal {
+      width: min(780px, 92vw);
+      max-height: 84vh;
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .code-modal-header {
+      padding: 14px 18px;
+      background: #0F172A;
+      border-bottom: 1px solid #1E293B;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .code-modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-toast {
+      font-size: 11px;
+      font-weight: 600;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .code-modal-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: #111827;
+      border-bottom: 1px solid #1E293B;
+      gap: 8px;
+    }
+    .code-tab-group {
+      display: flex;
+      gap: 6px;
+    }
+    .code-tab-btn {
+      background: #0B0F19;
+      color: #94A3B8;
+      border: 1px solid #1E293B;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .code-tab-btn:hover {
+      color: #F8FAFC;
+    }
+    .code-tab-btn.active {
+      background: #226CFF;
+      color: #FFFFFF;
+      border-color: #3B82F6;
+    }
+    .code-modal-body {
+      padding: 14px 18px;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .code-editor-area {
+      width: 100%;
+      height: 420px;
+      background: #080C14;
+      color: #E2E8F0;
+      border: 1px solid #1E293B;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.55;
+      resize: none;
+      outline: none;
+      white-space: pre;
+      overflow: auto;
+    }
+    .code-modal-footer {
+      padding: 12px 18px;
+      background: #0F172A;
+      border-top: 1px solid #1E293B;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -1034,6 +1167,7 @@
         💡 삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
       </div>
       <div class="action-btns">
+        <button class="btn-code" id="export-code-btn" title="현재 설정된 차트 옵션과 디자인 토큰을 개발자가 바로 붙여넣을 수 있는 코드로 내보냅니다">💻 개발자용 코드 내보내기</button>
         <button class="btn-secondary" id="update-selected-btn">🔄 선택된 차트 업데이트</button>
         <button class="btn-primary" id="insert-new-btn">➕ 피그마에 벡터(SVG)로 삽입</button>
       </div>
@@ -1041,8 +1175,42 @@
     <div class="plugin-window-resizer" id="plugin-window-resizer" title="드래그하여 피그마 플러그인 창 크기 조절"></div>
   </main>
 
+  <!-- 개발자용 코드 내보내기 모달 -->
+  <div class="code-modal-backdrop" id="code-export-modal">
+    <div class="code-modal">
+      <div class="code-modal-header">
+        <div class="code-modal-title">
+          <span>💻 개발자 전달용 코드 내보내기 (`@ju9nu7/nanocharts`)</span>
+          <span class="copy-toast" id="code-copy-toast">✅ 클립보드에 자동 복사됨</span>
+        </div>
+        <button class="btn-mini" id="close-code-modal-btn" style="padding:4px 10px;font-size:11px;">✕ 닫기 (ESC)</button>
+      </div>
+      <div class="code-modal-tabs">
+        <div class="code-tab-group" id="code-format-tabs">
+          <button class="code-tab-btn active" data-format="full">1. 전체 실행 코드 (TS / JS)</button>
+          <button class="code-tab-btn" data-format="tailwind">2. Tailwind CSS (React / HTML)</button>
+          <button class="code-tab-btn" data-format="options">3. 옵션 객체만 (Options)</button>
+          <button class="code-tab-btn" data-format="svg">4. 순수 SVG 태그 (SVG)</button>
+        </div>
+        <span style="font-size:11px;color:#94A3B8;">디자인 토큰(`var(--*)`) · Tailwind 클래스 자동 매핑</span>
+      </div>
+      <div class="code-modal-body">
+        <textarea class="code-editor-area" id="exported-code-textarea" readonly spellcheck="false"></textarea>
+      </div>
+      <div class="code-modal-footer">
+        <div style="font-size:11px;color:#94A3B8;">
+          💡 개발자에게 이 코드를 전달하면 웹 브라우저에서도 피그마와 100% 동일한 차트가 렌더링됩니다.
+        </div>
+        <div class="action-btns">
+          <button class="btn-code" id="download-code-btn">💾 파일로 저장 (.ts)</button>
+          <button class="btn-primary" id="copy-code-again-btn">📋 클립보드에 다시 복사</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
-    const NANOCHARTS_BUILD_META = {"version":"0.1.10","buildId":"0.1.10-1794292833579","buildTime":1794292833579,"builtAt":"2026-11-10T06:40:33.579Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+    const NANOCHARTS_BUILD_META = {"version":"0.1.11","buildId":"0.1.11-1794293953050","buildTime":1794293953050,"builtAt":"2026-11-10T06:59:13.050Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 
 var Ae = Object.defineProperty;
 var Ie = (u, t, e) => t in u ? Ae(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
@@ -6641,6 +6809,376 @@ const wrapSvgDocument = he;
 
     document.getElementById('update-selected-btn').addEventListener('click', () => {
       sendSvgToFigma(true);
+    });
+
+    // =========================================================================
+    // 개발자 전달용 코드 생성기 & 클립보드 복사 / 파일 다운로드
+    // =========================================================================
+    let currentCodeFormat = 'full';
+
+    function toCssVarToken(rawToken) {
+      const trimmed = (rawToken || '').trim();
+      if (!trimmed) return 'var(--primary)';
+      if (trimmed.startsWith('#') || trimmed.startsWith('rgb') || trimmed.startsWith('var(')) {
+        return trimmed;
+      }
+      const norm = normalizeTokenKey(trimmed);
+      return `var(--${norm})`;
+    }
+
+    function generateDeveloperCode(format = 'full') {
+      if (format === 'svg') {
+        if (!activeChart) return '';
+        const { bgHex } = getSurfaceTokens();
+        return activeChart.toSVG({
+          width: state.exportW,
+          height: state.exportH,
+          backgroundColor: state.includeBg ? bgHex : undefined,
+          backgroundRadius: state.includeBg ? 16 : 0,
+        });
+      }
+
+      const { xLabels, singleData, multiSeries } = parseInputData();
+      const tokenList = getActiveTokenList();
+      const cssTokens = tokenList.map((t) => toCssVarToken(t));
+      const isDark = state.surfaceMode === 'dark';
+      const bgToken = toCssVarToken(isDark ? 'surface/ultra-high' : 'surface/ultra-low');
+      const gridToken = toCssVarToken(isDark ? 'on-surface/higher' : 'outline/-');
+      const axisLineToken = toCssVarToken(isDark ? 'on-surface/higher' : 'outline/low');
+      const labelToken = toCssVarToken(isDark ? 'surface/mid' : 'on-surface/-');
+      const strongTextToken = toCssVarToken(isDark ? 'surface/ultra-low' : 'on-surface/highest');
+      const insideLabelToken = toCssVarToken('on-primary/ultra-low');
+      const bandToken = toCssVarToken(isDark ? 'overlay/white/lowest' : 'overlay/gray/-');
+
+      const padOpt = computeChartPadding();
+      const fontFamily = getActiveFontFamily();
+      const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
+      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+
+      const dataCode = singleData
+        .map((d, idx) => {
+          const tok = isEachColored ? cssTokens[idx % cssTokens.length] : cssTokens[0];
+          const figmaVar = isEachColored ? tokenList[idx % tokenList.length] : tokenList[0];
+          return `    { label: ${JSON.stringify(d.label)}, value: ${d.value}, color: '${tok}' }, // ${figmaVar}`;
+        })
+        .join('\n');
+
+      const seriesCode = multiSeries
+        .map((s, idx) => {
+          const tok = cssTokens[idx % cssTokens.length];
+          const figmaVar = tokenList[idx % tokenList.length];
+          return `    {\n      name: ${JSON.stringify(s.name)},\n      data: ${JSON.stringify(s.data)},\n      color: '${tok}', // ${figmaVar}\n    },`;
+        })
+        .join('\n');
+
+      const legendCode =
+        state.legendPos === 'none'
+          ? `  legend: false,`
+          : `  legend: {\n    visible: true,\n    position: '${state.legendPos}',\n    textColor: '${strongTextToken}',\n    fontFamily: ${JSON.stringify(fontFamily)},\n    fontSize: ${state.fontSize + 1},\n    fontWeight: '${state.fontWeight}',\n  },`;
+
+      const gridCode = `  grid: {\n    y: { visible: ${state.gridY}, color: '${gridToken}', lineWidth: ${state.gridWidth}, style: '${state.gridStyle}' },\n    x: { visible: ${state.gridX}, color: '${gridToken}', lineWidth: ${state.gridWidth}, style: '${state.gridStyle}' },\n    border: { visible: ${state.gridBorder}, color: '${axisLineToken}', lineWidth: ${state.gridWidth} },\n    alternateBand: { visible: ${state.gridBand}, color: '${bandToken}' },\n  },`;
+
+      let className = 'BarChart';
+      let optionsLines = [];
+
+      optionsLines.push(`{`);
+      optionsLines.push(`  // 📐 피그마 추출 기준 해상도: ${state.exportW} × ${state.exportH}px (유동 반응형 켜짐)`);
+      optionsLines.push(`  responsive: { enabled: true },`);
+      optionsLines.push(
+        `  padding: { top: ${padOpt.top}, right: ${padOpt.right}, bottom: ${padOpt.bottom}, left: ${padOpt.left} }, // 5.Spacing: ${state.paddingToken} (${state.paddingPx}px)`
+      );
+      optionsLines.push(
+        `  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`
+      );
+
+      if (state.chartType === 'bar') {
+        className = 'BarChart';
+        const mode =
+          state.seriesMode === 'stacked'
+            ? 'stacked'
+            : state.seriesMode === 'percent'
+              ? 'percent'
+              : 'grouped';
+        const labelOffset = Math.max(4, Math.min(12, state.gapPx ?? 6));
+
+        if (isMulti) {
+          optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
+          optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
+        } else {
+          optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        }
+
+        optionsLines.push(
+          `  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // 4.Radius: ${state.radiusToken} (${state.radius}px)\n    fill: '${cssTokens[0]}', // ${tokenList[0]}\n  },`
+        );
+        optionsLines.push(legendCode);
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: '${mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside'}',\n    color: '${mode === 'stacked' || mode === 'percent' ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffset}, // 5.Spacing: ${state.gapToken}\n  },`
+        );
+        optionsLines.push(gridCode);
+        optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
+        optionsLines.push(
+          mode === 'percent'
+            ? `  yAxis: { labelColor: '${labelToken}', formatter: (v) => \`\${v}%\` },`
+            : `  yAxis: { labelColor: '${labelToken}' },`
+        );
+      } else if (state.chartType === 'line') {
+        className = 'LineChart';
+        const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
+        const labelOffset = Math.max(4, Math.min(14, state.gapPx ?? 8));
+
+        if (isMulti) {
+          optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
+          optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
+          optionsLines.push(`  stacked: ${isStacked},`);
+        } else {
+          optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        }
+
+        optionsLines.push(
+          `  line: {\n    color: '${cssTokens[0]}', // ${tokenList[0]}\n    width: 2.5,\n    curve: '${state.curve}',\n  },`
+        );
+        optionsLines.push(`  points: {\n    fill: '${bgToken}',\n  },`);
+        optionsLines.push(
+          `  area: {\n    visible: true,\n    topOpacity: ${state.areaTopOpacity},\n    bottomOpacity: 0.02,\n    saturationDelta: ${state.areaSatDelta},\n    lightnessDelta: ${state.areaLightDelta},\n  },`
+        );
+        optionsLines.push(legendCode);
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: 'top-outside',\n    color: '${strongTextToken}',\n    offset: ${labelOffset}, // 5.Spacing: ${state.gapToken}\n  },`
+        );
+        optionsLines.push(gridCode);
+        optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
+        optionsLines.push(`  yAxis: { labelColor: '${labelToken}' },`);
+      } else if (state.chartType === 'funnel') {
+        className = 'FunnelChart';
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(
+          `  funnel: {\n    direction: '${state.funnelDirection}',\n    shape: '${state.funnelShape}',\n    gap: ${state.funnelGap}, // 5.Spacing: ${state.funnelGapToken}\n    borderRadius: ${state.radius}, // 4.Radius: ${state.radiusToken}\n    colors: ${JSON.stringify(cssTokens)},\n    showConversion: true,\n  },`
+        );
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
+        );
+        optionsLines.push(legendCode);
+      } else {
+        className = 'PieChart';
+        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(
+          `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+        );
+        if (state.holeRatio >= 0.35) {
+          optionsLines.push(
+            `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
+          );
+        }
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+        );
+        optionsLines.push(legendCode);
+      }
+
+      optionsLines.push(`}`);
+      const optionsBlock = optionsLines.join('\n');
+
+      if (format === 'options') {
+        return optionsBlock;
+      }
+
+      if (format === 'tailwind') {
+        const twPadClass = (state.paddingToken || 'padding/p-6').replace('padding/', '').replace('_', '.');
+        const activeGapTok =
+          state.chartType === 'funnel' ? state.funnelGapToken || state.gapToken : state.gapToken || 'gap/gap-2';
+        const twGapClass = activeGapTok === 'none' ? 'gap-0' : activeGapTok.replace('gap/', '').replace('_', '.');
+        const twRadiusMap = {
+          none: 'rounded-none',
+          'rounded-xxs': 'rounded-[2px]',
+          'rounded-xs': 'rounded-[3px]',
+          'rounded-sm': 'rounded-sm',
+          'rounded-md': 'rounded-md',
+          'rounded-lg': 'rounded-lg',
+          'rounded-xl': 'rounded-xl',
+          'rounded-xxl': 'rounded-2xl',
+          'rounded-full': 'rounded-full',
+        };
+        const twBarRadiusClass = twRadiusMap[state.radiusToken] || `rounded-[${state.radius}px]`;
+        const twWeightMap = {
+          '400': 'font-normal',
+          '500': 'font-medium',
+          '600': 'font-semibold',
+          '700': 'font-bold',
+        };
+        const twFontWeightClass = twWeightMap[String(state.fontWeight)] || 'font-medium';
+        const twSurfaceBgClass = `bg-[${bgToken}]`;
+        const twBorderClass = state.gridBorder
+          ? `border border-[${axisLineToken}]`
+          : `border border-[var(--outline-lower)]`;
+        const twTextClass = `text-[${strongTextToken}] text-[${state.fontSize}px] ${twFontWeightClass}`;
+        const twContainerClasses = [
+          'w-full',
+          `max-w-[${state.exportW}px]`,
+          `h-[${state.exportH}px]`,
+          state.includeBg ? `${twSurfaceBgClass} rounded-2xl ${twBorderClass}` : '',
+          twPadClass,
+          twGapClass,
+          twTextClass,
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+        const twSeriesSwatches = cssTokens
+          .slice(0, 6)
+          .map((tok, idx) => `  // Series ${idx + 1} (${tokenList[idx]}): "bg-[${tok}] text-[${tok}] border-[${tok}]"`)
+          .join('\n');
+
+        return [
+          `import React, { useEffect, useRef } from 'react';`,
+          `import { ${className} } from '@ju9nu7/nanocharts';`,
+          ``,
+          `/**`,
+          ` * 🎨 Figma Variables ➔ Tailwind CSS 유틸리티 클래스 매핑 요약`,
+          ` * - 5.Spacing (여백/간격): "${twPadClass}" (${state.paddingToken} = ${state.paddingPx}px), "${twGapClass}" (${activeGapTok} = ${state.gapPx}px)`,
+          ` * - 4.Radius (모서리): "${twBarRadiusClass}" (${state.radiusToken} = ${state.radius}px)`,
+          ` * - 2.Color token (배경/텍스트): "${twSurfaceBgClass}", "${twTextClass}"`,
+          `${twSeriesSwatches}`,
+          ` *`,
+          ` * [순수 HTML + Tailwind 래퍼 마크업]`,
+          ` * <div id="chart-container" class="${twContainerClasses}"></div>`,
+          ` */`,
+          `export function NanoChartSection() {`,
+          `  const containerRef = useRef<HTMLDivElement>(null);`,
+          ``,
+          `  useEffect(() => {`,
+          `    if (!containerRef.current) return;`,
+          `    const chart = new ${className}(containerRef.current, ${optionsBlock.split('\n').join('\n    ')});`,
+          `    return () => chart.destroy();`,
+          `  }, []);`,
+          ``,
+          `  return (`,
+          `    <div`,
+          `      ref={containerRef}`,
+          `      className="${twContainerClasses}"`,
+          `    />`,
+          `  );`,
+          `}`,
+        ].join('\n');
+      }
+
+      return [
+        `import { ${className} } from '@ju9nu7/nanocharts';`,
+        ``,
+        `// 🎨 Figma NanoCharts Studio에서 내보낸 차트 설정 (권장 크기: ${state.exportW}×${state.exportH}px, 배경: ${bgToken})`,
+        `const container = document.getElementById('chart-container')!;`,
+        `const chart = new ${className}(container, ${optionsBlock});`,
+        ``,
+        `// 추후 데이터/옵션 동적 업데이트 시: chart.update({ ... });`,
+      ].join('\n');
+    }
+
+    function copyTextToClipboard(text) {
+      const toastEl = document.getElementById('code-copy-toast');
+      const showCopiedToast = () => {
+        if (!toastEl) return;
+        toastEl.innerText = '✅ 클립보드에 복사되었습니다!';
+        toastEl.style.opacity = '1';
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(text)
+          .then(showCopiedToast)
+          .catch(() => fallbackCopyText(text, showCopiedToast));
+      } else {
+        fallbackCopyText(text, showCopiedToast);
+      }
+    }
+
+    function fallbackCopyText(text, onDone) {
+      const ta = document.getElementById('exported-code-textarea');
+      if (!ta) return;
+      ta.value = text;
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        if (onDone) onDone();
+      } catch {
+        // ignore
+      }
+    }
+
+    function openCodeExportModal(format = currentCodeFormat) {
+      currentCodeFormat = format;
+      const modalEl = document.getElementById('code-export-modal');
+      const textareaEl = document.getElementById('exported-code-textarea');
+      const downloadBtn = document.getElementById('download-code-btn');
+
+      document.querySelectorAll('#code-format-tabs .code-tab-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.format === format);
+      });
+
+      if (downloadBtn) {
+        downloadBtn.innerText =
+          format === 'svg'
+            ? '💾 파일로 저장 (.svg)'
+            : format === 'tailwind'
+              ? '💾 파일로 저장 (.tsx)'
+              : '💾 파일로 저장 (.ts)';
+      }
+
+      const code = generateDeveloperCode(format);
+      textareaEl.value = code;
+      modalEl.classList.add('open');
+      copyTextToClipboard(code);
+    }
+
+    document.getElementById('export-code-btn').addEventListener('click', () => {
+      openCodeExportModal(currentCodeFormat);
+    });
+
+    document.querySelectorAll('#code-format-tabs .code-tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        openCodeExportModal(btn.dataset.format || 'full');
+      });
+    });
+
+    document.getElementById('copy-code-again-btn').addEventListener('click', () => {
+      const textareaEl = document.getElementById('exported-code-textarea');
+      if (textareaEl) {
+        copyTextToClipboard(textareaEl.value);
+      }
+    });
+
+    document.getElementById('download-code-btn').addEventListener('click', () => {
+      const textareaEl = document.getElementById('exported-code-textarea');
+      if (!textareaEl) return;
+      const ext = currentCodeFormat === 'svg' ? 'svg' : currentCodeFormat === 'tailwind' ? 'tsx' : 'ts';
+      const mime = currentCodeFormat === 'svg' ? 'image/svg+xml;charset=utf-8' : 'text/plain;charset=utf-8';
+      const blob = new Blob([textareaEl.value], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nanochart-${state.chartType}-${state.seriesMode}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('close-code-modal-btn').addEventListener('click', () => {
+      document.getElementById('code-export-modal').classList.remove('open');
+    });
+
+    document.getElementById('code-export-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'code-export-modal') {
+        e.target.classList.remove('open');
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('code-export-modal')?.classList.remove('open');
+      }
     });
 
     window.onmessage = (event) => {

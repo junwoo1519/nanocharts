@@ -1,8 +1,8 @@
 {
-  "version": "0.1.10",
-  "buildId": "0.1.10-1794292833579",
-  "buildTime": 1794292833579,
-  "builtAt": "2026-11-10T06:40:33.579Z",
+  "version": "0.1.11",
+  "buildId": "0.1.11-1794293953050",
+  "buildTime": 1794293953050,
+  "builtAt": "2026-11-10T06:59:13.050Z",
   "githubRepo": "junwoo1519/nanocharts",
   "githubBranch": "main",
   "npmPackage": "@ju9nu7/nanocharts"
