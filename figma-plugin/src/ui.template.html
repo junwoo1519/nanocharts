@@ -768,24 +768,36 @@
             </div>
           </div>
 
-          <!-- 활성 토큰 미리보기, 변수 직접 입력 및 피그마 변수 선택 -->
+          <!-- 활성 토큰 미리보기, 카테고리별 변수 선택 및 직접 입력 -->
           <div class="token-box">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:10.5px;color:#94A3B8;font-weight:600;">시리즈 변수 (칩 클릭 후 변경 / 직접 입력)</span>
+              <span style="font-size:10.5px;color:#94A3B8;font-weight:600;">시리즈 변수 (칩 클릭 후 카테고리·세부 단계 선택)</span>
               <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">📦 파일에 변수 등록</button>
             </div>
             <div class="token-chips" id="active-token-chips"></div>
             <div class="row-2" style="margin-top:2px;">
+              <div class="field">
+                <label>1. 컬러 카테고리 / 그룹</label>
+                <select id="project-var-group-select" title="컬러 토큰 카테고리를 먼저 선택하면 우측에 해당 그룹의 세부 단계만 깔끔하게 표시됩니다">
+                  <option value="primary">primary (10)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label id="project-var-step-label">2. 세부 토큰 (#1 변경)</label>
+                <select id="project-var-select" title="선택된 시리즈 칩에 적용할 세부 단계 변수를 선택합니다">
+                  <option value="">🎨 세부 단계 선택...</option>
+                </select>
+              </div>
+            </div>
+            <div class="field" style="margin-top:2px;">
+              <label>전체 시리즈 변수 직접 입력 (쉼표 구분)</label>
               <input
                 type="text"
                 id="custom-tokens-input"
                 list="project-vars-datalist"
-                placeholder="예: primary/-, primary/lower, Primary/500"
-                title="쉼표(,)로 구분하여 피그마 변수명을 직접 입력할 수 있습니다 (예: primary/-, primary/lower, Primary/500)"
+                placeholder="예: primary/-, teal/-, indigo/-, amber/-"
+                title="쉼표(,)로 구분하여 피그마 변수명을 직접 입력할 수 있습니다"
               />
-              <select id="project-var-select" title="현재 피그마 파일에 등록된 변수를 선택해 선택된 시리즈 칩에 적용합니다">
-                <option value="">🔍 프로젝트 변수에서 선택...</option>
-              </select>
             </div>
             <datalist id="project-vars-datalist"></datalist>
           </div>
@@ -1374,6 +1386,123 @@
       return TOKEN_PALETTES[state.theme] || TOKEN_PALETTES['weseed-categorical'];
     }
 
+    let categorizedVarGroups = {};
+
+    function classifyColorTokenGroup(varName, colName = '') {
+      const name = (varName || '').trim();
+      const parts = name.split('/');
+      const first = parts[0] || '';
+      const second = parts[1] || '';
+
+      const SEMANTIC_BASE = ['primary', 'on-primary', 'surface', 'on-surface', 'outline'];
+      const POINT_COLORS = [
+        'red', 'on-red',
+        'orange', 'on-orange',
+        'amber', 'on-amber',
+        'yellow', 'on-yellow',
+        'lime', 'on-lime',
+        'green', 'on-green',
+        'teal', 'on-teal',
+        'cyan', 'on-cyan',
+        'sky', 'on-sky',
+        'blue', 'on-blue',
+        'indigo', 'on-indigo',
+        'purple', 'on-purple',
+        'violet', 'on-violet',
+        'pink', 'on-pink',
+      ];
+
+      if (first === 'overlay' && second) {
+        return {
+          section: '2.Color token (시맨틱 토큰)',
+          groupKey: `2:overlay/${second}`,
+          groupLabel: `overlay / ${second}`,
+        };
+      }
+      if (first === 'transparent' || first === 'variant') {
+        return {
+          section: '2.Color token (시맨틱 토큰)',
+          groupKey: '2:variant',
+          groupLabel: 'variant & transparent',
+        };
+      }
+      if (SEMANTIC_BASE.includes(first) && !/^\d+$/.test(second)) {
+        return {
+          section: '2.Color token (시맨틱 토큰)',
+          groupKey: `2:${first}`,
+          groupLabel: first,
+        };
+      }
+      if (POINT_COLORS.includes(first) && !/^\d+$/.test(second)) {
+        return {
+          section: '3.Color token - point (포인트 컬러)',
+          groupKey: `3:${first}`,
+          groupLabel: first,
+        };
+      }
+      if (colName.includes('2.Color token') && !colName.includes('point')) {
+        return {
+          section: '2.Color token (시맨틱 토큰)',
+          groupKey: `2:${first}`,
+          groupLabel: first,
+        };
+      }
+      if (colName.includes('3.Color token')) {
+        return {
+          section: '3.Color token - point (포인트 컬러)',
+          groupKey: `3:${first}`,
+          groupLabel: first,
+        };
+      }
+      return {
+        section: '1.Color Palette (기본 팔레트)',
+        groupKey: `1:${first}`,
+        groupLabel: `${first} (Palette)`,
+      };
+    }
+
+    function updateStepSelectForGroup(groupKey, currentChipVarName = '') {
+      const selectEl = document.getElementById('project-var-select');
+      const stepLabelEl = document.getElementById('project-var-step-label');
+      if (stepLabelEl) {
+        stepLabelEl.innerText = `2. 세부 토큰 (#${selectedChipIndex + 1} 변경)`;
+      }
+      if (!selectEl) return;
+
+      const groupInfo = categorizedVarGroups[groupKey];
+      const items = groupInfo ? groupInfo.items : [];
+      const defaultOpt = `<option value="">🎨 #${selectedChipIndex + 1} 시리즈에 적용...</option>`;
+
+      selectEl.innerHTML =
+        defaultOpt +
+        items
+          .map((v) => {
+            const selectedAttr = v.name === currentChipVarName ? 'selected' : '';
+            return `<option value="${v.name}" ${selectedAttr}>${v.name} (${v.hex})</option>`;
+          })
+          .join('');
+    }
+
+    function syncGroupSelectToActiveChip() {
+      const groupSelectEl = document.getElementById('project-var-group-select');
+      if (!groupSelectEl) return;
+      const visibleTokens = getActiveTokenList().slice(0, 6);
+      const activeRaw = visibleTokens[selectedChipIndex] || visibleTokens[0] || 'primary/-';
+      const displayVar = resolveDisplayVarName(activeRaw);
+      const { groupKey } = classifyColorTokenGroup(displayVar);
+
+      if (categorizedVarGroups[groupKey]) {
+        groupSelectEl.value = groupKey;
+        updateStepSelectForGroup(groupKey, displayVar);
+      } else {
+        const firstKey = Object.keys(categorizedVarGroups)[0] || '';
+        if (firstKey) {
+          groupSelectEl.value = firstKey;
+          updateStepSelectForGroup(firstKey, displayVar);
+        }
+      }
+    }
+
     function renderTokenChips(tokenNames) {
       const wrap = document.getElementById('active-token-chips');
       const visibleTokens = tokenNames.slice(0, 6);
@@ -1386,7 +1515,7 @@
           const hex = resolveTokenHex(t);
           const displayVar = resolveDisplayVarName(t);
           const isSelected = idx === selectedChipIndex ? 'selected' : '';
-          return `<span class="token-chip ${isSelected}" data-idx="${idx}" title="클릭하여 ${idx + 1}번 시리즈 변수 변경 (${displayVar})"><span class="token-dot" style="background:${hex};"></span>${displayVar}</span>`;
+          return `<span class="token-chip ${isSelected}" data-idx="${idx}" title="클릭하여 ${idx + 1}번 시리즈 변수 변경 (${displayVar})"><span class="token-dot" style="background:${hex};"></span>#${idx + 1} ${displayVar}</span>`;
         })
         .join('');
 
@@ -1394,6 +1523,7 @@
         chip.addEventListener('click', () => {
           selectedChipIndex = parseInt(chip.dataset.idx, 10) || 0;
           renderTokenChips(tokenNames);
+          syncGroupSelectToActiveChip();
         });
       });
 
@@ -1401,55 +1531,71 @@
       if (document.activeElement !== customInput) {
         customInput.value = visibleTokens.join(', ');
       }
+      syncGroupSelectToActiveChip();
     }
 
     function populateProjectVariableControls() {
-      const selectEl = document.getElementById('project-var-select');
+      const groupSelectEl = document.getElementById('project-var-group-select');
       const datalistEl = document.getElementById('project-vars-datalist');
+      categorizedVarGroups = {};
 
-      const defaultOption = `<option value="">🔍 프로젝트 변수 선택 (#${selectedChipIndex + 1} 변경)...</option>`;
+      const rawItems =
+        projectVariablesList.length > 0
+          ? projectVariablesList
+          : Object.keys(DESIGN_TOKENS).map((k) => ({
+              name: toFigmaVariableName(k),
+              hex: DESIGN_TOKENS[k],
+              collectionName: '',
+            }));
 
-      if (projectVariablesList.length > 0) {
-        const byCollection = {};
-        projectVariablesList.forEach((v) => {
-          const col = v.collectionName || 'Variables';
-          if (!byCollection[col]) byCollection[col] = [];
-          byCollection[col].push(v);
-        });
+      const sectionOrder = [
+        '2.Color token (시맨틱 토큰)',
+        '3.Color token - point (포인트 컬러)',
+        '1.Color Palette (기본 팔레트)',
+      ];
+      const bySection = {
+        '2.Color token (시맨틱 토큰)': [],
+        '3.Color token - point (포인트 컬러)': [],
+        '1.Color Palette (기본 팔레트)': [],
+      };
 
-        selectEl.innerHTML =
-          defaultOption +
-          Object.entries(byCollection)
-            .map(
-              ([colName, vars]) =>
-                `<optgroup label="${colName}">` +
-                vars
-                  .map((v) => `<option value="${v.name}">${v.name} (${v.hex})</option>`)
-                  .join('') +
-                `</optgroup>`
-            )
-            .join('');
+      rawItems.forEach((v) => {
+        const info = classifyColorTokenGroup(v.name, v.collectionName || '');
+        if (!categorizedVarGroups[info.groupKey]) {
+          categorizedVarGroups[info.groupKey] = {
+            section: info.section,
+            groupKey: info.groupKey,
+            groupLabel: info.groupLabel,
+            items: [],
+          };
+          if (!bySection[info.section]) bySection[info.section] = [];
+          bySection[info.section].push(info.groupKey);
+        }
+        categorizedVarGroups[info.groupKey].items.push(v);
+      });
 
-        datalistEl.innerHTML = projectVariablesList
-          .map((v) => `<option value="${v.name}">${v.collectionName} (${v.hex})</option>`)
-          .join('');
-      } else {
-        const fallbackKeys = Object.keys(DESIGN_TOKENS);
-        selectEl.innerHTML =
-          defaultOption +
-          `<optgroup label="2.Color token / 3.Color token - point">` +
-          fallbackKeys
-            .map((k) => {
-              const slash = toFigmaVariableName(k);
-              return `<option value="${slash}">${slash} (${DESIGN_TOKENS[k]})</option>`;
-            })
-            .join('') +
-          `</optgroup>`;
-
-        datalistEl.innerHTML = fallbackKeys
-          .map((k) => `<option value="${toFigmaVariableName(k)}">${DESIGN_TOKENS[k]}</option>`)
+      if (groupSelectEl) {
+        groupSelectEl.innerHTML = sectionOrder
+          .filter((sec) => bySection[sec] && bySection[sec].length > 0)
+          .map((sec) => {
+            const opts = bySection[sec]
+              .map((gKey) => {
+                const g = categorizedVarGroups[gKey];
+                return `<option value="${gKey}">${g.groupLabel} (${g.items.length})</option>`;
+              })
+              .join('');
+            return `<optgroup label="${sec}">${opts}</optgroup>`;
+          })
           .join('');
       }
+
+      if (datalistEl) {
+        datalistEl.innerHTML = rawItems
+          .map((v) => `<option value="${v.name}">${v.collectionName || 'Token'} (${v.hex})</option>`)
+          .join('');
+      }
+
+      syncGroupSelectToActiveChip();
     }
 
     function getActiveFontFamily() {
@@ -1855,6 +2001,14 @@
       renderPreview();
     });
 
+    document.getElementById('project-var-group-select').addEventListener('change', (e) => {
+      const groupKey = e.target.value;
+      const visibleTokens = getActiveTokenList().slice(0, 6);
+      const activeRaw = visibleTokens[selectedChipIndex] || visibleTokens[0] || '';
+      const displayVar = resolveDisplayVarName(activeRaw);
+      updateStepSelectForGroup(groupKey, displayVar);
+    });
+
     document.getElementById('project-var-select').addEventListener('change', (e) => {
       const chosen = e.target.value;
       if (!chosen) return;
@@ -1868,7 +2022,6 @@
       state.customTokens = list.join(', ');
       document.getElementById('theme-select').value = 'custom';
       document.getElementById('custom-tokens-input').value = state.customTokens;
-      e.target.value = '';
       renderPreview();
     });
 
