@@ -342,11 +342,13 @@ npm.cmd run build:figma
 코드를 수정한 뒤 디자이너의 피그마 플러그인에 **파일 전달 없이 즉시 최신 버전을 반영**하려면 아래 명령어를 실행합니다:
 
 ```bash
+# 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
+npm.cmd version patch --no-git-tag-version
+
 # 방법 A: 원클릭 스크립트 (빌드 + git add + commit + push 자동 실행)
 npm.cmd run deploy:figma
 
 # 방법 B: 수동으로 커밋 메시지를 지정하여 푸시할 때
-npm.cmd run build:figma
 git add .
 git commit -m "feat: 차트 기능 및 피그마 플러그인 업데이트"
 git push origin main
@@ -356,16 +358,13 @@ git push origin main
 npm 레지스트리는 이미 배포된 버전 번호로 덮어쓰기를 허용하지 않으므로(`403 Forbidden` 방지), **반드시 버전을 먼저 올린 후 배포**합니다:
 
 ```bash
-# 1단계: 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
-npm.cmd version patch --no-git-tag-version
-
-# 2단계: 라이브러리 + 피그마 번들 통합 빌드
+# 1단계: 라이브러리 + 피그마 번들 통합 빌드
 npm.cmd run build:figma
 
-# 3단계: 배포될 파일 목록 사전 확인 (선택 사항)
+# 2단계: 배포될 파일 목록 사전 확인 (선택 사항)
 npm.cmd pack --dry-run
 
-# 4단계: npm 공개 배포 실행 (prepublishOnly 훅으로 빌드 자동 검증 포함)
+# 3단계: npm 공개 배포 실행 (prepublishOnly 훅으로 빌드 자동 검증 포함)
 npm.cmd publish --access public
 ```
 

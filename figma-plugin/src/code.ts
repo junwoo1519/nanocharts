@@ -28,6 +28,10 @@ declare const NANOCHARTS_BUILD_META:
 
 const PLUGIN_DATA_KEY = 'nanocharts-state';
 const OTA_CACHE_KEY = 'nanocharts-ota-cache-v1';
+const DEFAULT_PLUGIN_WIDTH = 1280;
+const DEFAULT_PLUGIN_HEIGHT = 860;
+let currentPluginWidth = DEFAULT_PLUGIN_WIDTH;
+let currentPluginHeight = DEFAULT_PLUGIN_HEIGHT;
 let lastAppliedOtaBuildTime =
   typeof NANOCHARTS_BUILD_META !== 'undefined' && NANOCHARTS_BUILD_META?.buildTime
     ? NANOCHARTS_BUILD_META.buildTime
@@ -172,8 +176,8 @@ async function bootPluginUiAsync(): Promise<void> {
   }
 
   figma.showUI(uiHtmlToLoad, {
-    width: 920,
-    height: 680,
+    width: currentPluginWidth,
+    height: currentPluginHeight,
     themeColors: true,
   });
 
@@ -1929,13 +1933,23 @@ figma.ui.onmessage = async (msg: {
       }
 
       figma.showUI(msg.uiHtml, {
-        width: 920,
-        height: 680,
+        width: currentPluginWidth,
+        height: currentPluginHeight,
         themeColors: true,
       });
       notifySelectionState();
       await notifyProjectVariables();
       figma.notify(`🚀 NanoCharts 최신 버전(v${msg.version || 'latest'})이 GitHub에서 자동 업데이트되었습니다!`);
+    }
+  } else if (
+    msg.type === 'RESIZE_PLUGIN_WINDOW' &&
+    typeof (msg as any).windowWidth === 'number' &&
+    typeof (msg as any).windowHeight === 'number'
+  ) {
+    currentPluginWidth = Math.max(920, Math.min(2200, Math.round((msg as any).windowWidth)));
+    currentPluginHeight = Math.max(640, Math.min(1500, Math.round((msg as any).windowHeight)));
+    if (figma.ui && typeof figma.ui.resize === 'function') {
+      figma.ui.resize(currentPluginWidth, currentPluginHeight);
     }
   } else if (msg.type === 'CLOSE_PLUGIN') {
     figma.closePlugin();

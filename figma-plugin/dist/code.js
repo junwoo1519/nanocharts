@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.9","buildId":"0.1.9-1794290018736","buildTime":1794290018736,"builtAt":"2026-11-10T05:53:38.736Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.9","buildId":"0.1.9-1794292705118","buildTime":1794292705118,"builtAt":"2026-11-10T06:38:25.118Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -14,6 +14,10 @@ const NANOCHARTS_BUILD_META = {"version":"0.1.9","buildId":"0.1.9-1794290018736"
  */
 const PLUGIN_DATA_KEY = 'nanocharts-state';
 const OTA_CACHE_KEY = 'nanocharts-ota-cache-v1';
+const DEFAULT_PLUGIN_WIDTH = 1280;
+const DEFAULT_PLUGIN_HEIGHT = 860;
+let currentPluginWidth = DEFAULT_PLUGIN_WIDTH;
+let currentPluginHeight = DEFAULT_PLUGIN_HEIGHT;
 let lastAppliedOtaBuildTime = typeof NANOCHARTS_BUILD_META !== 'undefined' && (NANOCHARTS_BUILD_META === null || NANOCHARTS_BUILD_META === void 0 ? void 0 : NANOCHARTS_BUILD_META.buildTime)
     ? NANOCHARTS_BUILD_META.buildTime
     : 0;
@@ -145,8 +149,8 @@ async function bootPluginUiAsync() {
         // clientStorage 접근 실패 시 기본 내장 __html__ 사용
     }
     figma.showUI(uiHtmlToLoad, {
-        width: 920,
-        height: 680,
+        width: currentPluginWidth,
+        height: currentPluginHeight,
         themeColors: true,
     });
     notifySelectionState();
@@ -1668,13 +1672,22 @@ figma.ui.onmessage = async (msg) => {
                 // 캐시 저장 실패 시에도 현재 세션 UI는 즉시 최신으로 교체
             }
             figma.showUI(msg.uiHtml, {
-                width: 920,
-                height: 680,
+                width: currentPluginWidth,
+                height: currentPluginHeight,
                 themeColors: true,
             });
             notifySelectionState();
             await notifyProjectVariables();
             figma.notify(`🚀 NanoCharts 최신 버전(v${msg.version || 'latest'})이 GitHub에서 자동 업데이트되었습니다!`);
+        }
+    }
+    else if (msg.type === 'RESIZE_PLUGIN_WINDOW' &&
+        typeof msg.windowWidth === 'number' &&
+        typeof msg.windowHeight === 'number') {
+        currentPluginWidth = Math.max(920, Math.min(2200, Math.round(msg.windowWidth)));
+        currentPluginHeight = Math.max(640, Math.min(1500, Math.round(msg.windowHeight)));
+        if (figma.ui && typeof figma.ui.resize === 'function') {
+            figma.ui.resize(currentPluginWidth, currentPluginHeight);
         }
     }
     else if (msg.type === 'CLOSE_PLUGIN') {
