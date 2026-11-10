@@ -6,7 +6,12 @@
   "ui": "dist/ui.html",
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": [
+      "https://raw.githubusercontent.com",
+      "https://cdn.jsdelivr.net",
+      "https://unpkg.com"
+    ],
+    "reasoning": "Fetches the latest NanoCharts plugin bundle and design tokens automatically from GitHub (junwoo1519/nanocharts) and jsDelivr CDN."
   },
   "documentAccess": "dynamic-page"
 }

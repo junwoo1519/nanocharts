@@ -693,6 +693,14 @@
     <div class="preview-toolbar">
       <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
       <div class="toolbar-badges">
+        <div
+          class="var-status-badge"
+          id="ota-status-badge"
+          style="cursor:pointer;background:rgba(34,108,255,0.14);border-color:rgba(34,108,255,0.35);color:#93C5FD;"
+          title="클릭하여 GitHub(junwoo1519/nanocharts) 최신 버전 수동 확인"
+        >
+          🔄 GitHub 버전 확인 중...
+        </div>
         <div class="var-status-badge" id="var-status-badge">🔗 variables.scss 기본 토큰 사용 중</div>
         <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
       </div>
@@ -1712,6 +1720,124 @@
 
     populateProjectVariableControls();
     renderPreview();
+
+    // =========================================================================
+    // GitHub (junwoo1519/nanocharts) & npm CDN 원격 자동 업데이트 (OTA) 체크
+    // =========================================================================
+    const otaBadgeEl = document.getElementById('ota-status-badge');
+    const localMeta =
+      typeof NANOCHARTS_BUILD_META !== 'undefined'
+        ? NANOCHARTS_BUILD_META
+        : {
+            version: '0.1.7',
+            buildId: '0.1.7-0',
+            buildTime: 0,
+            githubRepo: 'junwoo1519/nanocharts',
+            githubBranch: 'main',
+            npmPackage: '@ju9nu7/nanocharts',
+          };
+
+    async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function fetchTextWithTimeout(url, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+        if (!res.ok) return null;
+        return await res.text();
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function checkAndApplyOtaUpdate(isManual = false) {
+      if (otaBadgeEl) {
+        otaBadgeEl.innerText = isManual
+          ? '🔄 GitHub 최신 빌드 확인 중...'
+          : `✅ v${localMeta.version} · 자동업데이트 켜짐`;
+      }
+
+      const ts = Date.now();
+      const endpoints = [
+        {
+          name: 'GitHub',
+          baseUrl: `https://raw.githubusercontent.com/${localMeta.githubRepo}/${localMeta.githubBranch}/figma-plugin/dist`,
+        },
+        {
+          name: 'npm CDN',
+          baseUrl: `https://cdn.jsdelivr.net/npm/${localMeta.npmPackage}@latest/figma-plugin/dist`,
+        },
+      ];
+
+      let newestRemote = null;
+      let newestEndpoint = null;
+
+      for (const ep of endpoints) {
+        const meta = await fetchJsonWithTimeout(`${ep.baseUrl}/version.json?t=${ts}`);
+        if (meta && typeof meta.buildTime === 'number') {
+          if (!newestRemote || meta.buildTime > newestRemote.buildTime) {
+            newestRemote = meta;
+            newestEndpoint = ep;
+          }
+        }
+      }
+
+      if (!newestRemote || !newestEndpoint) {
+        if (otaBadgeEl) {
+          otaBadgeEl.innerText = `⚡ v${localMeta.version} (로컬 실행 중)`;
+        }
+        return;
+      }
+
+      if (newestRemote.buildTime > (localMeta.buildTime || 0)) {
+        if (otaBadgeEl) {
+          otaBadgeEl.innerText = `⏳ 새 버전(v${newestRemote.version}) 자동 업데이트 중...`;
+        }
+        const remoteUiHtml = await fetchTextWithTimeout(`${newestEndpoint.baseUrl}/ui.html?t=${ts}`);
+        if (remoteUiHtml && remoteUiHtml.includes('NanoCharts')) {
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: 'APPLY_OTA_UPDATE',
+                version: newestRemote.version,
+                buildId: newestRemote.buildId,
+                buildTime: newestRemote.buildTime,
+                uiHtml: remoteUiHtml,
+              },
+            },
+            '*'
+          );
+          return;
+        }
+      }
+
+      if (otaBadgeEl) {
+        otaBadgeEl.innerText = `✅ 최신 v${localMeta.version} (${newestEndpoint.name} 동기화됨)`;
+      }
+    }
+
+    if (otaBadgeEl) {
+      otaBadgeEl.addEventListener('click', () => {
+        checkAndApplyOtaUpdate(true);
+      });
+    }
+
+    checkAndApplyOtaUpdate(false);
   </script>
 </body>
 </html>

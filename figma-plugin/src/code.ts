@@ -14,8 +14,24 @@
 
 declare const figma: any;
 declare const __html__: string;
+declare const NANOCHARTS_BUILD_META:
+  | {
+      version: string;
+      buildId: string;
+      buildTime: number;
+      builtAt: string;
+      githubRepo: string;
+      githubBranch: string;
+      npmPackage: string;
+    }
+  | undefined;
 
 const PLUGIN_DATA_KEY = 'nanocharts-state';
+const OTA_CACHE_KEY = 'nanocharts-ota-cache-v1';
+let lastAppliedOtaBuildTime =
+  typeof NANOCHARTS_BUILD_META !== 'undefined' && NANOCHARTS_BUILD_META?.buildTime
+    ? NANOCHARTS_BUILD_META.buildTime
+    : 0;
 const LEGACY_COLLECTION_NAME = 'Design Tokens (variables.scss)';
 const SEMANTIC_COLLECTION_NAME = '2.Color token';
 const POINT_COLLECTION_NAME = '3.Color token - point';
@@ -126,11 +142,46 @@ const TRANSPARENCY_SCALE_TO_TOKEN: Record<string, string> = {
   '200': 'overlay-gray-higher',
 };
 
-figma.showUI(__html__, {
-  width: 920,
-  height: 680,
-  themeColors: true,
-});
+/**
+ * 플러그인 시작 시 로컬 빌드 타임스탬프와 `figma.clientStorage`에 캐시된 원격(GitHub OTA) 번들을 비교하여
+ * 더 최신인 UI 번들로 실행합니다.
+ */
+async function bootPluginUiAsync(): Promise<void> {
+  let uiHtmlToLoad = __html__;
+  const localBuildTime =
+    typeof NANOCHARTS_BUILD_META !== 'undefined' && NANOCHARTS_BUILD_META?.buildTime
+      ? NANOCHARTS_BUILD_META.buildTime
+      : 0;
+
+  try {
+    if (figma.clientStorage && typeof figma.clientStorage.getAsync === 'function') {
+      const cached = await figma.clientStorage.getAsync(OTA_CACHE_KEY);
+      if (
+        cached &&
+        typeof cached.buildTime === 'number' &&
+        cached.buildTime > localBuildTime &&
+        typeof cached.uiHtml === 'string' &&
+        cached.uiHtml.includes('NanoCharts')
+      ) {
+        uiHtmlToLoad = cached.uiHtml;
+        lastAppliedOtaBuildTime = cached.buildTime;
+      }
+    }
+  } catch {
+    // clientStorage 접근 실패 시 기본 내장 __html__ 사용
+  }
+
+  figma.showUI(uiHtmlToLoad, {
+    width: 920,
+    height: 680,
+    themeColors: true,
+  });
+
+  notifySelectionState();
+  notifyProjectVariables();
+}
+
+bootPluginUiAsync();
 
 /**
  * 피그마 변수명(`--primary`, `primary/-`, `primary/lower`, `Primary/500`, `point red/500`, `overlay/white/low`, `Transparency/50`)을
@@ -1415,10 +1466,6 @@ figma.on('selectionchange', () => {
   notifySelectionState();
 });
 
-// 초기 실행 시 현재 선택된 노드 및 프로젝트 로컬 변수 검사
-notifySelectionState();
-notifyProjectVariables();
-
 figma.ui.onmessage = async (msg: {
   type: string;
   svg?: string;
@@ -1432,6 +1479,10 @@ figma.ui.onmessage = async (msg: {
   tokensToSync?: Record<string, string>;
   allTokens?: Record<string, string>;
   state?: unknown;
+  version?: string;
+  buildId?: string;
+  buildTime?: number;
+  uiHtml?: string;
 }) => {
   if (msg.type === 'INSERT_SVG' && msg.svg) {
     try {
@@ -1555,6 +1606,31 @@ figma.ui.onmessage = async (msg: {
       figma.notify(`🎨 variables.scss 컬러 변수 ${count}개가 현재 피그마 파일에 등록되었습니다!`);
     } catch (err: any) {
       figma.notify(`❌ 변수 등록 실패: ${err?.message || String(err)}`, { error: true });
+    }
+  } else if (msg.type === 'APPLY_OTA_UPDATE' && msg.uiHtml && typeof msg.buildTime === 'number') {
+    if (msg.buildTime > lastAppliedOtaBuildTime && msg.uiHtml.includes('NanoCharts')) {
+      lastAppliedOtaBuildTime = msg.buildTime;
+      try {
+        if (figma.clientStorage && typeof figma.clientStorage.setAsync === 'function') {
+          await figma.clientStorage.setAsync(OTA_CACHE_KEY, {
+            version: msg.version || 'latest',
+            buildId: msg.buildId || String(msg.buildTime),
+            buildTime: msg.buildTime,
+            uiHtml: msg.uiHtml,
+          });
+        }
+      } catch {
+        // 캐시 저장 실패 시에도 현재 세션 UI는 즉시 최신으로 교체
+      }
+
+      figma.showUI(msg.uiHtml, {
+        width: 920,
+        height: 680,
+        themeColors: true,
+      });
+      notifySelectionState();
+      await notifyProjectVariables();
+      figma.notify(`🚀 NanoCharts 최신 버전(v${msg.version || 'latest'})이 GitHub에서 자동 업데이트되었습니다!`);
     }
   } else if (msg.type === 'CLOSE_PLUGIN') {
     figma.closePlugin();

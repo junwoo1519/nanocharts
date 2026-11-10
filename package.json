@@ -20,6 +20,8 @@
   },
   "files": [
     "dist",
+    "figma-plugin/manifest.json",
+    "figma-plugin/dist",
     "README.md",
     "LICENSE"
   ],
@@ -27,8 +29,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:figma": "npm run build && node scripts/build-figma-plugin.mjs",
+    "deploy:figma": "npm run build:figma && git add figma-plugin/manifest.json figma-plugin/dist && git commit -m \"chore(figma): update figma plugin bundle (OTA)\" && git push",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build:figma"
   },
   "keywords": [
     "chart",

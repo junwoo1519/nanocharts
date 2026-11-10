@@ -17,6 +17,7 @@ const rootDir = path.resolve(__dirname, '..');
 const libBundlePath = path.join(rootDir, 'dist', 'index.js');
 const uiTemplatePath = path.join(rootDir, 'figma-plugin', 'src', 'ui.template.html');
 const codeTsPath = path.join(rootDir, 'figma-plugin', 'src', 'code.ts');
+const pkgJsonPath = path.join(rootDir, 'package.json');
 const outDir = path.join(rootDir, 'figma-plugin', 'dist');
 
 if (!fs.existsSync(libBundlePath)) {
@@ -25,6 +26,21 @@ if (!fs.existsSync(libBundlePath)) {
 }
 
 fs.mkdirSync(outDir, { recursive: true });
+
+const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+const buildTime = Date.now();
+const buildMeta = {
+  version: pkg.version || '0.1.7',
+  buildId: `${pkg.version || '0.1.7'}-${buildTime}`,
+  buildTime,
+  builtAt: new Date(buildTime).toISOString(),
+  githubRepo: 'junwoo1519/nanocharts',
+  githubBranch: 'main',
+  npmPackage: pkg.name || '@ju9nu7/nanocharts',
+};
+
+// 0. OTA 버전 메타데이터(figma-plugin/dist/version.json) 생성
+fs.writeFileSync(path.join(outDir, 'version.json'), JSON.stringify(buildMeta, null, 2), 'utf8');
 
 // 1. dist/index.js의 export { a as B, c as D } 구문을 const B = a; const D = c; 바인딩으로 변환
 let libCode = fs.readFileSync(libBundlePath, 'utf8');
@@ -46,8 +62,12 @@ libCode = libCode.replace(/export\s*\{([^}]*)\}\s*;?\s*$/m, (_match, inner) => {
   return `\n${bindings}\n`;
 });
 
+const buildMetaScript = `const NANOCHARTS_BUILD_META = ${JSON.stringify(buildMeta)};\n`;
 const uiTemplate = fs.readFileSync(uiTemplatePath, 'utf8');
-const finalUiHtml = uiTemplate.replace('/* __NANOCHARTS_INLINE_BUNDLE__ */', libCode);
+const finalUiHtml = uiTemplate.replace(
+  '/* __NANOCHARTS_INLINE_BUNDLE__ */',
+  `${buildMetaScript}\n${libCode}`
+);
 fs.writeFileSync(path.join(outDir, 'ui.html'), finalUiHtml, 'utf8');
 
 // 2. figma-plugin/src/code.ts -> figma-plugin/dist/code.js 트랜스파일
@@ -60,13 +80,16 @@ const transpiled = ts.transpileModule(codeTsSource, {
   },
 });
 
-const cleanCodeJs = transpiled.outputText.replace(
-  /Object\.defineProperty\(exports,\s*["']__esModule["'],\s*\{\s*value:\s*true\s*\}\);\s*/g,
-  ''
-);
+const cleanCodeJs =
+  buildMetaScript +
+  transpiled.outputText.replace(
+    /Object\.defineProperty\(exports,\s*["']__esModule["'],\s*\{\s*value:\s*true\s*\}\);\s*/g,
+    ''
+  );
 fs.writeFileSync(path.join(outDir, 'code.js'), cleanCodeJs, 'utf8');
 
-console.log('✅ Figma Plugin 빌드 완료!');
+console.log(`✅ Figma Plugin 빌드 완료! (buildId: ${buildMeta.buildId})`);
 console.log('   - figma-plugin/manifest.json');
+console.log('   - figma-plugin/dist/version.json');
 console.log('   - figma-plugin/dist/code.js');
 console.log('   - figma-plugin/dist/ui.html');

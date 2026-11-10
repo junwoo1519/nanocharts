@@ -4,7 +4,8 @@ node_modules/
 .pnp.js
 
 # 2. 빌드 및 번들 결과물 (Production Builds)
-dist/
+/dist/
+!/figma-plugin/dist/
 build/
 out/
 *.tsbuildinfo
