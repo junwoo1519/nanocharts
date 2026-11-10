@@ -841,18 +841,10 @@
           <!-- Bar 전용 -->
           <div class="row-2" id="bar-controls">
             <div class="field">
-              <label>모서리 변수 (4.Radius) <span class="val-badge" id="radius-txt">6px</span></label>
-              <select id="radius-token-select">
-                <option value="none:0">0px (직각)</option>
-                <option value="rounded-xxs:2">rounded-xxs (2px)</option>
-                <option value="rounded-xs:3">rounded-xs (3px)</option>
-                <option value="rounded-sm:4">rounded-sm (4px)</option>
-                <option value="rounded-md:6" selected>rounded-md (6px)</option>
-                <option value="rounded-lg:8">rounded-lg (8px)</option>
-                <option value="rounded-xl:12">rounded-xl (12px)</option>
-                <option value="rounded-xxl:16">rounded-xxl (16px)</option>
-                <option value="rounded-full:999">rounded-full (999px)</option>
-              </select>
+              <label>모서리 둥글기 <span class="val-badge" id="radius-txt">6px</span></label>
+              <div class="slider-box">
+                <input type="range" id="radius-slider" min="0" max="8" value="4" step="1" />
+              </div>
             </div>
             <div class="field">
               <label>바 폭 비율 <span class="val-badge" id="ratio-txt">65%</span></label>
@@ -932,16 +924,10 @@
             </div>
             <div class="row-2">
               <div class="field">
-                <label>단계 간격 (5.Spacing) <span class="val-badge" id="funnel-gap-txt">4px</span></label>
-                <select id="funnel-gap-select">
-                  <option value="none:0">0px (간격 없음)</option>
-                  <option value="gap/gap-0_5:2">gap/gap-0_5 (2px)</option>
-                  <option value="gap/gap-1:4" selected>gap/gap-1 (4px)</option>
-                  <option value="gap/gap-1_5:6">gap/gap-1_5 (6px)</option>
-                  <option value="gap/gap-2:8">gap/gap-2 (8px)</option>
-                  <option value="gap/gap-3:12">gap/gap-3 (12px)</option>
-                  <option value="gap/gap-4:16">gap/gap-4 (16px)</option>
-                </select>
+                <label>단계 간격 <span class="val-badge" id="funnel-gap-txt">4px</span></label>
+                <div class="slider-box">
+                  <input type="range" id="funnel-gap-slider" min="0" max="6" value="2" step="1" />
+                </div>
               </div>
               <div class="field">
                 <label>라벨 표시 위치</label>
@@ -1071,38 +1057,16 @@
         <div class="section-body">
           <div class="row-2">
             <div class="field">
-              <label>차트 여백 (padding) <span class="val-badge" id="padding-txt">24px</span></label>
-              <select id="padding-token-select">
-                <option value="padding/p-0_5:2">padding/p-0_5 (2px)</option>
-                <option value="padding/p-1:4">padding/p-1 (4px)</option>
-                <option value="padding/p-1_5:6">padding/p-1_5 (6px)</option>
-                <option value="padding/p-2:8">padding/p-2 (8px)</option>
-                <option value="padding/p-3:12">padding/p-3 (12px)</option>
-                <option value="padding/p-4:16">padding/p-4 (16px)</option>
-                <option value="padding/p-5:20">padding/p-5 (20px)</option>
-                <option value="padding/p-6:24" selected>padding/p-6 (24px)</option>
-                <option value="padding/p-7:28">padding/p-7 (28px)</option>
-                <option value="padding/p-8:32">padding/p-8 (32px)</option>
-                <option value="padding/p-9:36">padding/p-9 (36px)</option>
-                <option value="padding/p-10:40">padding/p-10 (40px)</option>
-              </select>
+              <label>차트 여백 <span class="val-badge" id="padding-txt">24px</span></label>
+              <div class="slider-box">
+                <input type="range" id="padding-slider" min="0" max="11" value="7" step="1" />
+              </div>
             </div>
             <div class="field">
-              <label>요소 간격 (gap) <span class="val-badge" id="gap-txt">8px</span></label>
-              <select id="gap-token-select">
-                <option value="gap/gap-0_5:2">gap/gap-0_5 (2px)</option>
-                <option value="gap/gap-1:4">gap/gap-1 (4px)</option>
-                <option value="gap/gap-1_5:6">gap/gap-1_5 (6px)</option>
-                <option value="gap/gap-2:8" selected>gap/gap-2 (8px)</option>
-                <option value="gap/gap-3:12">gap/gap-3 (12px)</option>
-                <option value="gap/gap-4:16">gap/gap-4 (16px)</option>
-                <option value="gap/gap-5:20">gap/gap-5 (20px)</option>
-                <option value="gap/gap-6:24">gap/gap-6 (24px)</option>
-                <option value="gap/gap-7:28">gap/gap-7 (28px)</option>
-                <option value="gap/gap-8:32">gap/gap-8 (32px)</option>
-                <option value="gap/gap-9:36">gap/gap-9 (36px)</option>
-                <option value="gap/gap-10:40">gap/gap-10 (40px)</option>
-              </select>
+              <label>요소 간격 <span class="val-badge" id="gap-txt">8px</span></label>
+              <div class="slider-box">
+                <input type="range" id="gap-slider" min="0" max="11" value="3" step="1" />
+              </div>
             </div>
           </div>
 
@@ -1222,7 +1186,7 @@
   </div>
 
   <script type="module">
-    const NANOCHARTS_BUILD_META = {"version":"0.1.12","buildId":"0.1.12-1794294864705","buildTime":1794294864705,"builtAt":"2026-11-10T07:14:24.705Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+    const NANOCHARTS_BUILD_META = {"version":"0.1.13","buildId":"0.1.13-1794296008303","buildTime":1794296008303,"builtAt":"2026-11-10T07:33:28.303Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 
 var Ae = Object.defineProperty;
 var Ie = (u, t, e) => t in u ? Ae(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
@@ -6756,11 +6720,64 @@ const wrapSvgDocument = he;
       renderPreview();
     });
 
-    document.getElementById('radius-token-select').addEventListener('change', (e) => {
-      const [tokenName, pxStr] = (e.target.value || 'rounded-md:6').split(':');
-      state.radiusToken = tokenName === 'none' ? '' : tokenName;
-      state.radius = parseInt(pxStr, 10) || 0;
-      document.getElementById('radius-txt').innerText = `${state.radius}px`;
+    const RADIUS_STEPS = [
+      { token: '', label: '0px', px: 0 },
+      { token: 'rounded-xxs', label: '2px', px: 2 },
+      { token: 'rounded-xs', label: '3px', px: 3 },
+      { token: 'rounded-sm', label: '4px', px: 4 },
+      { token: 'rounded-md', label: '6px', px: 6 },
+      { token: 'rounded-lg', label: '8px', px: 8 },
+      { token: 'rounded-xl', label: '12px', px: 12 },
+      { token: 'rounded-xxl', label: '16px', px: 16 },
+      { token: 'rounded-full', label: '999px', px: 999 },
+    ];
+
+    const PADDING_STEPS = [
+      { token: 'padding/p-0_5', label: '2px', px: 2 },
+      { token: 'padding/p-1', label: '4px', px: 4 },
+      { token: 'padding/p-1_5', label: '6px', px: 6 },
+      { token: 'padding/p-2', label: '8px', px: 8 },
+      { token: 'padding/p-3', label: '12px', px: 12 },
+      { token: 'padding/p-4', label: '16px', px: 16 },
+      { token: 'padding/p-5', label: '20px', px: 20 },
+      { token: 'padding/p-6', label: '24px', px: 24 },
+      { token: 'padding/p-7', label: '28px', px: 28 },
+      { token: 'padding/p-8', label: '32px', px: 32 },
+      { token: 'padding/p-9', label: '36px', px: 36 },
+      { token: 'padding/p-10', label: '40px', px: 40 },
+    ];
+
+    const GAP_STEPS = [
+      { token: 'gap/gap-0_5', label: '2px', px: 2 },
+      { token: 'gap/gap-1', label: '4px', px: 4 },
+      { token: 'gap/gap-1_5', label: '6px', px: 6 },
+      { token: 'gap/gap-2', label: '8px', px: 8 },
+      { token: 'gap/gap-3', label: '12px', px: 12 },
+      { token: 'gap/gap-4', label: '16px', px: 16 },
+      { token: 'gap/gap-5', label: '20px', px: 20 },
+      { token: 'gap/gap-6', label: '24px', px: 24 },
+      { token: 'gap/gap-7', label: '28px', px: 28 },
+      { token: 'gap/gap-8', label: '32px', px: 32 },
+      { token: 'gap/gap-9', label: '36px', px: 36 },
+      { token: 'gap/gap-10', label: '40px', px: 40 },
+    ];
+
+    const FUNNEL_GAP_STEPS = [
+      { token: '', label: '0px', px: 0 },
+      { token: 'gap/gap-0_5', label: '2px', px: 2 },
+      { token: 'gap/gap-1', label: '4px', px: 4 },
+      { token: 'gap/gap-1_5', label: '6px', px: 6 },
+      { token: 'gap/gap-2', label: '8px', px: 8 },
+      { token: 'gap/gap-3', label: '12px', px: 12 },
+      { token: 'gap/gap-4', label: '16px', px: 16 },
+    ];
+
+    document.getElementById('radius-slider').addEventListener('input', (e) => {
+      const idx = Math.max(0, Math.min(RADIUS_STEPS.length - 1, parseInt(e.target.value, 10) || 0));
+      const item = RADIUS_STEPS[idx];
+      state.radiusToken = item.token;
+      state.radius = item.px;
+      document.getElementById('radius-txt').innerText = item.label;
       renderPreview();
     });
 
@@ -6835,27 +6852,30 @@ const wrapSvgDocument = he;
       renderPreview();
     });
 
-    document.getElementById('funnel-gap-select').addEventListener('change', (e) => {
-      const [tokenName, pxStr] = (e.target.value || 'gap/gap-1:4').split(':');
-      state.funnelGapToken = tokenName === 'none' ? '' : tokenName;
-      state.funnelGap = parseInt(pxStr, 10) || 0;
-      document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap}px`;
+    document.getElementById('funnel-gap-slider').addEventListener('input', (e) => {
+      const idx = Math.max(0, Math.min(FUNNEL_GAP_STEPS.length - 1, parseInt(e.target.value, 10) || 0));
+      const item = FUNNEL_GAP_STEPS[idx];
+      state.funnelGapToken = item.token;
+      state.funnelGap = item.px;
+      document.getElementById('funnel-gap-txt').innerText = item.label;
       renderPreview();
     });
 
-    document.getElementById('padding-token-select').addEventListener('change', (e) => {
-      const [tokenName, pxStr] = (e.target.value || 'padding/p-6:24').split(':');
-      state.paddingToken = tokenName;
-      state.paddingPx = parseInt(pxStr, 10) || 24;
-      document.getElementById('padding-txt').innerText = `${state.paddingPx}px`;
+    document.getElementById('padding-slider').addEventListener('input', (e) => {
+      const idx = Math.max(0, Math.min(PADDING_STEPS.length - 1, parseInt(e.target.value, 10) || 0));
+      const item = PADDING_STEPS[idx];
+      state.paddingToken = item.token;
+      state.paddingPx = item.px;
+      document.getElementById('padding-txt').innerText = item.label;
       renderPreview();
     });
 
-    document.getElementById('gap-token-select').addEventListener('change', (e) => {
-      const [tokenName, pxStr] = (e.target.value || 'gap/gap-2:8').split(':');
-      state.gapToken = tokenName;
-      state.gapPx = parseInt(pxStr, 10) || 8;
-      document.getElementById('gap-txt').innerText = `${state.gapPx}px`;
+    document.getElementById('gap-slider').addEventListener('input', (e) => {
+      const idx = Math.max(0, Math.min(GAP_STEPS.length - 1, parseInt(e.target.value, 10) || 0));
+      const item = GAP_STEPS[idx];
+      state.gapToken = item.token;
+      state.gapPx = item.px;
+      document.getElementById('gap-txt').innerText = item.label;
       renderPreview();
     });
 
@@ -7375,12 +7395,13 @@ const wrapSvgDocument = he;
           document.getElementById('surface-mode').value = state.surfaceMode || 'light';
           document.getElementById('series-names-input').value = state.seriesNames;
           document.getElementById('data-textarea').value = state.rawText;
-          const radTokenVal = state.radius === 0 ? 'none:0' : `${state.radiusToken || 'rounded-md'}:${state.radius}`;
-          const radSelect = document.getElementById('radius-token-select');
-          if (radSelect) {
-            radSelect.value = radTokenVal;
-          }
-          document.getElementById('radius-txt').innerText = `${state.radius}px`;
+          const radIdx = Math.max(
+            0,
+            RADIUS_STEPS.findIndex((s) => s.px === state.radius || (state.radiusToken && s.token === state.radiusToken))
+          );
+          const radItem = RADIUS_STEPS[radIdx] || RADIUS_STEPS[4];
+          document.getElementById('radius-slider').value = radIdx;
+          document.getElementById('radius-txt').innerText = radItem.label;
           document.getElementById('ratio-slider').value = Math.round(state.widthRatio * 100);
           document.getElementById('ratio-txt').innerText = `${Math.round(state.widthRatio * 100)}%`;
           document.getElementById('curve-select').value = state.curve;
@@ -7397,23 +7418,27 @@ const wrapSvgDocument = he;
           document.getElementById('pie-pad-txt').innerText = `${restoredPadDeg}°`;
           document.getElementById('funnel-dir-select').value = state.funnelDirection || 'vertical';
           document.getElementById('funnel-shape-select').value = state.funnelShape || 'trapezoid';
-          const funnelGapVal =
-            (state.funnelGap ?? 4) === 0
-              ? 'none:0'
-              : `${state.funnelGapToken || 'gap/gap-1'}:${state.funnelGap ?? 4}`;
-          const funnelGapEl = document.getElementById('funnel-gap-select');
-          if (funnelGapEl) funnelGapEl.value = funnelGapVal;
-          document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap ?? 4}px`;
-          const padSelectEl = document.getElementById('padding-token-select');
-          if (padSelectEl) {
-            padSelectEl.value = `${state.paddingToken || 'padding/p-6'}:${state.paddingPx ?? 24}`;
-          }
-          document.getElementById('padding-txt').innerText = `${state.paddingPx ?? 24}px`;
-          const gapSelectEl = document.getElementById('gap-token-select');
-          if (gapSelectEl) {
-            gapSelectEl.value = `${state.gapToken || 'gap/gap-2'}:${state.gapPx ?? 8}`;
-          }
-          document.getElementById('gap-txt').innerText = `${state.gapPx ?? 8}px`;
+          const fGapIdx = Math.max(
+            0,
+            FUNNEL_GAP_STEPS.findIndex((s) => s.px === (state.funnelGap ?? 4))
+          );
+          const fGapItem = FUNNEL_GAP_STEPS[fGapIdx] || FUNNEL_GAP_STEPS[2];
+          document.getElementById('funnel-gap-slider').value = fGapIdx;
+          document.getElementById('funnel-gap-txt').innerText = fGapItem.label;
+          const padIdx = Math.max(
+            0,
+            PADDING_STEPS.findIndex((s) => s.px === (state.paddingPx ?? 24) || s.token === state.paddingToken)
+          );
+          const padItem = PADDING_STEPS[padIdx] || PADDING_STEPS[7];
+          document.getElementById('padding-slider').value = padIdx;
+          document.getElementById('padding-txt').innerText = padItem.label;
+          const gapIdx = Math.max(
+            0,
+            GAP_STEPS.findIndex((s) => s.px === (state.gapPx ?? 8) || s.token === state.gapToken)
+          );
+          const gapItem = GAP_STEPS[gapIdx] || GAP_STEPS[3];
+          document.getElementById('gap-slider').value = gapIdx;
+          document.getElementById('gap-txt').innerText = gapItem.label;
           document.getElementById('funnel-label-pos').value = state.funnelLabelPos || 'inside';
           document.getElementById('legend-pos-select').value = state.legendPos || 'top-right';
           document.getElementById('font-family-select').value = state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
