@@ -69,6 +69,39 @@ export const DESIGN_TOKENS: Record<string, string> = {
   'outline-highest': '#2C2F33',
   'outline-ultra-high': '#222222',
 
+  // Transparent & Variant (2.Color token)
+  'transparent': 'rgba(255, 255, 255, 0)',
+  'variant': '#226CFF',
+  'variant-high': '#1C57CC',
+
+  // Overlay / White (2.Color token: overlay/white/* — #FFFFFF 10%~80%)
+  'overlay-white': 'rgba(255, 255, 255, 0.4)',
+  'overlay-white-lowest': 'rgba(255, 255, 255, 0.1)',
+  'overlay-white-lower': 'rgba(255, 255, 255, 0.2)',
+  'overlay-white-low': 'rgba(255, 255, 255, 0.3)',
+  'overlay-white-mid': 'rgba(255, 255, 255, 0.5)',
+  'overlay-white-high': 'rgba(255, 255, 255, 0.6)',
+  'overlay-white-higher': 'rgba(255, 255, 255, 0.7)',
+  'overlay-white-highest': 'rgba(255, 255, 255, 0.8)',
+
+  // Overlay / Gray (2.Color token: overlay/gray/* — Transparency/20~200, 5%~34%)
+  'overlay-gray': 'rgba(6, 19, 31, 0.05)',
+  'overlay-gray-lower': 'rgba(6, 19, 31, 0.1)',
+  'overlay-gray-low': 'rgba(6, 19, 31, 0.13)',
+  'overlay-gray-mid': 'rgba(6, 19, 31, 0.2)',
+  'overlay-gray-high': 'rgba(6, 19, 31, 0.26)',
+  'overlay-gray-higher': 'rgba(6, 19, 31, 0.34)',
+
+  // Overlay / Black (2.Color token: overlay/black/* — #06131F 10%~80%)
+  'overlay-black': 'rgba(6, 19, 31, 0.4)',
+  'overlay-black-lowest': 'rgba(6, 19, 31, 0.1)',
+  'overlay-black-lower': 'rgba(6, 19, 31, 0.2)',
+  'overlay-black-low': 'rgba(6, 19, 31, 0.3)',
+  'overlay-black-mid': 'rgba(6, 19, 31, 0.5)',
+  'overlay-black-high': 'rgba(6, 19, 31, 0.6)',
+  'overlay-black-higher': 'rgba(6, 19, 31, 0.7)',
+  'overlay-black-highest': 'rgba(6, 19, 31, 0.8)',
+
   // Red
   'red': '#FF334B',
   'red-lowest': '#FFFFFF',
@@ -208,28 +241,354 @@ export const DESIGN_TOKENS: Record<string, string> = {
   'pink-high': '#F857AC',
   'pink-higher': '#D32B84',
   'pink-highest': '#8C1C58',
+
+  // On-Red (3.Color token - point: on-red/*)
+  'on-red': '#FFEDEF',
+  'on-red-lowest': '#FFFFFF',
+  'on-red-lower': '#FFD9DD',
+  'on-red-low': '#FF586B',
+  'on-red-mid': '#DB2C40',
+  'on-red-high': '#911D2B',
+  'on-red-higher': '#6B1520',
+  'on-red-highest': '#480E15',
+
+  // On-Orange (3.Color token - point: on-orange/*)
+  'on-orange': '#FFF3E8',
+  'on-orange-lowest': '#FFFFFF',
+  'on-orange-lower': '#FFE6CF',
+  'on-orange-low': '#FF902E',
+  'on-orange-mid': '#DB6600',
+  'on-orange-high': '#914400',
+  'on-orange-higher': '#6B3200',
+  'on-orange-highest': '#482100',
+
+  // On-Amber (3.Color token - point: on-amber/*)
+  'on-amber': '#FFF7EC',
+  'on-amber-lowest': '#FFFFFF',
+  'on-amber-lower': '#FEEDD6',
+  'on-amber-low': '#FBB554',
+  'on-amber-mid': '#D78E28',
+  'on-amber-high': '#8E5E1A',
+  'on-amber-higher': '#694513',
+  'on-amber-highest': '#472F0D',
+
+  // On-Yellow (3.Color token - point: on-yellow/*)
+  'on-yellow': '#FFFAE8',
+  'on-yellow-lowest': '#FFFFFF',
+  'on-yellow-lower': '#FFF5CF',
+  'on-yellow-low': '#FFD500',
+  'on-yellow-mid': '#DBAD00',
+  'on-yellow-high': '#917200',
+  'on-yellow-higher': '#6B5400',
+  'on-yellow-highest': '#483900',
+
+  // On-Lime (3.Color token - point: on-lime/*)
+  'on-lime': '#F8FAEB',
+  'on-lime-lowest': '#FFFFFF',
+  'on-lime-lower': '#F0F5D5',
+  'on-lime-low': '#BCD446',
+  'on-lime-mid': '#95AD19',
+  'on-lime-high': '#627310',
+  'on-lime-higher': '#49550C',
+  'on-lime-highest': '#313908',
+
+  // On-Green (3.Color token - point: on-green/*)
+  'on-green': '#EDFAF0',
+  'on-green-lowest': '#FFFFFF',
+  'on-green-lower': '#DAF5E0',
+  'on-green-low': '#5ED47B',
+  'on-green-mid': '#33AD51',
+  'on-green-high': '#227335',
+  'on-green-higher': '#195527',
+  'on-green-highest': '#11391A',
+
+  // On-Teal (3.Color token - point: on-teal/*)
+  'on-teal': '#EBFAF8',
+  'on-teal-lowest': '#FFFFFF',
+  'on-teal-lower': '#D5F5F0',
+  'on-teal-low': '#4CD2BE',
+  'on-teal-mid': '#1FAC97',
+  'on-teal-high': '#147264',
+  'on-teal-higher': '#0F544A',
+  'on-teal-highest': '#0A3932',
+
+  // On-Cyan (3.Color token - point: on-cyan/*)
+  'on-cyan': '#E8F9FD',
+  'on-cyan-lowest': '#FFFFFF',
+  'on-cyan-lower': '#CFF3FB',
+  'on-cyan-low': '#2ECAEB',
+  'on-cyan-mid': '#00A3C6',
+  'on-cyan-high': '#006C83',
+  'on-cyan-higher': '#005061',
+  'on-cyan-highest': '#003641',
+
+  // On-Sky (3.Color token - point: on-sky/*)
+  'on-sky': '#E9F7FE',
+  'on-sky-lowest': '#FFFFFF',
+  'on-sky-lower': '#D1EFFD',
+  'on-sky-low': '#38B5F4',
+  'on-sky-mid': '#0A8ECF',
+  'on-sky-high': '#075E89',
+  'on-sky-higher': '#054665',
+  'on-sky-highest': '#032F44',
+
+  // On-Blue (3.Color token - point: on-blue/*)
+  'on-blue': '#EEF3FF',
+  'on-blue-lowest': '#FFFFFF',
+  'on-blue-lower': '#DBE7FE',
+  'on-blue-low': '#6296FB',
+  'on-blue-mid': '#376DD7',
+  'on-blue-high': '#24488E',
+  'on-blue-higher': '#1B3569',
+  'on-blue-highest': '#122447',
+
+  // On-Indigo (3.Color token - point: on-indigo/*)
+  'on-indigo': '#F3F0FF',
+  'on-indigo-lowest': '#FFFFFF',
+  'on-indigo-lower': '#E5E0FF',
+  'on-indigo-low': '#9079FD',
+  'on-indigo-mid': '#674FD9',
+  'on-indigo-high': '#443490',
+  'on-indigo-higher': '#32276A',
+  'on-indigo-highest': '#221A48',
+
+  // On-Purple (3.Color token - point: on-purple/*)
+  'on-purple': '#F7EFFF',
+  'on-purple-lowest': '#FFFFFF',
+  'on-purple-lower': '#F0DEFF',
+  'on-purple-low': '#BA6BFF',
+  'on-purple-mid': '#9340DB',
+  'on-purple-high': '#612B91',
+  'on-purple-higher': '#48206B',
+  'on-purple-highest': '#301548',
+
+  // On-Violet (3.Color token - point: on-violet/*)
+  'on-violet': '#FAEEFB',
+  'on-violet-lowest': '#FFFFFF',
+  'on-violet-lower': '#F6DCF7',
+  'on-violet-low': '#D664DE',
+  'on-violet-mid': '#B039B9',
+  'on-violet-high': '#75267A',
+  'on-violet-higher': '#571C5A',
+  'on-violet-highest': '#3A133D',
+
+  // On-Pink (3.Color token - point: on-pink/*)
+  'on-pink': '#FEEDF6',
+  'on-pink-lowest': '#FFFFFF',
+  'on-pink-lower': '#FDD9EC',
+  'on-pink-low': '#F857AC',
+  'on-pink-mid': '#D32B84',
+  'on-pink-high': '#8C1C58',
+  'on-pink-higher': '#681541',
+  'on-pink-highest': '#460E2C',
 };
 
 /**
- * 변수명 문자열(`var(--primary)`, `--primary`, `color/primary/high`, `primary/default`)을
- * 표준 토큰 키(`primary`, `primary-high`)로 정규화합니다.
+ * 디자이너 피그마 `4.Radius` 컬렉션 표준 수치 토큰 맵
+ */
+export const RADIUS_TOKENS: Record<string, number> = {
+  'rounded-xxs': 2,
+  'rounded-xs': 3,
+  'rounded-sm': 4,
+  'rounded-md': 6,
+  'rounded-lg': 8,
+  'rounded-xl': 12,
+  'rounded-xxl': 16,
+  'rounded-full': 999,
+};
+
+/**
+ * 디자이너 피그마 `5.Spacing` 컬렉션 — `padding` 그룹 (12개) 표준 수치 토큰 맵
+ */
+export const SPACING_PADDING_TOKENS: Record<string, number> = {
+  'padding/p-0_5': 2,
+  'padding/p-1': 4,
+  'padding/p-1_5': 6,
+  'padding/p-2': 8,
+  'padding/p-3': 12,
+  'padding/p-4': 16,
+  'padding/p-5': 20,
+  'padding/p-6': 24,
+  'padding/p-7': 28,
+  'padding/p-8': 32,
+  'padding/p-9': 36,
+  'padding/p-10': 40,
+};
+
+/**
+ * 디자이너 피그마 `5.Spacing` 컬렉션 — `gap` 그룹 (12개) 표준 수치 토큰 맵
+ */
+export const SPACING_GAP_TOKENS: Record<string, number> = {
+  'gap/gap-0_5': 2,
+  'gap/gap-1': 4,
+  'gap/gap-1_5': 6,
+  'gap/gap-2': 8,
+  'gap/gap-3': 12,
+  'gap/gap-4': 16,
+  'gap/gap-5': 20,
+  'gap/gap-6': 24,
+  'gap/gap-7': 28,
+  'gap/gap-8': 32,
+  'gap/gap-9': 36,
+  'gap/gap-10': 40,
+};
+
+/**
+ * 디자이너 피그마 `5.Spacing` 전체(padding 12 + gap 12 = 24개) 토큰 맵
+ */
+export const SPACING_TOKENS: Record<string, number> = {
+  ...SPACING_PADDING_TOKENS,
+  ...SPACING_GAP_TOKENS,
+};
+
+/**
+ * 포인트 컬러 14종 베이스 이름 목록 (`3.Color token - point`)
+ */
+const POINT_COLOR_BASES = new Set([
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'purple',
+  'violet',
+  'pink',
+]);
+
+/**
+ * 숫자 스케일(Palette 30~950)을 시맨틱 단계명(ultra-low~ultra-high)으로 변환하는 매핑 테이블
+ */
+const NUMERIC_SCALE_TO_STEPS: Record<string, string[]> = {
+  '30': ['ultra-low', 'lower', 'lowest'],
+  '40': ['ultra-low', 'lowest'],
+  '50': ['lowest', 'low', 'ultra-low'],
+  '100': ['lower'],
+  '200': ['low', 'mid'],
+  '300': ['mid'],
+  '400': ['high', 'low'],
+  '500': [''],
+  '600': ['higher', 'mid'],
+  '700': ['highest'],
+  '800': ['ultra-high', 'highest', 'high'],
+  '900': ['ultra-high', 'highest', 'higher'],
+  '950': ['ultra-high', 'highest'],
+};
+
+/**
+ * 포인트 컬러 팔레트 숫자 스케일(`point red/30` ~ `point red/800`) 매핑 테이블
+ */
+const POINT_NUMERIC_SCALE_TO_STEPS: Record<string, string[]> = {
+  '30': ['lower'],
+  '50': ['low'],
+  '100': ['lower', 'low'],
+  '200': ['mid'],
+  '400': ['high'],
+  '500': [''],
+  '600': ['higher'],
+  '800': ['highest'],
+  '900': ['highest', 'higher'],
+  '950': ['highest'],
+};
+
+/**
+ * `1.Color Palette`의 `Transparency/20` ~ `Transparency/200`을 `overlay/gray/*` 토큰으로 매핑하는 테이블
+ */
+const TRANSPARENCY_SCALE_TO_TOKEN: Record<string, string> = {
+  '20': 'overlay-gray',
+  '30': 'overlay-gray-lower',
+  '40': 'overlay-gray-low',
+  '50': 'overlay-gray-mid',
+  '100': 'overlay-gray-high',
+  '200': 'overlay-gray-higher',
+};
+
+/**
+ * 변수명 문자열(`var(--primary)`, `--primary`, `primary/-`, `primary/lower`, `Primary/500`, `point red/500`, `overlay/white/low`, `Transparency/50`)을
+ * 표준 토큰 키(`primary`, `primary-lower`, `red`, `overlay-white-low`, `overlay-gray-mid`)로 정규화합니다.
  */
 export function normalizeTokenKey(raw: string): string {
   let s = (raw || '').trim();
-  const varMatch = s.match(/^var\(\s*--([a-zA-Z0-9_-]+)(?:\s*,\s*([^)]+))?\s*\)$/);
+  const varMatch = s.match(/^var\(\s*--([a-zA-Z0-9_/-]+)(?:\s*,\s*([^)]+))?\s*\)$/);
   if (varMatch) {
     s = varMatch[1];
   }
   s = s.replace(/^--+/, '');
-  s = s.replace(/^(?:color|colors|token|tokens)[/-]/i, '');
-  s = s.replace(/[/-](?:default|base)$/i, '');
-  s = s.replace(/\//g, '-').toLowerCase();
+  // `point red/500`, `color/primary/high` 등 공백·슬래시·하이픈 구분 접두사 제거
+  s = s.replace(/^(?:color|colors|token|tokens|point|theme|palette|weseed|semantic|primitive)[\s/-]+/i, '');
+  // 피그마 기본 토큰 표기(`primary/-`, `overlay/white/-`, `primary/default`, `primary/base`)의 접미사 제거
+  s = s.replace(/[/-](?:default|base|-)+$/i, '');
+  s = s.replace(/\//g, '-').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+
+  // Transparency/20 ~ Transparency/200 -> overlay-gray-* 매핑
+  const transMatch = s.match(/^transparency-(\d+)$/);
+  if (transMatch && TRANSPARENCY_SCALE_TO_TOKEN[transMatch[1]]) {
+    return TRANSPARENCY_SCALE_TO_TOKEN[transMatch[1]];
+  }
+
+  // Primary/500, point red/500 등 숫자 스케일 표기를 DESIGN_TOKENS 키로 매핑
+  const numMatch = s.match(/^([a-z-]+)-(\d+)$/);
+  if (numMatch) {
+    const base = numMatch[1];
+    const num = numMatch[2];
+    const steps = POINT_COLOR_BASES.has(base)
+      ? POINT_NUMERIC_SCALE_TO_STEPS[num] || NUMERIC_SCALE_TO_STEPS[num]
+      : NUMERIC_SCALE_TO_STEPS[num];
+    if (steps) {
+      for (const step of steps) {
+        const candidate = step ? `${base}-${step}` : base;
+        if (DESIGN_TOKENS[candidate]) {
+          return candidate;
+        }
+      }
+    }
+  }
+
   return s;
 }
 
 /**
- * CSS 변수(`var(--primary)`, `--primary`) 또는 디자인 시스템 토큰명을
- * Canvas 2D 및 SVG가 즉시 렌더링할 수 있는 실제 HEX / RGB 색상 문자열로 변환합니다.
+ * 표준 토큰 키(`primary`, `primary-lower`, `overlay-white-low`, `overlay-black`)를
+ * 디자이너 피그마 변수 폴더 구조(`primary/-`, `primary/lower`, `overlay/white/low`, `overlay/black/-`)로 변환합니다.
+ */
+export function toFigmaVariableName(rawKey: string): string {
+  const trimmed = (rawKey || '').trim();
+  if (!trimmed) return 'primary/-';
+  // 이미 슬래시(/) 폴더 구조가 포함된 경우(`primary/-`, `overlay/white/low`, `Primary/500` 등) 그대로 유지
+  if (trimmed.includes('/')) {
+    return trimmed.replace(/\s*\/\s*/g, '/');
+  }
+  const norm = normalizeTokenKey(trimmed);
+
+  // 3단 폴더 구조: overlay/white/*, overlay/gray/*, overlay/black/*
+  const overlayMatch = norm.match(
+    /^overlay-(white|gray|black)(?:-(ultra-low|lowest|lower|low|mid|high|higher|highest|ultra-high|\d+))?$/
+  );
+  if (overlayMatch) {
+    return `overlay/${overlayMatch[1]}/${overlayMatch[2] || '-'}`;
+  }
+
+  if (norm === 'transparent') {
+    return 'transparent';
+  }
+
+  const stepMatch = norm.match(
+    /^(.+)-(ultra-low|lowest|lower|low|mid|high|higher|highest|ultra-high|\d+)$/
+  );
+  if (stepMatch) {
+    return `${stepMatch[1]}/${stepMatch[2]}`;
+  }
+  return `${norm}/-`;
+}
+
+/**
+ * CSS 변수(`var(--primary)`, `--primary`), 피그마 폴더형 변수명(`primary/-`, `primary/lower`, `Primary/500`),
+ * 또는 디자인 시스템 토큰명을 Canvas 2D 및 SVG가 즉시 렌더링할 수 있는 실제 HEX / RGB 색상 문자열로 변환합니다.
  *
  * 1. 브라우저 DOM의 `:root`(또는 `scopeElement`)에 선언된 실제 CSS 변수 값을 최우선 조회합니다.
  * 2. DOM에 선언되지 않은 경우 내장된 `DESIGN_TOKENS`(`variables.scss`) 기본값으로 폴백합니다.
@@ -238,18 +597,21 @@ export function resolveColor(input: string | undefined, scopeElement?: Element |
   if (!input) return '#226CFF';
   const trimmed = input.trim();
 
-  // 1. var(--token, fallback) 또는 --token 형태인지 확인
+  // 1. var(--token, fallback), --token, 또는 슬래시/토큰명 형태인지 확인
   let varName: string | null = null;
   let customFallback: string | null = null;
 
-  const varMatch = trimmed.match(/^var\(\s*(--[a-zA-Z0-9_-]+)(?:\s*,\s*([^)]+))?\s*\)$/);
+  const varMatch = trimmed.match(/^var\(\s*(--[a-zA-Z0-9_/-]+)(?:\s*,\s*([^)]+))?\s*\)$/);
   if (varMatch) {
     varName = varMatch[1];
     customFallback = varMatch[2] ? varMatch[2].trim() : null;
   } else if (trimmed.startsWith('--')) {
     varName = trimmed;
-  } else if (DESIGN_TOKENS[trimmed.toLowerCase()]) {
-    varName = `--${trimmed.toLowerCase()}`;
+  } else {
+    const norm = normalizeTokenKey(trimmed);
+    if (DESIGN_TOKENS[norm]) {
+      varName = `--${norm}`;
+    }
   }
 
   if (varName) {

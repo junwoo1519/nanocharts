@@ -212,31 +212,35 @@ export function svgRoundedRectElement(params: {
   const { id, x, y, width, height, radius = 0, fillAttrs, strokeAttrs = '' } = params;
   if (width <= 0 || height <= 0) return '';
 
-  let tl = 0,
-    tr = 0,
-    br = 0,
-    bl = 0;
+  let rawTl = 0,
+    rawTr = 0,
+    rawBr = 0,
+    rawBl = 0;
   if (typeof radius === 'number') {
-    tl = tr = br = bl = radius;
+    rawTl = rawTr = rawBr = rawBl = Math.max(0, radius);
   } else if (Array.isArray(radius)) {
-    tl = radius[0] || 0;
-    tr = radius[1] || 0;
-    br = radius[2] || 0;
-    bl = radius[3] || 0;
+    rawTl = Math.max(0, radius[0] || 0);
+    rawTr = Math.max(0, radius[1] || 0);
+    rawBr = Math.max(0, radius[2] || 0);
+    rawBl = Math.max(0, radius[3] || 0);
   }
 
   const maxR = Math.min(width / 2, height / 2);
-  tl = Math.max(0, Math.min(tl, maxR));
-  tr = Math.max(0, Math.min(tr, maxR));
-  br = Math.max(0, Math.min(br, maxR));
-  bl = Math.max(0, Math.min(bl, maxR));
+  const tl = Math.max(0, Math.min(rawTl, maxR));
+  const tr = Math.max(0, Math.min(rawTr, maxR));
+  const br = Math.max(0, Math.min(rawBr, maxR));
+  const bl = Math.max(0, Math.min(rawBl, maxR));
 
   const idAttr = id ? ` id="${escapeXml(id)}"` : '';
   const strokePart = strokeAttrs ? ` ${strokeAttrs}` : '';
+  const cornersMeta =
+    rawTl > 0 || rawTr > 0 || rawBr > 0 || rawBl > 0
+      ? ` data-corners="${fmt(rawTl)},${fmt(rawTr)},${fmt(rawBr)},${fmt(rawBl)}" data-box="${fmt(x)},${fmt(y)},${fmt(width)},${fmt(height)}"`
+      : '';
 
-  if (tl === tr && tr === br && br === bl) {
-    const rxAttr = tl > 0 ? ` rx="${fmt(tl)}" ry="${fmt(tl)}"` : '';
-    return `<rect${idAttr} x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}"${rxAttr} ${fillAttrs}${strokePart} />`;
+  if (rawTl === rawTr && rawTr === rawBr && rawBr === rawBl) {
+    const rxAttr = rawTl > 0 ? ` rx="${fmt(rawTl)}" ry="${fmt(rawTl)}"` : '';
+    return `<rect${idAttr} x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}"${rxAttr}${cornersMeta} ${fillAttrs}${strokePart} />`;
   }
 
   const d = [
@@ -254,7 +258,7 @@ export function svgRoundedRectElement(params: {
     .filter(Boolean)
     .join(' ');
 
-  return `<path${idAttr} d="${d}" ${fillAttrs}${strokePart} />`;
+  return `<path${idAttr}${cornersMeta} d="${d}" ${fillAttrs}${strokePart} />`;
 }
 
 /**

@@ -60,7 +60,11 @@ const transpiled = ts.transpileModule(codeTsSource, {
   },
 });
 
-fs.writeFileSync(path.join(outDir, 'code.js'), transpiled.outputText, 'utf8');
+const cleanCodeJs = transpiled.outputText.replace(
+  /Object\.defineProperty\(exports,\s*["']__esModule["'],\s*\{\s*value:\s*true\s*\}\);\s*/g,
+  ''
+);
+fs.writeFileSync(path.join(outDir, 'code.js'), cleanCodeJs, 'utf8');
 
 console.log('✅ Figma Plugin 빌드 완료!');
 console.log('   - figma-plugin/manifest.json');

@@ -186,6 +186,17 @@
       padding: 2px 6px;
       border-radius: 4px;
       color: #CBD5E1;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .token-chip:hover {
+      border-color: #5991FF;
+      color: #FFFFFF;
+    }
+    .token-chip.selected {
+      border-color: #226CFF;
+      background: rgba(34, 108, 255, 0.22);
+      color: #FFFFFF;
     }
     .token-dot {
       width: 8px;
@@ -350,30 +361,45 @@
       <!-- 3. variables.scss 디자인 토큰 팔레트 & 배경 모드 -->
       <div class="row-2">
         <div class="field">
-          <label>토큰 팔레트 (variables.scss)</label>
+          <label>변수 프리셋 (Color Token / Palette)</label>
           <select id="theme-select">
-            <option value="weseed-categorical">기본 카테고리 (--primary, --teal...)</option>
-            <option value="weseed-primary-scale">Primary 톤온톤 (--primary-high...)</option>
-            <option value="weseed-cool">Cool 블루/청록 (--blue, --sky...)</option>
-            <option value="weseed-warm">Warm 레드/앰버 (--red, --amber...)</option>
+            <option value="weseed-categorical">기본 카테고리 (primary/-, teal/-...)</option>
+            <option value="weseed-primary-scale">Primary 토큰 스케일 (primary/-, primary/lower...)</option>
+            <option value="weseed-palette-scale">Primary 팔레트 스케일 (Primary/500, Primary/100...)</option>
+            <option value="weseed-cool">Cool 블루/청록 (blue/-, sky/-...)</option>
+            <option value="weseed-warm">Warm 레드/앰버 (red/-, amber/-...)</option>
+            <option value="custom">✏️ 직접 변수 지정 (Custom)</option>
           </select>
         </div>
         <div class="field">
           <label>배경 테마 (Surface)</label>
           <select id="surface-mode">
-            <option value="light">Light (--surface-ultra-low)</option>
-            <option value="dark">Dark (--surface-ultra-high)</option>
+            <option value="light">Light (surface/ultra-low)</option>
+            <option value="dark">Dark (surface/ultra-high)</option>
           </select>
         </div>
       </div>
 
-      <!-- 활성 토큰 미리보기 및 피그마 변수 동기화 -->
+      <!-- 활성 토큰 미리보기, 변수 직접 입력 및 피그마 변수 선택 -->
       <div class="token-box">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:10px;color:#94A3B8;font-weight:600;">매핑될 피그마 변수명 (자동 감지)</span>
-          <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 variables.scss 로컬 변수를 일괄 생성합니다">📦 파일에 변수 등록</button>
+          <span style="font-size:10px;color:#94A3B8;font-weight:600;">시리즈 변수 (칩 클릭 후 변경 또는 직접 입력)</span>
+          <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">📦 파일에 변수 등록</button>
         </div>
         <div class="token-chips" id="active-token-chips"></div>
+        <div class="row-2" style="margin-top:2px;">
+          <input
+            type="text"
+            id="custom-tokens-input"
+            list="project-vars-datalist"
+            placeholder="예: primary/-, primary/lower, Primary/500"
+            title="쉼표(,)로 구분하여 피그마 변수명을 직접 입력할 수 있습니다 (예: primary/-, primary/lower, Primary/500)"
+          />
+          <select id="project-var-select" title="현재 피그마 파일에 등록된 변수를 선택해 선택된 시리즈 칩에 적용합니다">
+            <option value="">🔍 프로젝트 변수에서 선택...</option>
+          </select>
+        </div>
+        <datalist id="project-vars-datalist"></datalist>
       </div>
 
       <!-- 4. 데이터 & 시리즈 이름 -->
@@ -398,8 +424,18 @@
       <!-- 5. 차트별 전용 컨트롤 -->
       <div class="row-2" id="bar-controls">
         <div class="field">
-          <label>모서리 둥글기 <span id="radius-txt">6px</span></label>
-          <input type="range" id="radius-slider" min="0" max="16" value="6" />
+          <label>모서리 변수 (4.Radius) <span id="radius-txt">6px</span></label>
+          <select id="radius-token-select">
+            <option value="none:0">0px (직각)</option>
+            <option value="rounded-xxs:2">rounded-xxs (2px)</option>
+            <option value="rounded-xs:3">rounded-xs (3px)</option>
+            <option value="rounded-sm:4">rounded-sm (4px)</option>
+            <option value="rounded-md:6" selected>rounded-md (6px)</option>
+            <option value="rounded-lg:8">rounded-lg (8px)</option>
+            <option value="rounded-xl:12">rounded-xl (12px)</option>
+            <option value="rounded-xxl:16">rounded-xxl (16px)</option>
+            <option value="rounded-full:999">rounded-full (999px)</option>
+          </select>
         </div>
         <div class="field">
           <label>바 폭 비율 <span id="ratio-txt">65%</span></label>
@@ -467,8 +503,16 @@
         </div>
         <div class="row-2">
           <div class="field">
-            <label>단계 간격 (Gap) <span id="funnel-gap-txt">4px</span></label>
-            <input type="range" id="funnel-gap-slider" min="0" max="16" value="4" />
+            <label>단계 간격 (5.Spacing) <span id="funnel-gap-txt">4px</span></label>
+            <select id="funnel-gap-select">
+              <option value="none:0">0px (간격 없음)</option>
+              <option value="gap/gap-0_5:2">gap/gap-0_5 (2px)</option>
+              <option value="gap/gap-1:4" selected>gap/gap-1 (4px)</option>
+              <option value="gap/gap-1_5:6">gap/gap-1_5 (6px)</option>
+              <option value="gap/gap-2:8">gap/gap-2 (8px)</option>
+              <option value="gap/gap-3:12">gap/gap-3 (12px)</option>
+              <option value="gap/gap-4:16">gap/gap-4 (16px)</option>
+            </select>
           </div>
           <div class="field">
             <label>라벨 표시 위치</label>
@@ -571,8 +615,45 @@
         </div>
       </div>
 
-      <!-- 8. 반응형 프리셋 및 피그마 프레임 추출 크기 -->
-      <div class="section-divider">반응형 크기 & 내보내기</div>
+      <!-- 8. 5.Spacing(여백·간격) 및 반응형 프레임 크기 -->
+      <div class="section-divider">5.Spacing (여백·간격) & 반응형 크기</div>
+      <div class="row-2">
+        <div class="field">
+          <label>차트 여백 (padding) <span id="padding-txt">24px</span></label>
+          <select id="padding-token-select">
+            <option value="padding/p-0_5:2">padding/p-0_5 (2px)</option>
+            <option value="padding/p-1:4">padding/p-1 (4px)</option>
+            <option value="padding/p-1_5:6">padding/p-1_5 (6px)</option>
+            <option value="padding/p-2:8">padding/p-2 (8px)</option>
+            <option value="padding/p-3:12">padding/p-3 (12px)</option>
+            <option value="padding/p-4:16">padding/p-4 (16px)</option>
+            <option value="padding/p-5:20">padding/p-5 (20px)</option>
+            <option value="padding/p-6:24" selected>padding/p-6 (24px)</option>
+            <option value="padding/p-7:28">padding/p-7 (28px)</option>
+            <option value="padding/p-8:32">padding/p-8 (32px)</option>
+            <option value="padding/p-9:36">padding/p-9 (36px)</option>
+            <option value="padding/p-10:40">padding/p-10 (40px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>요소 간격 (gap) <span id="gap-txt">8px</span></label>
+          <select id="gap-token-select">
+            <option value="gap/gap-0_5:2">gap/gap-0_5 (2px)</option>
+            <option value="gap/gap-1:4">gap/gap-1 (4px)</option>
+            <option value="gap/gap-1_5:6">gap/gap-1_5 (6px)</option>
+            <option value="gap/gap-2:8" selected>gap/gap-2 (8px)</option>
+            <option value="gap/gap-3:12">gap/gap-3 (12px)</option>
+            <option value="gap/gap-4:16">gap/gap-4 (16px)</option>
+            <option value="gap/gap-5:20">gap/gap-5 (20px)</option>
+            <option value="gap/gap-6:24">gap/gap-6 (24px)</option>
+            <option value="gap/gap-7:28">gap/gap-7 (28px)</option>
+            <option value="gap/gap-8:32">gap/gap-8 (32px)</option>
+            <option value="gap/gap-9:36">gap/gap-9 (36px)</option>
+            <option value="gap/gap-10:40">gap/gap-10 (40px)</option>
+          </select>
+        </div>
+      </div>
+
       <div class="field">
         <div class="seg-group-3" id="size-preset-group">
           <button class="seg-btn active" data-w="640" data-h="400">🖥 Desktop</button>
@@ -639,40 +720,53 @@
 
     const TOKEN_PALETTES = {
       'weseed-categorical': [
-        'primary',
-        'teal',
-        'indigo',
-        'amber',
-        'pink',
-        'cyan',
-        'green',
-        'purple',
-        'orange',
-        'red',
+        'primary/-',
+        'teal/-',
+        'indigo/-',
+        'amber/-',
+        'pink/-',
+        'cyan/-',
+        'green/-',
+        'purple/-',
+        'orange/-',
+        'red/-',
       ],
       'weseed-primary-scale': [
-        'primary',
-        'primary-high',
-        'primary-mid',
-        'primary-low',
-        'primary-higher',
-        'primary-highest',
+        'primary/-',
+        'primary/high',
+        'primary/mid',
+        'primary/low',
+        'primary/lower',
+        'primary/lowest',
       ],
-      'weseed-cool': ['blue', 'sky', 'cyan', 'teal', 'indigo', 'purple'],
-      'weseed-warm': ['red', 'orange', 'amber', 'yellow', 'pink', 'violet'],
+      'weseed-palette-scale': [
+        'Primary/500',
+        'Primary/400',
+        'Primary/300',
+        'Primary/200',
+        'Primary/100',
+        'Primary/50',
+      ],
+      'weseed-cool': ['blue/-', 'sky/-', 'cyan/-', 'teal/-', 'indigo/-', 'purple/-'],
+      'weseed-warm': ['red/-', 'orange/-', 'amber/-', 'yellow/-', 'pink/-', 'violet/-'],
     };
 
     let projectTokenHexMap = {};
+    let projectTokenToVarNameMap = {};
+    let projectVariablesList = [];
     let currentHexToTokenMap = {};
+    let selectedChipIndex = 0;
 
     let state = {
       chartType: 'bar',
       seriesMode: 'grouped',
       theme: 'weseed-categorical',
+      customTokens: 'primary/-, teal/-, indigo/-, amber/-, pink/-, cyan/-',
       surfaceMode: 'light',
       seriesNames: 'Frontend, Backend, AI/Cloud',
       rawText: `1월: 120, 85, 45\n2월: 155, 110, 60\n3월: 135, 95, 75\n4월: 190, 130, 90\n5월: 225, 150, 115\n6월: 260, 175, 140`,
       radius: 6,
+      radiusToken: 'rounded-md',
       widthRatio: 0.65,
       curve: 'smooth',
       areaTopOpacity: 0.45,
@@ -683,7 +777,12 @@
       funnelDirection: 'vertical',
       funnelShape: 'trapezoid',
       funnelGap: 4,
+      funnelGapToken: 'gap/gap-1',
       funnelLabelPos: 'inside',
+      paddingToken: 'padding/p-6',
+      paddingPx: 24,
+      gapToken: 'gap/gap-2',
+      gapPx: 8,
       legendPos: 'top-right',
       fontFamilyPreset: 'Pretendard, Inter, sans-serif',
       customFontFamily: 'Spoqa Han Sans Neo, sans-serif',
@@ -706,23 +805,157 @@
     const containerEl = document.getElementById('preview-canvas');
     const chartBoxEl = document.getElementById('chart-box');
 
-    function useTokenColor(tokenKey) {
-      const hex = (projectTokenHexMap[tokenKey] || DESIGN_TOKENS[tokenKey] || '#226CFF').toUpperCase();
-      if (!currentHexToTokenMap[hex]) {
-        currentHexToTokenMap[hex] = tokenKey;
+    function resolveTokenHex(rawInput) {
+      const trimmed = (rawInput || '').trim();
+      if (!trimmed) return '#226CFF';
+      if (trimmed.startsWith('#')) return trimmed.toUpperCase();
+
+      const lower = trimmed.toLowerCase();
+      const norm = normalizeTokenKey(trimmed);
+      const slashName = toFigmaVariableName(trimmed);
+      const slashLower = slashName.toLowerCase();
+
+      const resolved =
+        projectTokenHexMap[trimmed] ||
+        projectTokenHexMap[lower] ||
+        projectTokenHexMap[slashName] ||
+        projectTokenHexMap[slashLower] ||
+        projectTokenHexMap[norm] ||
+        DESIGN_TOKENS[norm] ||
+        resolveColor(trimmed) ||
+        '#226CFF';
+
+      return resolved.startsWith('#') ? resolved.toUpperCase() : resolved;
+    }
+
+    function resolveDisplayVarName(rawInput) {
+      const trimmed = (rawInput || '').trim();
+      if (!trimmed) return 'primary/-';
+      const lower = trimmed.toLowerCase();
+      const norm = normalizeTokenKey(trimmed);
+      return (
+        projectTokenToVarNameMap[trimmed] ||
+        projectTokenToVarNameMap[lower] ||
+        projectTokenToVarNameMap[norm] ||
+        toFigmaVariableName(trimmed)
+      );
+    }
+
+    function useTokenColor(tokenKey, isPriority = false) {
+      const colorStr = resolveTokenHex(tokenKey);
+      const upperKey = colorStr.toUpperCase();
+      if (isPriority || !currentHexToTokenMap[upperKey]) {
+        currentHexToTokenMap[upperKey] = tokenKey;
       }
-      return hex;
+      // rgba(r, g, b, a) 형태의 오버레이 토큰(overlay/white/*, overlay/gray/*, overlay/black/*)인 경우
+      // SVG 파싱 후 생성되는 `#HEX@투명도%` 키로도 함께 매핑 등록
+      const rgbaMatch = colorStr.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)$/i);
+      if (rgbaMatch) {
+        const r = Math.max(0, Math.min(255, parseInt(rgbaMatch[1], 10)));
+        const g = Math.max(0, Math.min(255, parseInt(rgbaMatch[2], 10)));
+        const b = Math.max(0, Math.min(255, parseInt(rgbaMatch[3], 10)));
+        const a = rgbaMatch[4] !== undefined ? Math.max(0, Math.min(1, parseFloat(rgbaMatch[4]))) : 1;
+        const hex =
+          '#' +
+          [r, g, b]
+            .map((v) => v.toString(16).padStart(2, '0'))
+            .join('')
+            .toUpperCase();
+        const alphaPctKey = `${hex}@${Math.round(a * 100)}`;
+        if (isPriority || !currentHexToTokenMap[alphaPctKey]) {
+          currentHexToTokenMap[alphaPctKey] = tokenKey;
+        }
+      }
+      return colorStr;
+    }
+
+    function getActiveTokenList() {
+      if (state.theme === 'custom' && state.customTokens) {
+        const parsed = state.customTokens
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (parsed.length > 0) return parsed;
+      }
+      return TOKEN_PALETTES[state.theme] || TOKEN_PALETTES['weseed-categorical'];
     }
 
     function renderTokenChips(tokenNames) {
       const wrap = document.getElementById('active-token-chips');
-      wrap.innerHTML = tokenNames
-        .slice(0, 6)
-        .map((t) => {
-          const hex = (projectTokenHexMap[t] || DESIGN_TOKENS[t] || '#226CFF').toUpperCase();
-          return `<span class="token-chip"><span class="token-dot" style="background:${hex};"></span>--${t}</span>`;
+      const visibleTokens = tokenNames.slice(0, 6);
+      if (selectedChipIndex >= visibleTokens.length) {
+        selectedChipIndex = 0;
+      }
+
+      wrap.innerHTML = visibleTokens
+        .map((t, idx) => {
+          const hex = resolveTokenHex(t);
+          const displayVar = resolveDisplayVarName(t);
+          const isSelected = idx === selectedChipIndex ? 'selected' : '';
+          return `<span class="token-chip ${isSelected}" data-idx="${idx}" title="클릭하여 ${idx + 1}번 시리즈 변수 변경 (${displayVar})"><span class="token-dot" style="background:${hex};"></span>${displayVar}</span>`;
         })
         .join('');
+
+      wrap.querySelectorAll('.token-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          selectedChipIndex = parseInt(chip.dataset.idx, 10) || 0;
+          renderTokenChips(tokenNames);
+        });
+      });
+
+      const customInput = document.getElementById('custom-tokens-input');
+      if (document.activeElement !== customInput) {
+        customInput.value = visibleTokens.join(', ');
+      }
+    }
+
+    function populateProjectVariableControls() {
+      const selectEl = document.getElementById('project-var-select');
+      const datalistEl = document.getElementById('project-vars-datalist');
+
+      const defaultOption = `<option value="">🔍 프로젝트 변수 선택 (#${selectedChipIndex + 1} 변경)...</option>`;
+
+      if (projectVariablesList.length > 0) {
+        const byCollection = {};
+        projectVariablesList.forEach((v) => {
+          const col = v.collectionName || 'Variables';
+          if (!byCollection[col]) byCollection[col] = [];
+          byCollection[col].push(v);
+        });
+
+        selectEl.innerHTML =
+          defaultOption +
+          Object.entries(byCollection)
+            .map(
+              ([colName, vars]) =>
+                `<optgroup label="${colName}">` +
+                vars
+                  .map((v) => `<option value="${v.name}">${v.name} (${v.hex})</option>`)
+                  .join('') +
+                `</optgroup>`
+            )
+            .join('');
+
+        datalistEl.innerHTML = projectVariablesList
+          .map((v) => `<option value="${v.name}">${v.collectionName} (${v.hex})</option>`)
+          .join('');
+      } else {
+        const fallbackKeys = Object.keys(DESIGN_TOKENS);
+        selectEl.innerHTML =
+          defaultOption +
+          `<optgroup label="2.Color token / 3.Color token - point">` +
+          fallbackKeys
+            .map((k) => {
+              const slash = toFigmaVariableName(k);
+              return `<option value="${slash}">${slash} (${DESIGN_TOKENS[k]})</option>`;
+            })
+            .join('') +
+          `</optgroup>`;
+
+        datalistEl.innerHTML = fallbackKeys
+          .map((k) => `<option value="${toFigmaVariableName(k)}">${DESIGN_TOKENS[k]}</option>`)
+          .join('');
+      }
     }
 
     function getActiveFontFamily() {
@@ -732,8 +965,6 @@
     }
 
     function parseInputData() {
-      currentHexToTokenMap = {};
-
       const names = state.seriesNames
         .split(',')
         .map((s) => s.trim())
@@ -759,8 +990,8 @@
       });
 
       const maxCols = Math.max(1, ...rows.map((r) => r.length));
-      const tokenList = TOKEN_PALETTES[state.theme] || TOKEN_PALETTES['weseed-categorical'];
-      const palette = tokenList.map((t) => useTokenColor(t));
+      const tokenList = getActiveTokenList();
+      const palette = tokenList.map((t) => useTokenColor(t, true));
 
       renderTokenChips(tokenList);
 
@@ -805,12 +1036,12 @@
 
     function getSurfaceTokens() {
       const isDark = state.surfaceMode === 'dark';
-      const bgHex = useTokenColor(isDark ? 'surface-ultra-high' : 'surface-ultra-low');
-      const gridHex = useTokenColor(isDark ? 'on-surface-higher' : 'outline');
-      const axisLineHex = useTokenColor(isDark ? 'on-surface-higher' : 'outline-low');
-      const labelHex = useTokenColor(isDark ? 'surface-mid' : 'on-surface');
-      const strongTextHex = useTokenColor(isDark ? 'surface-ultra-low' : 'on-surface-highest');
-      const insideLabelHex = useTokenColor('on-primary-ultra-low');
+      const bgHex = useTokenColor(isDark ? 'surface/ultra-high' : 'surface/ultra-low');
+      const gridHex = useTokenColor(isDark ? 'on-surface/higher' : 'outline/-');
+      const axisLineHex = useTokenColor(isDark ? 'on-surface/higher' : 'outline/low');
+      const labelHex = useTokenColor(isDark ? 'surface/mid' : 'on-surface/-');
+      const strongTextHex = useTokenColor(isDark ? 'surface/ultra-low' : 'on-surface/highest');
+      const insideLabelHex = useTokenColor('on-primary/ultra-low');
 
       return { bgHex, gridHex, axisLineHex, labelHex, strongTextHex, insideLabelHex };
     }
@@ -852,13 +1083,36 @@
         },
         alternateBand: {
           visible: state.gridBand,
-          color:
-            state.surfaceMode === 'dark'
-              ? 'rgba(255, 255, 255, 0.04)'
-              : 'rgba(233, 236, 239, 0.35)',
+          color: useTokenColor(
+            state.surfaceMode === 'dark' ? 'overlay/white/lowest' : 'overlay/gray/-'
+          ),
         },
       };
       return { fontOpt, legendOpt, gridOpt };
+    }
+
+    function computeChartPadding() {
+      const basePad = state.paddingPx ?? 24;
+      const hasTopLegend = state.legendPos !== 'none' && state.legendPos.startsWith('top');
+      const hasBottomLegend = state.legendPos !== 'none' && state.legendPos.startsWith('bottom');
+      const hasLeftLegend = state.legendPos !== 'none' && state.legendPos.startsWith('left');
+      const hasRightLegend = state.legendPos !== 'none' && state.legendPos.startsWith('right');
+
+      if (state.chartType === 'pie' || state.chartType === 'funnel') {
+        return {
+          top: basePad + (hasTopLegend ? 20 : 4),
+          right: basePad + (hasRightLegend ? 96 : 8),
+          bottom: basePad + (hasBottomLegend ? 20 : 4),
+          left: basePad + (hasLeftLegend ? 96 : 8),
+        };
+      }
+
+      return {
+        top: basePad + (hasTopLegend ? 22 : 8),
+        right: basePad + (hasRightLegend ? 96 : 4),
+        bottom: basePad + (hasBottomLegend ? 26 : 16),
+        left: Math.max(36, basePad + 20) + (hasLeftLegend ? 88 : 0),
+      };
     }
 
     function renderPreview() {
@@ -869,9 +1123,11 @@
       containerEl.innerHTML = '';
       updateControlVisibility();
 
-      const { xLabels, singleData, multiSeries, palette } = parseInputData();
+      currentHexToTokenMap = {};
       const { bgHex, gridHex, axisLineHex, labelHex, strongTextHex, insideLabelHex } = getSurfaceTokens();
+      const { xLabels, singleData, multiSeries, palette } = parseInputData();
       const { fontOpt, legendOpt, gridOpt } = buildCommonOptions(strongTextHex, gridHex, axisLineHex);
+      const padOpt = computeChartPadding();
 
       chartBoxEl.style.background = bgHex;
       chartBoxEl.style.maxWidth = `${Math.min(540, Math.max(240, state.exportW))}px`;
@@ -891,8 +1147,9 @@
           data: isMulti ? undefined : singleData,
           series: isMulti ? multiSeries : undefined,
           xLabels: isMulti ? xLabels : undefined,
+          padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: true },
+          responsive: { enabled: false },
           bar: {
             mode,
             widthRatio: state.widthRatio,
@@ -904,6 +1161,7 @@
             visible: state.showLabels,
             position: mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside',
             color: mode === 'stacked' || mode === 'percent' ? insideLabelHex : strongTextHex,
+            offset: Math.max(4, Math.min(12, state.gapPx ?? 6)),
           },
           grid: gridOpt,
           xAxis: { labelColor: labelHex, color: axisLineHex },
@@ -919,8 +1177,9 @@
           series: isMulti ? multiSeries : undefined,
           xLabels: isMulti ? xLabels : undefined,
           stacked: isMulti && isStacked,
+          padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: true },
+          responsive: { enabled: false },
           line: {
             color: palette[0],
             width: 2.5,
@@ -941,6 +1200,7 @@
             visible: state.showLabels,
             position: 'top-outside',
             color: strongTextHex,
+            offset: Math.max(4, Math.min(14, state.gapPx ?? 8)),
           },
           grid: gridOpt,
           xAxis: { labelColor: labelHex, color: axisLineHex },
@@ -949,8 +1209,9 @@
       } else if (state.chartType === 'funnel') {
         activeChart = new FunnelChart(containerEl, {
           data: singleData,
+          padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: true },
+          responsive: { enabled: false },
           funnel: {
             direction: state.funnelDirection,
             shape: state.funnelShape,
@@ -971,8 +1232,9 @@
         const padRad = ((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180;
         activeChart = new PieChart(containerEl, {
           data: singleData,
+          padding: padOpt,
           font: fontOpt,
-          responsive: { enabled: true },
+          responsive: { enabled: false },
           pie: {
             innerRadiusRatio: state.holeRatio,
             padAngle: padRad,
@@ -1014,7 +1276,7 @@
         funnel: `NanoChart — Funnel (${state.funnelDirection})`,
       };
 
-          parent.postMessage(
+      parent.postMessage(
         {
           pluginMessage: {
             type: 'INSERT_SVG',
@@ -1023,6 +1285,9 @@
             replaceSelected,
             bindVariables: state.bindVariables,
             hexToTokenMap: currentHexToTokenMap,
+            radiusToken: state.radiusToken,
+            paddingToken: state.paddingToken,
+            gapToken: state.chartType === 'funnel' ? state.funnelGapToken || state.gapToken : state.gapToken,
             allTokens: DESIGN_TOKENS,
             state,
           },
@@ -1048,6 +1313,34 @@
 
     document.getElementById('theme-select').addEventListener('change', (e) => {
       state.theme = e.target.value;
+      if (state.theme !== 'custom' && TOKEN_PALETTES[state.theme]) {
+        state.customTokens = TOKEN_PALETTES[state.theme].slice(0, 6).join(', ');
+        document.getElementById('custom-tokens-input').value = state.customTokens;
+      }
+      renderPreview();
+    });
+
+    document.getElementById('custom-tokens-input').addEventListener('input', (e) => {
+      state.theme = 'custom';
+      state.customTokens = e.target.value;
+      document.getElementById('theme-select').value = 'custom';
+      renderPreview();
+    });
+
+    document.getElementById('project-var-select').addEventListener('change', (e) => {
+      const chosen = e.target.value;
+      if (!chosen) return;
+      const list = [...getActiveTokenList().slice(0, 6)];
+      if (selectedChipIndex >= 0 && selectedChipIndex < list.length) {
+        list[selectedChipIndex] = chosen;
+      } else {
+        list[0] = chosen;
+      }
+      state.theme = 'custom';
+      state.customTokens = list.join(', ');
+      document.getElementById('theme-select').value = 'custom';
+      document.getElementById('custom-tokens-input').value = state.customTokens;
+      e.target.value = '';
       renderPreview();
     });
 
@@ -1102,8 +1395,10 @@
       renderPreview();
     });
 
-    document.getElementById('radius-slider').addEventListener('input', (e) => {
-      state.radius = parseInt(e.target.value, 10);
+    document.getElementById('radius-token-select').addEventListener('change', (e) => {
+      const [tokenName, pxStr] = (e.target.value || 'rounded-md:6').split(':');
+      state.radiusToken = tokenName === 'none' ? '' : tokenName;
+      state.radius = parseInt(pxStr, 10) || 0;
       document.getElementById('radius-txt').innerText = `${state.radius}px`;
       renderPreview();
     });
@@ -1179,9 +1474,27 @@
       renderPreview();
     });
 
-    document.getElementById('funnel-gap-slider').addEventListener('input', (e) => {
-      state.funnelGap = parseInt(e.target.value, 10);
+    document.getElementById('funnel-gap-select').addEventListener('change', (e) => {
+      const [tokenName, pxStr] = (e.target.value || 'gap/gap-1:4').split(':');
+      state.funnelGapToken = tokenName === 'none' ? '' : tokenName;
+      state.funnelGap = parseInt(pxStr, 10) || 0;
       document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap}px`;
+      renderPreview();
+    });
+
+    document.getElementById('padding-token-select').addEventListener('change', (e) => {
+      const [tokenName, pxStr] = (e.target.value || 'padding/p-6:24').split(':');
+      state.paddingToken = tokenName;
+      state.paddingPx = parseInt(pxStr, 10) || 24;
+      document.getElementById('padding-txt').innerText = `${state.paddingPx}px`;
+      renderPreview();
+    });
+
+    document.getElementById('gap-token-select').addEventListener('change', (e) => {
+      const [tokenName, pxStr] = (e.target.value || 'gap/gap-2:8').split(':');
+      state.gapToken = tokenName;
+      state.gapPx = parseInt(pxStr, 10) || 8;
+      document.getElementById('gap-txt').innerText = `${state.gapPx}px`;
       renderPreview();
     });
 
@@ -1296,11 +1609,16 @@
 
       if (msg.type === 'PROJECT_VARIABLES_STATE') {
         projectTokenHexMap = msg.tokenHexMap || {};
+        projectTokenToVarNameMap = msg.tokenToVarNameMap || {};
+        projectVariablesList = msg.projectVariables || [];
+        populateProjectVariableControls();
         const varBadge = document.getElementById('var-status-badge');
         if (msg.matchedCount > 0) {
-          varBadge.innerText = `🔗 현재 프로젝트 변수 ${msg.matchedCount}개 감지됨 (자동 매핑)`;
+          const radText = msg.radiusMatchedCount > 0 ? ` · Radius ${msg.radiusMatchedCount}` : '';
+          const spText = msg.spacingMatchedCount > 0 ? ` · Spacing ${msg.spacingMatchedCount}` : '';
+          varBadge.innerText = `🔗 컬러 ${msg.matchedCount}${radText}${spText} 연결됨`;
         } else {
-          varBadge.innerText = `🔗 variables.scss 기본 토큰 사용 중`;
+          varBadge.innerText = `🔗 기본 토큰 (primary/-, rounded-md, p-6...) 사용 중`;
         }
         renderPreview();
       } else if (msg.type === 'SELECTION_SAVED_CHART') {
@@ -1317,13 +1635,20 @@
             b.classList.toggle('active', b.dataset.type === state.chartType);
           });
           document.getElementById('series-mode').value = state.seriesMode;
-          if (TOKEN_PALETTES[state.theme]) {
+          if (TOKEN_PALETTES[state.theme] || state.theme === 'custom') {
             document.getElementById('theme-select').value = state.theme;
+          }
+          if (state.customTokens) {
+            document.getElementById('custom-tokens-input').value = state.customTokens;
           }
           document.getElementById('surface-mode').value = state.surfaceMode || 'light';
           document.getElementById('series-names-input').value = state.seriesNames;
           document.getElementById('data-textarea').value = state.rawText;
-          document.getElementById('radius-slider').value = state.radius;
+          const radTokenVal = state.radius === 0 ? 'none:0' : `${state.radiusToken || 'rounded-md'}:${state.radius}`;
+          const radSelect = document.getElementById('radius-token-select');
+          if (radSelect) {
+            radSelect.value = radTokenVal;
+          }
           document.getElementById('radius-txt').innerText = `${state.radius}px`;
           document.getElementById('ratio-slider').value = Math.round(state.widthRatio * 100);
           document.getElementById('ratio-txt').innerText = `${Math.round(state.widthRatio * 100)}%`;
@@ -1341,8 +1666,23 @@
           document.getElementById('pie-pad-txt').innerText = `${restoredPadDeg}°`;
           document.getElementById('funnel-dir-select').value = state.funnelDirection || 'vertical';
           document.getElementById('funnel-shape-select').value = state.funnelShape || 'trapezoid';
-          document.getElementById('funnel-gap-slider').value = state.funnelGap ?? 4;
+          const funnelGapVal =
+            (state.funnelGap ?? 4) === 0
+              ? 'none:0'
+              : `${state.funnelGapToken || 'gap/gap-1'}:${state.funnelGap ?? 4}`;
+          const funnelGapEl = document.getElementById('funnel-gap-select');
+          if (funnelGapEl) funnelGapEl.value = funnelGapVal;
           document.getElementById('funnel-gap-txt').innerText = `${state.funnelGap ?? 4}px`;
+          const padSelectEl = document.getElementById('padding-token-select');
+          if (padSelectEl) {
+            padSelectEl.value = `${state.paddingToken || 'padding/p-6'}:${state.paddingPx ?? 24}`;
+          }
+          document.getElementById('padding-txt').innerText = `${state.paddingPx ?? 24}px`;
+          const gapSelectEl = document.getElementById('gap-token-select');
+          if (gapSelectEl) {
+            gapSelectEl.value = `${state.gapToken || 'gap/gap-2'}:${state.gapPx ?? 8}`;
+          }
+          document.getElementById('gap-txt').innerText = `${state.gapPx ?? 8}px`;
           document.getElementById('funnel-label-pos').value = state.funnelLabelPos || 'inside';
           document.getElementById('legend-pos-select').value = state.legendPos || 'top-right';
           document.getElementById('font-family-select').value = state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
@@ -1370,6 +1710,7 @@
       }
     };
 
+    populateProjectVariableControls();
     renderPreview();
   </script>
 </body>
