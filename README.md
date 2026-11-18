@@ -345,10 +345,8 @@ npm.cmd run build:figma
 # 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
 npm.cmd version patch --no-git-tag-version
 
-# 1단계: 라이브러리 + 피그마 번들 통합 빌드
+# 라이브러리 + 피그마 번들 통합 빌드
 npm.cmd run build:figma
-
-# 방법 B: 수동으로 커밋 메시지를 지정하여 푸시할 때
 git add .
 git commit -m "feat: 차트 기능 및 피그마 플러그인 업데이트"
 git push origin main

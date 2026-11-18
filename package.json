@@ -1,6 +1,6 @@
 {
   "name": "@ju9nu7/nanocharts",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "High-performance, ultra-lightweight, and designer-friendly Canvas chart library.",
   "type": "module",
   "main": "./dist/index.cjs",
