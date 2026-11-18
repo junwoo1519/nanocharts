@@ -356,6 +356,7 @@ git push origin main
 npm 레지스트리는 이미 배포된 버전 번호로 덮어쓰기를 허용하지 않으므로(`403 Forbidden` 방지), **반드시 버전을 먼저 올린 후 배포**합니다:
 
 ```bash
+npm.cmd login
 npm.cmd publish --access public
 ```
 
