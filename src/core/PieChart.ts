@@ -109,7 +109,7 @@ export class PieChart extends EventEmitter {
             return;
           }
           const sliceIdx = this.slices.findIndex(
-            (s) => this.getItemLegendKey(s.item, s.index) === legendItem.key
+            (s) => !s.isTrack && this.getItemLegendKey(s.item, s.index) === legendItem.key
           );
           if (sliceIdx !== -1) {
             this.hoveredIndex = sliceIdx;
@@ -353,6 +353,7 @@ export class PieChart extends EventEmitter {
 
     for (let i = 0; i < this.slices.length; i++) {
       const slice = this.slices[i];
+      if (slice.isTrack) continue;
       // 반지름 범위 검사 (도넛 구멍 안쪽이나 외곽 밖 제외, 팝아웃 여유 거리 포함)
       const currentRatio = this.hoverRatios[i] ?? 0;
       const extraRadius = (this.options.pie?.hoverExplode ?? 10) * currentRatio + 10;

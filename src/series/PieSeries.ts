@@ -82,10 +82,29 @@ export class PieSeries {
     height: number,
     padding: Padding
   ): PieSliceGeometry[] {
-    if (data.length === 0) return [];
+    if (data.length === 0 && !(this.styleOptions.maxValue && this.styleOptions.maxValue > 0)) {
+      return [];
+    }
 
-    const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
-    if (total <= 0) return [];
+    const dataTotal = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+    const configuredMax =
+      this.styleOptions.maxValue ??
+      (this.styleOptions.trackColor && dataTotal < 100 ? 100 : undefined);
+    const baseTotal =
+      configuredMax !== undefined && configuredMax > 0
+        ? Math.max(dataTotal, configuredMax)
+        : dataTotal;
+    if (baseTotal <= 0) return [];
+
+    const remainingValue = Math.max(0, baseTotal - dataTotal);
+    const rawTrackColor =
+      this.styleOptions.trackColor ??
+      (configuredMax !== undefined && configuredMax > 0 ? 'var(--surface-low)' : undefined);
+    const hasTrackSlice =
+      remainingValue > baseTotal * 0.0005 &&
+      Boolean(rawTrackColor) &&
+      rawTrackColor !== 'transparent' &&
+      rawTrackColor !== 'none';
 
     const availableWidth = width - padding.left - padding.right;
     const availableHeight = height - padding.top - padding.bottom;
@@ -107,16 +126,19 @@ export class PieSeries {
     let currentAngle = -Math.PI / 2;
     const defaultPadAngle = innerRatio > 0.001 ? 0.02 : 0;
     const rawPadAngle = this.styleOptions.padAngle ?? defaultPadAngle;
-    const padAngle = data.length > 1 ? Math.max(0, rawPadAngle) : 0;
+    const activeSliceCount = data.filter((item) => item.value > 0).length;
+    const segmentCount = activeSliceCount + (hasTrackSlice ? 1 : 0);
+    const padAngle = segmentCount > 1 ? Math.max(0, rawPadAngle) : 0;
     const slices: PieSliceGeometry[] = [];
 
     data.forEach((item, index) => {
       const val = Math.max(0, item.value);
-      const percentage = val / total;
+      const percentage = val / baseTotal;
       const sweepAngle = percentage * 2 * Math.PI;
+      const slicePad = sweepAngle > 0 ? Math.min(padAngle, sweepAngle * 0.8) : 0;
 
-      const startAngle = currentAngle + padAngle / 2;
-      const endAngle = currentAngle + sweepAngle - padAngle / 2;
+      const startAngle = currentAngle + slicePad / 2;
+      const endAngle = currentAngle + sweepAngle - slicePad / 2;
       const midAngle = currentAngle + sweepAngle / 2;
 
       // 색상 결정
@@ -138,6 +160,30 @@ export class PieSeries {
 
       currentAngle += sweepAngle;
     });
+
+    if (hasTrackSlice && rawTrackColor) {
+      const trackPercentage = remainingValue / baseTotal;
+      const trackSweepAngle = trackPercentage * 2 * Math.PI;
+      const trackPad = trackSweepAngle > 0 ? Math.min(padAngle, trackSweepAngle * 0.8) : 0;
+
+      slices.push({
+        startAngle: currentAngle + trackPad / 2,
+        endAngle: currentAngle + trackSweepAngle - trackPad / 2,
+        midAngle: currentAngle + trackSweepAngle / 2,
+        innerRadius,
+        outerRadius,
+        percentage: trackPercentage,
+        cx,
+        cy,
+        color: resolveTokenColor(rawTrackColor),
+        item: {
+          label: 'Track',
+          value: Number(remainingValue.toFixed(2)),
+        },
+        index: data.length,
+        isTrack: true,
+      });
+    }
 
     return slices;
   }
@@ -165,7 +211,7 @@ export class PieSeries {
     const radiusScale = progress >= 1 ? 1 : 0.85 + 0.15 * progress;
 
     const resolveHoverRatio = (index: number): number => {
-      if (progress < 1) return 0;
+      if (progress < 1 || slices[index]?.isTrack) return 0;
       if (Array.isArray(hoverState)) return hoverState[index] ?? 0;
       return hoverState === index ? 1 : 0;
     };
@@ -318,13 +364,20 @@ export class PieSeries {
       return;
     }
 
-    const data = slices.map((s) => s.item);
+    const data = slices.filter((s) => !s.isTrack).map((s) => s.item);
     const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+    const configuredMax =
+      this.styleOptions.maxValue ??
+      (this.styleOptions.trackColor && total < 100 ? 100 : undefined);
+    const defaultTitle =
+      configuredMax && configuredMax > 0
+        ? `${Math.round((total / Math.max(total, configuredMax)) * 100)}%`
+        : total.toLocaleString();
 
     const titleText =
       typeof opts?.title === 'function'
         ? opts.title(data, total)
-        : opts?.title || total.toLocaleString();
+        : opts?.title || defaultTitle;
 
     const subtitleText =
       typeof opts?.subtitle === 'function'
@@ -363,8 +416,8 @@ export class PieSeries {
     ctx.font = opts.font || '600 11px Pretendard, -apple-system, sans-serif';
 
     slices.forEach((slice, idx) => {
-      // 5% 미만의 너무 작은 조각은 라벨 겹침 방지를 위해 스킵
-      if (slice.percentage < 0.04) return;
+      // 배경 트랙 조각이거나 4% 미만의 너무 작은 조각은 라벨 겹침 방지를 위해 스킵
+      if (slice.isTrack || slice.percentage < 0.04) return;
 
       const hoverRatio = resolveHoverRatio ? resolveHoverRatio(idx) : 0;
       const explodeDist = (this.styleOptions.hoverExplode ?? 10) * hoverRatio;
@@ -453,15 +506,20 @@ export class PieSeries {
       );
       if (!pathD) return;
       const parsedFill = parseSvgColor(slice.color);
+      const fillOpacityAttr =
+        parsedFill.opacity < 0.999 ? ` fill-opacity="${fmt(parsedFill.opacity)}"` : '';
       const pctText = `${(slice.percentage * 100).toFixed(1)}%`;
       // padAngle이 0이고 별도 border가 없을 때는 조각 경계 안티앨리어싱 실금을 막기 위해 0.5px 동색 stroke 부여
       const sliceStrokeAttr =
         customStrokeAttr ||
-        (effectivePad <= 0.0005
+        (effectivePad <= 0.0005 && parsedFill.opacity >= 0.999
           ? ` stroke="${escapeXml(parsedFill.color)}" stroke-width="0.5" stroke-linejoin="round"`
           : '');
+      const sliceId = slice.isTrack
+        ? `Slice: Track (${pctText})`
+        : `Slice: ${escapeXml(slice.item.label)} (${pctText})`;
       sliceEls.push(
-        `<path id="Slice: ${escapeXml(slice.item.label)} (${pctText})" d="${pathD}" fill="${escapeXml(parsedFill.color)}"${sliceStrokeAttr} />`
+        `<path id="${sliceId}" d="${pathD}" fill="${escapeXml(parsedFill.color)}"${fillOpacityAttr}${sliceStrokeAttr} />`
       );
     });
 
@@ -473,16 +531,23 @@ export class PieSeries {
     // 도넛 중앙 텍스트
     if (slices[0] && slices[0].innerRadius > 15) {
       const { cx, cy } = slices[0];
-      const data = slices.map((s) => s.item);
+      const data = slices.filter((s) => !s.isTrack).map((s) => s.item);
       const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
       const opts = this.centerOptions;
+      const configuredMax =
+        this.styleOptions.maxValue ??
+        (this.styleOptions.trackColor && total < 100 ? 100 : undefined);
+      const defaultTitle =
+        configuredMax && configuredMax > 0
+          ? `${Math.round((total / Math.max(total, configuredMax)) * 100)}%`
+          : total.toLocaleString();
 
       const titleText =
         typeof opts?.title === 'function'
           ? opts.title(data, total)
           : opts?.title !== undefined
             ? opts.title
-            : total.toLocaleString();
+            : defaultTitle;
 
       const subtitleText =
         typeof opts?.subtitle === 'function'
@@ -530,7 +595,7 @@ export class PieSeries {
     if (lOpts?.visible && lOpts.position !== 'none') {
       const font = lOpts.font || '600 11px Pretendard, sans-serif';
       slices.forEach((slice) => {
-        if (slice.percentage < 0.04) return;
+        if (slice.isTrack || slice.percentage < 0.04) return;
         const { midAngle, innerRadius, outerRadius, cx, cy, item, percentage } = slice;
         const text = lOpts.formatter
           ? lOpts.formatter(item, percentage)

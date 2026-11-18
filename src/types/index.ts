@@ -601,6 +601,8 @@ export interface PieSliceGeometry {
   item: DataItem;
   /** 원본 데이터 인덱스 */
   index: number;
+  /** 잔여 비율을 채우는 배경 트랙 조각 여부 (`true`인 경우 호버/툴팁/라벨 제외) */
+  isTrack?: boolean;
 }
 
 /**
@@ -612,6 +614,29 @@ export interface PieStyleOptions {
    * 예: 0.6으로 설정하면 가운데가 뚫린 세련된 도넛 차트가 됩니다.
    */
   innerRadiusRatio?: number;
+  /**
+   * 전체 100%(360도) 기준이 되는 목표 최대값 (선택)
+   * - 미지정 시: 전달된 `data` 값들의 합계(`total`)를 100%로 계산합니다 (기본 동작).
+   * - 지정 시 (예: `maxValue: 100`): 각 데이터가 `item.value / maxValue` 비율만큼만 영역을 차지하고,
+   *   남는 비율(예: 데이터 합이 56이면 나머지 44%)은 `trackColor`(배경 트랙 색상)로 채웁니다.
+   *
+   * @example
+   * ```ts
+   * pie: {
+   *   innerRadiusRatio: 0.65,
+   *   maxValue: 100,
+   *   trackColor: 'var(--surface-low)' // 데이터 합이 56이면 나머지 44%를 배경색으로 채움
+   * }
+   * ```
+   */
+  maxValue?: number;
+  /**
+   * `maxValue` 대비 데이터가 채우지 못한 나머지 빈 영역을 채울 배경 트랙 색상 (선택)
+   * - CSS 변수(`'var(--surface-low)'`, `'var(--outline-lower)'`) 또는 Hex/RGB 색상 지원
+   * - `maxValue`를 생략하고 `trackColor`만 지정한 경우, 데이터 합계가 100 미만이면 자동으로 `maxValue: 100` 기준으로 동작합니다.
+   * - 기본값: `'var(--surface-low)'` (`'transparent'` 또는 `'none'` 지정 시 빈 영역 미표시)
+   */
+  trackColor?: string;
   /** 조각들 사이의 빈 여백 각도 (라디안, 기본값: 0.02) */
   padAngle?: number;
   /** 파이 조각 외곽 모서리 둥글기 (px, 기본값: 0) */
