@@ -4,7 +4,13 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
-  "editorType": ["figma"],
+  "editorType": ["figma", "dev"],
+  "capabilities": ["codegen"],
+  "codegenLanguages": [
+    { "label": "NanoCharts (React + Tailwind)", "value": "react-tailwind" },
+    { "label": "NanoCharts (Vanilla TS)", "value": "vanilla-ts" },
+    { "label": "NanoCharts (Options)", "value": "options" }
+  ],
   "networkAccess": {
     "allowedDomains": [
       "https://raw.githubusercontent.com",
@@ -13,5 +19,9 @@
     ],
     "reasoning": "Fetches the latest NanoCharts plugin bundle and design tokens automatically from GitHub (junwoo1519/nanocharts) and jsDelivr CDN."
   },
-  "documentAccess": "dynamic-page"
+  "documentAccess": "dynamic-page",
+  "relaunchButtons": [
+    { "command": "open", "name": "NanoCharts 열기" },
+    { "command": "edit", "name": "차트 편집" }
+  ]
 }

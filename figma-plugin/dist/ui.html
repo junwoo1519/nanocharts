@@ -24,8 +24,8 @@
       width: 400px;
       min-width: 320px;
       max-width: 580px;
-      background: #0B0F19;
-      border-right: 1px solid #1E293B;
+      background: #111622;
+      border-right: 1px solid #232D3F;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -45,9 +45,9 @@
       background: rgba(56, 189, 248, 0.35);
     }
     .sidebar-header {
-      padding: 13px 16px;
-      background: #111827;
-      border-bottom: 1px solid #1E293B;
+      padding: 13px 18px;
+      background: #111622;
+      border-bottom: 1px solid #232D3F;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -70,91 +70,96 @@
       font-weight: 600;
     }
     .sidebar-body {
-      padding: 12px 14px 32px 14px;
+      padding: 0 0 28px 0;
       overflow-y: scroll;
       overflow-x: hidden;
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0;
     }
     .sidebar-body > * {
       flex-shrink: 0;
     }
     .sidebar-body::-webkit-scrollbar {
-      width: 8px;
+      width: 7px;
     }
     .sidebar-body::-webkit-scrollbar-track {
-      background: #0B0F19;
+      background: #111622;
     }
     .sidebar-body::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: #2C384E;
       border-radius: 4px;
     }
     .sidebar-body::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+      background: #435370;
     }
-    /* 카테고리 섹션 카드 & 헤더 */
+    /* 카테고리 섹션 (선 기반 영역 구분 — 플랫 인스펙터 스타일) */
     .option-card {
-      background: #111827;
-      border: 1px solid #1E293B;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #232D3F;
+      border-radius: 0;
+      overflow: visible;
+      box-shadow: none;
+      padding: 16px 18px;
+    }
+    .option-card:last-child {
+      border-bottom: none;
     }
     .section-header {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      padding: 8px 12px;
-      background: linear-gradient(90deg, #162033 0%, #111827 100%);
-      border-bottom: 1px solid #1E293B;
-      border-left: 3px solid #3B82F6;
+      padding: 0;
+      margin-bottom: 12px;
+      background: transparent;
+      border: none;
     }
     .section-title {
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-size: 12px;
+      gap: 6px;
+      font-size: 12.5px;
       font-weight: 700;
       color: #F8FAFC;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
     }
     .section-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 20px;
-      height: 18px;
-      padding: 0 5px;
-      border-radius: 4px;
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      min-width: auto;
+      height: auto;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      border: none;
       color: #60A5FA;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       font-family: 'JetBrains Mono', Consolas, monospace;
     }
     .section-sub {
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 10.5px;
+      font-weight: 500;
       color: #64748B;
-      background: #0B0F19;
-      border: 1px solid #1E293B;
-      padding: 2px 6px;
-      border-radius: 4px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
     }
     .section-body {
-      padding: 12px;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 11px;
     }
     .sub-divider {
       height: 1px;
-      background: #1E293B;
-      margin: 2px 0;
+      background: #1F293B;
+      margin: 4px 0;
     }
     /* 폼 필드 & 라벨 정렬 */
     .field {
@@ -164,10 +169,10 @@
       min-width: 0;
     }
     .field > label {
-      min-height: 18px;
+      min-height: 16px;
       font-size: 11px;
       font-weight: 600;
-      color: #CBD5E1;
+      color: #A8B6CA;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -176,32 +181,32 @@
     }
     .val-badge {
       font-family: 'JetBrains Mono', Consolas, monospace;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      color: #93C5FD;
-      background: rgba(34, 108, 255, 0.16);
-      border: 1px solid rgba(59, 130, 246, 0.32);
-      padding: 1px 6px;
-      border-radius: 4px;
+      color: #60A5FA;
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
       line-height: 1.3;
     }
     .seg-group {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      background: #0B0F19;
+      gap: 3px;
+      background: #182032;
       padding: 3px;
-      border-radius: 7px;
-      border: 1px solid #1E293B;
+      border-radius: 6px;
+      border: 1px solid #2A364F;
     }
     .seg-group-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-      background: #0B0F19;
+      gap: 3px;
+      background: #182032;
       padding: 3px;
-      border-radius: 7px;
-      border: 1px solid #1E293B;
+      border-radius: 6px;
+      border: 1px solid #2A364F;
     }
     .seg-btn {
       background: transparent;
@@ -210,41 +215,45 @@
       padding: 6px 4px;
       font-size: 11px;
       font-weight: 600;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
       transition: all 0.12s;
     }
     .seg-btn:hover {
       color: #F8FAFC;
+      background: rgba(255, 255, 255, 0.04);
     }
     .seg-btn.active {
       background: #226CFF;
       color: #FFFFFF;
-      box-shadow: 0 1px 4px rgba(34, 108, 255, 0.4);
+      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.35);
     }
     select, input[type="text"], input[type="number"] {
       width: 100%;
       height: 32px;
-      background: #0B0F19;
+      background: #182032;
       color: #F8FAFC;
-      border: 1px solid #26334D;
+      border: 1px solid #2A364F;
       border-radius: 6px;
-      padding: 0 8px;
+      padding: 0 9px;
       font-size: 11.5px;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.12s;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    select:hover, input[type="text"]:hover, input[type="number"]:hover, textarea:hover {
+      border-color: #3D4E6E;
     }
     textarea {
       width: 100%;
-      background: #0B0F19;
+      background: #182032;
       color: #F8FAFC;
-      border: 1px solid #26334D;
+      border: 1px solid #2A364F;
       border-radius: 6px;
-      padding: 7px 9px;
+      padding: 8px 10px;
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 11px;
-      line-height: 1.48;
+      line-height: 1.5;
       resize: vertical;
       min-height: 82px;
       outline: none;
@@ -252,26 +261,27 @@
     }
     select:focus, input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
       border-color: #3B82F6;
+      background: #1B253A;
     }
     .row-2 {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 8px;
+      gap: 10px;
       align-items: start;
     }
     .row-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
+      gap: 8px;
       align-items: start;
     }
-    /* 슬라이더 래퍼: 좌측 select(32px)와 수평 라인 100% 일치 */
+    /* 슬라이더 래퍼: 좌측 select(32px)와 수평 라인 일치, 불필요한 박스 테두리 제거 */
     .slider-box {
       height: 32px;
-      background: #0B0F19;
-      border: 1px solid #26334D;
-      border-radius: 6px;
-      padding: 0 8px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0 2px;
       display: flex;
       align-items: center;
     }
@@ -282,26 +292,26 @@
       cursor: ew-resize;
       margin: 0;
     }
-    /* 체크박스 토글 카드: 2열 그리드 정렬 통일 */
+    /* 체크박스 토글 행: 박스 테두리 제거, 깔끔한 플랫 행 */
     .checkbox-row {
-      height: 32px;
-      background: #0B0F19;
-      border: 1px solid #26334D;
-      border-radius: 6px;
-      padding: 0 10px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      padding: 0 4px;
       display: flex;
       align-items: center;
       gap: 7px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 500;
-      color: #E2E8F0;
+      color: #CBD5E1;
       cursor: pointer;
       user-select: none;
-      transition: border-color 0.12s, background 0.12s;
+      transition: background 0.12s, color 0.12s;
     }
     .checkbox-row:hover {
-      border-color: #3B82F6;
-      background: #131C2E;
+      background: rgba(148, 163, 184, 0.09);
+      color: #F8FAFC;
     }
     .checkbox-row input[type="checkbox"] {
       accent-color: #3B82F6;
@@ -311,28 +321,29 @@
       flex-shrink: 0;
     }
     .token-box {
-      background: #0B0F19;
-      border: 1px solid #26334D;
-      border-radius: 8px;
-      padding: 9px 10px;
+      background: transparent;
+      border: none;
+      border-top: 1px solid #1F293B;
+      border-radius: 0;
+      padding: 10px 0 0 0;
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 8px;
     }
     .token-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px;
+      gap: 5px;
     }
     .token-chip {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 10px;
+      gap: 5px;
+      font-size: 10.5px;
       font-family: 'JetBrains Mono', Consolas, monospace;
-      background: #151C2C;
-      border: 1px solid #263147;
-      padding: 2px 6px;
+      background: #182032;
+      border: 1px solid #2A364F;
+      padding: 3px 7px;
       border-radius: 4px;
       color: #CBD5E1;
       cursor: pointer;
@@ -343,8 +354,8 @@
       color: #FFFFFF;
     }
     .token-chip.selected {
-      border-color: #226CFF;
-      background: rgba(34, 108, 255, 0.22);
+      border-color: #3B82F6;
+      background: rgba(34, 108, 255, 0.24);
       color: #FFFFFF;
     }
     .token-dot {
@@ -354,18 +365,20 @@
       display: inline-block;
     }
     .btn-mini {
-      background: #1E293B;
+      background: #1C263B;
       color: #93C5FD;
-      border: 1px solid #334155;
+      border: 1px solid #2E3D59;
       border-radius: 5px;
-      padding: 3px 7px;
-      font-size: 10px;
+      padding: 3px 8px;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.12s;
     }
     .btn-mini:hover {
-      background: #334155;
+      background: #273552;
       color: #FFFFFF;
+      border-color: #4B628C;
     }
     /* 우측 프리뷰 & 액션 영역 */
     .main-area {
@@ -1212,7 +1225,7 @@
   </div>
 
   <script type="module">
-    const NANOCHARTS_BUILD_META = {"version":"0.1.14","buildId":"0.1.14-1794985508675","buildTime":1794985508675,"builtAt":"2026-11-18T07:05:08.675Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+    const NANOCHARTS_BUILD_META = {"version":"0.1.15","buildId":"0.1.15-1795510409167","buildTime":1795510409167,"builtAt":"2026-11-24T08:53:29.167Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 
 var Le = Object.defineProperty;
 var Ie = (u, t, e) => t in u ? Le(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;

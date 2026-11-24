@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.14","buildId":"0.1.14-1794985508675","buildTime":1794985508675,"builtAt":"2026-11-18T07:05:08.675Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.15","buildId":"0.1.15-1795510409167","buildTime":1795510409167,"builtAt":"2026-11-24T08:53:29.167Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -148,6 +148,15 @@ async function bootPluginUiAsync() {
     catch (_a) {
         // clientStorage 접근 실패 시 기본 내장 __html__ 사용
     }
+    // 피그마 오른쪽 「도구(Tools)」 패널에 플러그인 빠른 실행 버튼 등록
+    try {
+        if (figma.root && typeof figma.root.setRelaunchData === 'function') {
+            figma.root.setRelaunchData({ open: '벡터 차트 생성 및 디자인 토큰 바인딩' });
+        }
+    }
+    catch (_b) {
+        // 문서 권한 또는 dynamic-page 제약 시 무시
+    }
     figma.showUI(uiHtmlToLoad, {
         width: currentPluginWidth,
         height: currentPluginHeight,
@@ -156,7 +165,393 @@ async function bootPluginUiAsync() {
     notifySelectionState();
     notifyProjectVariables();
 }
-bootPluginUiAsync();
+const IS_DEV_CODEGEN_MODE = typeof figma !== 'undefined' && figma.editorType === 'dev' && figma.mode === 'codegen';
+if (IS_DEV_CODEGEN_MODE) {
+    registerDevModeCodegen();
+}
+else {
+    bootPluginUiAsync();
+}
+const CODEGEN_TOKEN_PALETTES = {
+    'weseed-categorical': [
+        'primary/-',
+        'teal/-',
+        'indigo/-',
+        'amber/-',
+        'pink/-',
+        'cyan/-',
+        'orange/-',
+        'red/-',
+    ],
+    'weseed-primary-scale': [
+        'primary/-',
+        'primary/high',
+        'primary/mid',
+        'primary/low',
+        'primary/lower',
+        'primary/lowest',
+    ],
+    'weseed-palette-scale': [
+        'Primary/500',
+        'Primary/400',
+        'Primary/300',
+        'Primary/200',
+        'Primary/100',
+        'Primary/50',
+    ],
+    'weseed-cool': ['blue/-', 'sky/-', 'cyan/-', 'teal/-', 'indigo/-', 'purple/-'],
+    'weseed-warm': ['red/-', 'orange/-', 'amber/-', 'yellow/-', 'pink/-', 'violet/-'],
+};
+/**
+ * 선택된 노드 또는 상위 부모 노드 중 NanoCharts 메타데이터(`nanocharts-state`)를 가진 차트 프레임을 찾습니다.
+ */
+function findNanoChartAncestorNode(node) {
+    let cur = node;
+    while (cur) {
+        if (typeof cur.getPluginData === 'function') {
+            const raw = cur.getPluginData(PLUGIN_DATA_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        return { chartNode: cur, state: parsed };
+                    }
+                }
+                catch (_a) {
+                    // JSON 파싱 실패 시 상위 탐색 계속
+                }
+            }
+        }
+        cur = cur.parent;
+    }
+    return null;
+}
+/**
+ * 피그마 변수명을 CSS 변수 문자열(`var(--token)`)로 변환합니다.
+ */
+function toCssVarTokenForCodegen(rawToken) {
+    const trimmed = (rawToken || '').trim();
+    if (!trimmed)
+        return 'var(--primary)';
+    if (trimmed.startsWith('#') || trimmed.startsWith('rgb') || trimmed.startsWith('var(')) {
+        return trimmed;
+    }
+    return `var(--${normalizeTokenKey(trimmed)})`;
+}
+/**
+ * 저장된 차트 상태의 `rawText`와 `seriesNames`를 파싱하여 코드 생성용 데이터 구조로 변환합니다.
+ */
+function parseSavedDataForCodegen(state) {
+    const rawText = String(state.rawText || '');
+    const lines = rawText
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+    const seriesNames = String(state.seriesNames || 'Series 1, Series 2, Series 3')
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    const xLabels = [];
+    const rows = [];
+    let maxCols = 1;
+    for (const line of lines) {
+        const colonIdx = line.indexOf(':');
+        const label = colonIdx >= 0 ? line.slice(0, colonIdx).trim() : `항목 ${xLabels.length + 1}`;
+        const rest = colonIdx >= 0 ? line.slice(colonIdx + 1) : line;
+        const nums = rest
+            .split(',')
+            .map((v) => parseFloat(v.trim()))
+            .filter((n) => !Number.isNaN(n));
+        if (nums.length > 0) {
+            xLabels.push(label);
+            rows.push(nums);
+            if (nums.length > maxCols)
+                maxCols = nums.length;
+        }
+    }
+    if (xLabels.length === 0) {
+        return {
+            xLabels: ['1월', '2월', '3월'],
+            singleData: [
+                { label: '1월', value: 120 },
+                { label: '2월', value: 155 },
+                { label: '3월', value: 190 },
+            ],
+            multiSeries: [{ name: seriesNames[0] || 'Series 1', data: [120, 155, 190] }],
+        };
+    }
+    const singleData = xLabels.map((label, i) => {
+        var _a;
+        return ({
+            label,
+            value: (_a = rows[i][0]) !== null && _a !== void 0 ? _a : 0,
+        });
+    });
+    const multiSeries = [];
+    for (let c = 0; c < maxCols; c++) {
+        multiSeries.push({
+            name: seriesNames[c] || `Series ${c + 1}`,
+            data: rows.map((r) => { var _a; return (_a = r[c]) !== null && _a !== void 0 ? _a : 0; }),
+        });
+    }
+    return { xLabels, singleData, multiSeries };
+}
+/**
+ * 저장된 상태의 범례 위치·여백 설정을 기반으로 차트 padding 객체를 계산합니다.
+ */
+function computePaddingForCodegen(state) {
+    const basePad = typeof state.paddingPx === 'number' ? state.paddingPx : 24;
+    const legendPos = String(state.legendPos || 'top-right');
+    const isCompact = (state.exportW || 640) < 420;
+    const hasLegend = legendPos !== 'none';
+    const isPieOrFunnel = state.chartType === 'pie' || state.chartType === 'funnel';
+    let top = Math.max(16, basePad + (hasLegend && legendPos.startsWith('top') ? 22 : 6));
+    let right = Math.max(16, basePad + (hasLegend && legendPos.startsWith('right') ? 88 : 0));
+    let bottom = Math.max(isPieOrFunnel ? 18 : 34, basePad + (hasLegend && legendPos.startsWith('bottom') ? 28 : isPieOrFunnel ? 0 : 12));
+    let left = Math.max(isPieOrFunnel ? 16 : isCompact ? 34 : 44, basePad + (hasLegend && legendPos.startsWith('left') ? 88 : isPieOrFunnel ? 0 : 18));
+    if (isCompact) {
+        top = Math.round(top * 0.85);
+        right = Math.round(right * 0.85);
+    }
+    return { top, right, bottom, left };
+}
+/**
+ * Dev Mode Codegen용 코드 블록(React+Tailwind / Vanilla TS / Options)을 생성합니다.
+ */
+function generateDevModeCodeBlocks(rawState, chartNode, language) {
+    var _a, _b, _c;
+    const liveW = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.width) || rawState.exportW || 640);
+    const liveH = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.height) || rawState.exportH || 400);
+    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
+    const { xLabels, singleData, multiSeries } = parseSavedDataForCodegen(state);
+    const tokenList = state.theme === 'custom' && state.customTokens
+        ? String(state.customTokens)
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : CODEGEN_TOKEN_PALETTES[state.theme] || CODEGEN_TOKEN_PALETTES['weseed-categorical'];
+    const safeTokens = tokenList.length > 0 ? tokenList : CODEGEN_TOKEN_PALETTES['weseed-categorical'];
+    const cssTokens = safeTokens.map((t) => toCssVarTokenForCodegen(t));
+    const isDark = state.surfaceMode === 'dark';
+    const bgToken = toCssVarTokenForCodegen(isDark ? 'surface/ultra-high' : 'surface/ultra-low');
+    const gridToken = toCssVarTokenForCodegen(isDark ? 'on-surface/higher' : 'outline/-');
+    const axisLineToken = toCssVarTokenForCodegen(isDark ? 'on-surface/higher' : 'outline/low');
+    const labelToken = toCssVarTokenForCodegen(isDark ? 'surface/mid' : 'on-surface/-');
+    const strongTextToken = toCssVarTokenForCodegen(isDark ? 'surface/ultra-low' : 'on-surface/highest');
+    const insideLabelToken = toCssVarTokenForCodegen('on-primary/ultra-low');
+    const bandToken = toCssVarTokenForCodegen(isDark ? 'overlay/white/lowest' : 'overlay/gray/-');
+    const padOpt = computePaddingForCodegen(state);
+    const fontFamily = state.fontFamilyPreset === 'custom' && state.customFontFamily
+        ? state.customFontFamily
+        : state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
+    const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
+    const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+    const dataCode = singleData
+        .map((d, idx) => {
+        const tok = isEachColored ? cssTokens[idx % cssTokens.length] : cssTokens[0];
+        const figmaVar = isEachColored ? safeTokens[idx % safeTokens.length] : safeTokens[0];
+        return `    { label: ${JSON.stringify(d.label)}, value: ${d.value}, color: '${tok}' }, // ${figmaVar}`;
+    })
+        .join('\n');
+    const seriesCode = multiSeries
+        .map((s, idx) => {
+        const tok = cssTokens[idx % cssTokens.length];
+        const figmaVar = safeTokens[idx % safeTokens.length];
+        return `    {\n      name: ${JSON.stringify(s.name)},\n      data: ${JSON.stringify(s.data)},\n      color: '${tok}', // ${figmaVar}\n    },`;
+    })
+        .join('\n');
+    const legendCode = state.legendPos === 'none'
+        ? `  legend: false,`
+        : `  legend: {\n    visible: true,\n    position: '${state.legendPos}',\n    textColor: '${strongTextToken}',\n    fontFamily: ${JSON.stringify(fontFamily)},\n    fontSize: ${state.fontSize + 1},\n    fontWeight: '${state.fontWeight}',\n  },`;
+    const gridCode = `  grid: {\n    y: { visible: ${state.gridY}, color: '${gridToken}', lineWidth: ${state.gridWidth}, style: '${state.gridStyle}' },\n    x: { visible: ${state.gridX}, color: '${gridToken}', lineWidth: ${state.gridWidth}, style: '${state.gridStyle}' },\n    border: { visible: ${state.gridBorder}, color: '${axisLineToken}', lineWidth: ${state.gridWidth} },\n    alternateBand: { visible: ${state.gridBand}, color: '${bandToken}' },\n  },`;
+    let className = 'BarChart';
+    const optionsLines = [];
+    optionsLines.push(`{`);
+    optionsLines.push(`  // 📐 피그마 프레임 기준 크기: ${liveW} × ${liveH}px`);
+    optionsLines.push(`  responsive: { enabled: true },`);
+    optionsLines.push(`  padding: { top: ${padOpt.top}, right: ${padOpt.right}, bottom: ${padOpt.bottom}, left: ${padOpt.left} }, // ${state.paddingToken} (${state.paddingPx}px)`);
+    optionsLines.push(`  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`);
+    if (state.chartType === 'bar') {
+        className = 'BarChart';
+        const mode = state.seriesMode === 'stacked' ? 'stacked' : state.seriesMode === 'percent' ? 'percent' : 'grouped';
+        const labelOffset = Math.max(4, Math.min(12, (_a = state.gapPx) !== null && _a !== void 0 ? _a : 6));
+        if (isMulti) {
+            optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
+            optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
+        }
+        else {
+            optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        }
+        optionsLines.push(`  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`);
+        optionsLines.push(legendCode);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: '${mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside'}',\n    color: '${mode === 'stacked' || mode === 'percent' ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffset},\n  },`);
+        optionsLines.push(gridCode);
+        optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
+        optionsLines.push(mode === 'percent'
+            ? `  yAxis: { labelColor: '${labelToken}', formatter: (v) => \`\${v}%\` },`
+            : `  yAxis: { labelColor: '${labelToken}' },`);
+    }
+    else if (state.chartType === 'line') {
+        className = 'LineChart';
+        const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
+        const labelOffset = Math.max(4, Math.min(14, (_b = state.gapPx) !== null && _b !== void 0 ? _b : 8));
+        if (isMulti) {
+            optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
+            optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
+            optionsLines.push(`  stacked: ${isStacked},`);
+        }
+        else {
+            optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        }
+        optionsLines.push(`  line: {\n    color: '${cssTokens[0]}', // ${safeTokens[0]}\n    width: 2.5,\n    curve: '${state.curve}',\n  },`);
+        optionsLines.push(`  points: {\n    fill: '${bgToken}',\n  },`);
+        optionsLines.push(`  area: {\n    visible: true,\n    topOpacity: ${state.areaTopOpacity},\n    bottomOpacity: 0.02,\n    saturationDelta: ${state.areaSatDelta},\n    lightnessDelta: ${state.areaLightDelta},\n  },`);
+        optionsLines.push(legendCode);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: 'top-outside',\n    color: '${strongTextToken}',\n    offset: ${labelOffset},\n  },`);
+        optionsLines.push(gridCode);
+        optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
+        optionsLines.push(`  yAxis: { labelColor: '${labelToken}' },`);
+    }
+    else if (state.chartType === 'funnel') {
+        className = 'FunnelChart';
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(`  funnel: {\n    direction: '${state.funnelDirection}',\n    shape: '${state.funnelShape}',\n    gap: ${state.funnelGap},\n    borderRadius: ${state.radius},\n    colors: ${JSON.stringify(cssTokens)},\n    showConversion: true,\n  },`);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`);
+        optionsLines.push(legendCode);
+    }
+    else {
+        className = 'PieChart';
+        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const padRad = Number(((((_c = state.piePadDeg) !== null && _c !== void 0 ? _c : defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
+        const resolvedTrackToken = state.pieTrackToken && state.pieTrackToken !== 'auto'
+            ? state.pieTrackToken
+            : isDark
+                ? 'surface/high'
+                : 'surface/low';
+        const trackCssToken = toCssVarTokenForCodegen(resolvedTrackToken);
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(maxVal
+            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`);
+        if (state.holeRatio >= 0.35) {
+            optionsLines.push(maxVal
+                ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
+                : `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`);
+        }
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`);
+        optionsLines.push(legendCode);
+    }
+    optionsLines.push(`}`);
+    const optionsBlock = optionsLines.join('\n');
+    if (language === 'options') {
+        return [
+            {
+                title: `${className} 옵션 (${liveW} × ${liveH}px)`,
+                language: 'TYPESCRIPT',
+                code: optionsBlock,
+            },
+        ];
+    }
+    if (language === 'vanilla-ts') {
+        const vanillaCode = [
+            `import { ${className} } from '@ju9nu7/nanocharts';`,
+            ``,
+            `// 프레임: ${(chartNode === null || chartNode === void 0 ? void 0 : chartNode.name) || 'NanoChart'} (${liveW}×${liveH}px, 배경: ${bgToken})`,
+            `const container = document.getElementById('chart-container')!;`,
+            `const chart = new ${className}(container, ${optionsBlock});`,
+        ].join('\n');
+        return [
+            {
+                title: `NanoCharts — ${className} (Vanilla TS)`,
+                language: 'TYPESCRIPT',
+                code: vanillaCode,
+            },
+        ];
+    }
+    // 기본: react-tailwind
+    const twPadClass = String(state.paddingToken || 'padding/p-6').replace('padding/', '').replace('_', '.');
+    const activeGapTok = state.chartType === 'funnel' ? state.funnelGapToken || state.gapToken : state.gapToken || 'gap/gap-2';
+    const twGapClass = activeGapTok === 'none' ? 'gap-0' : String(activeGapTok).replace('gap/', '').replace('_', '.');
+    const twWeightMap = {
+        '400': 'font-normal',
+        '500': 'font-medium',
+        '600': 'font-semibold',
+        '700': 'font-bold',
+    };
+    const twFontWeightClass = twWeightMap[String(state.fontWeight)] || 'font-medium';
+    const twSurfaceBgClass = `bg-[${bgToken}]`;
+    const twBorderClass = state.gridBorder
+        ? `border border-[${axisLineToken}]`
+        : `border border-[var(--outline-lower)]`;
+    const twTextClass = `text-[${strongTextToken}] text-[${state.fontSize}px] ${twFontWeightClass}`;
+    const twContainerClasses = [
+        'w-full',
+        `max-w-[${liveW}px]`,
+        `h-[${liveH}px]`,
+        state.includeBg ? `${twSurfaceBgClass} rounded-2xl ${twBorderClass}` : '',
+        twPadClass,
+        twGapClass,
+        twTextClass,
+    ]
+        .filter(Boolean)
+        .join(' ');
+    const reactCode = [
+        `import React, { useEffect, useRef } from 'react';`,
+        `import { ${className} } from '@ju9nu7/nanocharts';`,
+        ``,
+        `export function NanoChartSection() {`,
+        `  const containerRef = useRef<HTMLDivElement>(null);`,
+        ``,
+        `  useEffect(() => {`,
+        `    if (!containerRef.current) return;`,
+        `    const chart = new ${className}(containerRef.current, ${optionsBlock.split('\n').join('\n    ')});`,
+        `    return () => chart.destroy();`,
+        `  }, []);`,
+        ``,
+        `  return <div ref={containerRef} className="${twContainerClasses}" />;`,
+        `}`,
+    ].join('\n');
+    const tokenSummary = [
+        `/* 프레임: ${(chartNode === null || chartNode === void 0 ? void 0 : chartNode.name) || 'NanoChart'} (${liveW} × ${liveH}px) */`,
+        `/* 배경: ${bgToken} | 텍스트: ${strongTextToken} */`,
+        `/* 여백: ${state.paddingToken} (${state.paddingPx}px) | 모서리: ${state.radiusToken} (${state.radius}px) */`,
+        ...safeTokens.slice(0, 6).map((t, i) => `/* Series ${i + 1}: ${t} -> ${cssTokens[i]} */`),
+    ].join('\n');
+    return [
+        {
+            title: `NanoCharts — ${className} (React + Tailwind)`,
+            language: 'TYPESCRIPT',
+            code: reactCode,
+        },
+        {
+            title: '디자인 토큰 요약',
+            language: 'CSS',
+            code: tokenSummary,
+        },
+    ];
+}
+/**
+ * Figma Dev Mode(개발자 모드) Codegen 리스너를 등록합니다.
+ * 개발자가 차트 프레임 또는 내부 레이어를 클릭하면 우측 Code 패널에 NanoCharts 코드를 자동 표시합니다.
+ */
+function registerDevModeCodegen() {
+    if (!figma.codegen || typeof figma.codegen.on !== 'function')
+        return;
+    figma.codegen.on('generate', (event) => {
+        const found = findNanoChartAncestorNode(event.node);
+        if (!found) {
+            return [
+                {
+                    title: 'NanoCharts',
+                    language: 'PLAINTEXT',
+                    code: '// NanoCharts 플러그인으로 삽입한 차트 프레임(또는 내부 요소)을 선택하면\n// React / Vanilla TS 코드가 자동으로 표시됩니다.',
+                },
+            ];
+        }
+        return generateDevModeCodeBlocks(found.state, found.chartNode, event.language);
+    });
+}
 /**
  * 피그마 변수명(`--primary`, `primary/-`, `primary/lower`, `Primary/500`, `point red/500`, `overlay/white/low`, `Transparency/50`)을
  * 표준 토큰 키(`primary`, `primary-lower`, `red`, `overlay-white-low`, `overlay-gray-mid`)로 정규화합니다.
@@ -1512,185 +1907,198 @@ function notifySelectionState() {
         hasSavedChart: false,
     });
 }
-figma.on('selectionchange', () => {
-    notifySelectionState();
-});
-// 피그마 캔버스에서 선택된 NanoChart 프레임의 크기를 마우스로 조절할 때 UI 프리뷰와 실시간 동기화
-setInterval(() => {
-    try {
-        const selection = figma.currentPage.selection;
-        if (!selection || selection.length !== 1)
-            return;
-        const node = selection[0];
-        if (!node || node.id !== lastObservedSelectionId)
-            return;
-        const curW = Math.round(node.width || 0);
-        const curH = Math.round(node.height || 0);
-        if (curW >= 120 && curH >= 120 && (Math.abs(curW - lastObservedW) >= 2 || Math.abs(curH - lastObservedH) >= 2)) {
-            lastObservedW = curW;
-            lastObservedH = curH;
-            figma.ui.postMessage({
-                type: 'SELECTION_FRAME_RESIZED',
-                frameWidth: curW,
-                frameHeight: curH,
-            });
-        }
-    }
-    catch (_a) {
-        // 무시
-    }
-}, 300);
-figma.ui.onmessage = async (msg) => {
-    var _a, _b;
-    if (msg.type === 'INSERT_SVG' && msg.svg) {
+if (!IS_DEV_CODEGEN_MODE) {
+    figma.on('selectionchange', () => {
+        notifySelectionState();
+    });
+    // 피그마 캔버스에서 선택된 NanoChart 프레임의 크기를 마우스로 조절할 때 UI 프리뷰와 실시간 동기화
+    setInterval(() => {
         try {
-            const { cleanSvg, cornerRadiiByNodeName } = prepareSvgAndExtractCornersForFigma(msg.svg);
-            const newFrame = figma.createNodeFromSvg(cleanSvg);
-            newFrame.name = msg.chartTitle || 'NanoChart Vector';
-            // 재편집을 위해 차트 옵션 및 데이터 상태를 노드에 메타데이터로 저장
-            if (msg.state && typeof newFrame.setPluginData === 'function') {
-                newFrame.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(msg.state));
+            const selection = figma.currentPage.selection;
+            if (!selection || selection.length !== 1)
+                return;
+            const node = selection[0];
+            if (!node || node.id !== lastObservedSelectionId)
+                return;
+            const curW = Math.round(node.width || 0);
+            const curH = Math.round(node.height || 0);
+            if (curW >= 120 && curH >= 120 && (Math.abs(curW - lastObservedW) >= 2 || Math.abs(curH - lastObservedH) >= 2)) {
+                lastObservedW = curW;
+                lastObservedH = curH;
+                figma.ui.postMessage({
+                    type: 'SELECTION_FRAME_RESIZED',
+                    frameWidth: curW,
+                    frameHeight: curH,
+                });
             }
-            // 피그마 변수(Color, 4.Radius, 5.Spacing Variables) 자동 매칭 및 바인딩 실행
-            const hexMap = msg.hexToTokenMap || {};
-            const shouldBind = msg.bindVariables !== false;
-            const { variableMap, hexToVariableMap, reverseDesignTokens, autoCreatedCount } = await ensureChartVariablesAsync(hexMap, msg.allTokens);
-            const { radiusVarByName, radiusVarByValue } = await scanProjectRadiusVariables();
-            const { spacingVarByName, paddingVarByValue, gapVarByValue } = await scanProjectSpacingVariables();
-            let boundCount = await bindFigmaVariablesToTreeAsync(newFrame, hexMap, reverseDesignTokens, variableMap, hexToVariableMap, cornerRadiiByNodeName, radiusVarByName, radiusVarByValue, msg.radiusToken, shouldBind);
-            // 피그마 좌우/상하 자유 리사이즈 시에도 차트가 절대 깨지지 않도록 서브 프레임(Plot Area, Y-Axis, X-Axis, Legend) 계층 구성
-            const chartType = ((_a = msg.state) === null || _a === void 0 ? void 0 : _a.chartType) || 'bar';
-            const legendPos = ((_b = msg.state) === null || _b === void 0 ? void 0 : _b.legendPos) || 'top-right';
-            buildResponsiveFigmaLayout(newFrame, chartType, msg.padding, legendPos);
-            // 루트 차트 프레임에 5.Spacing (padding/* 및 gap/*) 변수 및 배경 모서리(rounded-xxl) 바인딩
-            if (shouldBind && typeof newFrame.setBoundVariable === 'function') {
-                const padKey = (msg.paddingToken || 'padding/p-6').toLowerCase();
-                const padVar = spacingVarByName.get(padKey) ||
-                    spacingVarByName.get(padKey.split('/').pop() || '') ||
-                    paddingVarByValue.get(24);
-                if (padVar) {
-                    for (const field of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft']) {
-                        try {
-                            newFrame.setBoundVariable(field, padVar);
-                            boundCount++;
-                        }
-                        catch (_c) {
-                            // 프레임 패딩 바인딩 미지원 시 무시
-                        }
+        }
+        catch (_a) {
+            // 무시
+        }
+    }, 300);
+}
+if (!IS_DEV_CODEGEN_MODE) {
+    figma.ui.onmessage = async (msg) => {
+        var _a, _b;
+        if (msg.type === 'INSERT_SVG' && msg.svg) {
+            try {
+                const { cleanSvg, cornerRadiiByNodeName } = prepareSvgAndExtractCornersForFigma(msg.svg);
+                const newFrame = figma.createNodeFromSvg(cleanSvg);
+                newFrame.name = msg.chartTitle || 'NanoChart Vector';
+                // 재편집을 위해 차트 옵션 및 데이터 상태를 노드에 메타데이터로 저장
+                if (msg.state && typeof newFrame.setPluginData === 'function') {
+                    newFrame.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(msg.state));
+                }
+                // 생성된 차트 프레임 선택 시 오른쪽 패널에 「차트 편집」 빠른 실행 버튼 표시
+                try {
+                    if (typeof newFrame.setRelaunchData === 'function') {
+                        newFrame.setRelaunchData({ edit: '선택한 차트 옵션·데이터 재편집' });
                     }
                 }
-                const gapKey = (msg.gapToken || 'gap/gap-2').toLowerCase();
-                const gapVar = spacingVarByName.get(gapKey) ||
-                    spacingVarByName.get(gapKey.split('/').pop() || '') ||
-                    gapVarByValue.get(8);
-                if (gapVar) {
-                    try {
-                        newFrame.setBoundVariable('itemSpacing', gapVar);
-                        boundCount++;
-                    }
-                    catch (_d) {
-                        // 간격 바인딩 미지원 시 무시
-                    }
+                catch (_c) {
+                    // relaunchData 설정 불가 시 무시
                 }
-                const frameRadVar = radiusVarByName.get('rounded-xxl') || radiusVarByValue.get(16);
-                if (frameRadVar) {
-                    for (const field of ['topLeftRadius', 'topRightRadius', 'bottomRightRadius', 'bottomLeftRadius']) {
+                // 피그마 변수(Color, 4.Radius, 5.Spacing Variables) 자동 매칭 및 바인딩 실행
+                const hexMap = msg.hexToTokenMap || {};
+                const shouldBind = msg.bindVariables !== false;
+                const { variableMap, hexToVariableMap, reverseDesignTokens, autoCreatedCount } = await ensureChartVariablesAsync(hexMap, msg.allTokens);
+                const { radiusVarByName, radiusVarByValue } = await scanProjectRadiusVariables();
+                const { spacingVarByName, paddingVarByValue, gapVarByValue } = await scanProjectSpacingVariables();
+                let boundCount = await bindFigmaVariablesToTreeAsync(newFrame, hexMap, reverseDesignTokens, variableMap, hexToVariableMap, cornerRadiiByNodeName, radiusVarByName, radiusVarByValue, msg.radiusToken, shouldBind);
+                // 피그마 좌우/상하 자유 리사이즈 시에도 차트가 절대 깨지지 않도록 서브 프레임(Plot Area, Y-Axis, X-Axis, Legend) 계층 구성
+                const chartType = ((_a = msg.state) === null || _a === void 0 ? void 0 : _a.chartType) || 'bar';
+                const legendPos = ((_b = msg.state) === null || _b === void 0 ? void 0 : _b.legendPos) || 'top-right';
+                buildResponsiveFigmaLayout(newFrame, chartType, msg.padding, legendPos);
+                // 루트 차트 프레임에 5.Spacing (padding/* 및 gap/*) 변수 및 배경 모서리(rounded-xxl) 바인딩
+                if (shouldBind && typeof newFrame.setBoundVariable === 'function') {
+                    const padKey = (msg.paddingToken || 'padding/p-6').toLowerCase();
+                    const padVar = spacingVarByName.get(padKey) ||
+                        spacingVarByName.get(padKey.split('/').pop() || '') ||
+                        paddingVarByValue.get(24);
+                    if (padVar) {
+                        for (const field of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft']) {
+                            try {
+                                newFrame.setBoundVariable(field, padVar);
+                                boundCount++;
+                            }
+                            catch (_d) {
+                                // 프레임 패딩 바인딩 미지원 시 무시
+                            }
+                        }
+                    }
+                    const gapKey = (msg.gapToken || 'gap/gap-2').toLowerCase();
+                    const gapVar = spacingVarByName.get(gapKey) ||
+                        spacingVarByName.get(gapKey.split('/').pop() || '') ||
+                        gapVarByValue.get(8);
+                    if (gapVar) {
                         try {
-                            newFrame.setBoundVariable(field, frameRadVar);
+                            newFrame.setBoundVariable('itemSpacing', gapVar);
                             boundCount++;
                         }
                         catch (_e) {
-                            // 모서리 바인딩 미지원 시 무시
+                            // 간격 바인딩 미지원 시 무시
+                        }
+                    }
+                    const frameRadVar = radiusVarByName.get('rounded-xxl') || radiusVarByValue.get(16);
+                    if (frameRadVar) {
+                        for (const field of ['topLeftRadius', 'topRightRadius', 'bottomRightRadius', 'bottomLeftRadius']) {
+                            try {
+                                newFrame.setBoundVariable(field, frameRadVar);
+                                boundCount++;
+                            }
+                            catch (_f) {
+                                // 모서리 바인딩 미지원 시 무시
+                            }
                         }
                     }
                 }
-            }
-            if (autoCreatedCount > 0) {
-                await notifyProjectVariables();
-            }
-            const selection = figma.currentPage.selection;
-            const targetToReplace = msg.replaceSelected && selection && selection.length === 1 ? selection[0] : null;
-            if (targetToReplace && targetToReplace.parent) {
-                const parent = targetToReplace.parent;
-                const index = parent.children.indexOf(targetToReplace);
-                newFrame.x = targetToReplace.x;
-                newFrame.y = targetToReplace.y;
-                parent.insertChild(index, newFrame);
-                targetToReplace.remove();
-            }
-            else {
-                const center = figma.viewport.center;
-                newFrame.x = Math.round(center.x - newFrame.width / 2);
-                newFrame.y = Math.round(center.y - newFrame.height / 2);
-                figma.currentPage.appendChild(newFrame);
-            }
-            figma.currentPage.selection = [newFrame];
-            lastObservedSelectionId = newFrame.id || '';
-            lastObservedW = Math.round(newFrame.width || 640);
-            lastObservedH = Math.round(newFrame.height || 400);
-            if (!msg.silent) {
-                figma.viewport.scrollAndZoomIntoView([newFrame]);
-                if (boundCount > 0) {
-                    figma.notify(`✨ 벡터 레이어 삽입 완료! (${boundCount}개 속성이 피그마 변수로 바인딩됨)`);
+                if (autoCreatedCount > 0) {
+                    await notifyProjectVariables();
+                }
+                const selection = figma.currentPage.selection;
+                const targetToReplace = msg.replaceSelected && selection && selection.length === 1 ? selection[0] : null;
+                if (targetToReplace && targetToReplace.parent) {
+                    const parent = targetToReplace.parent;
+                    const index = parent.children.indexOf(targetToReplace);
+                    newFrame.x = targetToReplace.x;
+                    newFrame.y = targetToReplace.y;
+                    parent.insertChild(index, newFrame);
+                    targetToReplace.remove();
                 }
                 else {
-                    figma.notify('✨ NanoCharts 반응형 벡터 레이어가 피그마에 삽입되었습니다!');
+                    const center = figma.viewport.center;
+                    newFrame.x = Math.round(center.x - newFrame.width / 2);
+                    newFrame.y = Math.round(center.y - newFrame.height / 2);
+                    figma.currentPage.appendChild(newFrame);
                 }
-            }
-            notifySelectionState();
-        }
-        catch (err) {
-            figma.notify(`❌ SVG 삽입 오류: ${(err === null || err === void 0 ? void 0 : err.message) || String(err)}`, { error: true });
-        }
-    }
-    else if (msg.type === 'RESCAN_VARIABLES') {
-        await notifyProjectVariables();
-    }
-    else if (msg.type === 'SYNC_VARIABLES_SCSS' && msg.tokensToSync) {
-        try {
-            const count = await syncVariablesScssToFigma(msg.tokensToSync);
-            figma.notify(`🎨 variables.scss 컬러 변수 ${count}개가 현재 피그마 파일에 등록되었습니다!`);
-        }
-        catch (err) {
-            figma.notify(`❌ 변수 등록 실패: ${(err === null || err === void 0 ? void 0 : err.message) || String(err)}`, { error: true });
-        }
-    }
-    else if (msg.type === 'APPLY_OTA_UPDATE' && msg.uiHtml && typeof msg.buildTime === 'number') {
-        if (msg.buildTime > lastAppliedOtaBuildTime && msg.uiHtml.includes('NanoCharts')) {
-            lastAppliedOtaBuildTime = msg.buildTime;
-            try {
-                if (figma.clientStorage && typeof figma.clientStorage.setAsync === 'function') {
-                    await figma.clientStorage.setAsync(OTA_CACHE_KEY, {
-                        version: msg.version || 'latest',
-                        buildId: msg.buildId || String(msg.buildTime),
-                        buildTime: msg.buildTime,
-                        uiHtml: msg.uiHtml,
-                    });
+                figma.currentPage.selection = [newFrame];
+                lastObservedSelectionId = newFrame.id || '';
+                lastObservedW = Math.round(newFrame.width || 640);
+                lastObservedH = Math.round(newFrame.height || 400);
+                if (!msg.silent) {
+                    figma.viewport.scrollAndZoomIntoView([newFrame]);
+                    if (boundCount > 0) {
+                        figma.notify(`✨ 벡터 레이어 삽입 완료! (${boundCount}개 속성이 피그마 변수로 바인딩됨)`);
+                    }
+                    else {
+                        figma.notify('✨ NanoCharts 반응형 벡터 레이어가 피그마에 삽입되었습니다!');
+                    }
                 }
+                notifySelectionState();
             }
-            catch (_f) {
-                // 캐시 저장 실패 시에도 현재 세션 UI는 즉시 최신으로 교체
+            catch (err) {
+                figma.notify(`❌ SVG 삽입 오류: ${(err === null || err === void 0 ? void 0 : err.message) || String(err)}`, { error: true });
             }
-            figma.showUI(msg.uiHtml, {
-                width: currentPluginWidth,
-                height: currentPluginHeight,
-                themeColors: true,
-            });
-            notifySelectionState();
+        }
+        else if (msg.type === 'RESCAN_VARIABLES') {
             await notifyProjectVariables();
-            figma.notify(`🚀 NanoCharts 최신 버전(v${msg.version || 'latest'})이 GitHub에서 자동 업데이트되었습니다!`);
         }
-    }
-    else if (msg.type === 'RESIZE_PLUGIN_WINDOW' &&
-        typeof msg.windowWidth === 'number' &&
-        typeof msg.windowHeight === 'number') {
-        currentPluginWidth = Math.max(920, Math.min(2200, Math.round(msg.windowWidth)));
-        currentPluginHeight = Math.max(640, Math.min(1500, Math.round(msg.windowHeight)));
-        if (figma.ui && typeof figma.ui.resize === 'function') {
-            figma.ui.resize(currentPluginWidth, currentPluginHeight);
+        else if (msg.type === 'SYNC_VARIABLES_SCSS' && msg.tokensToSync) {
+            try {
+                const count = await syncVariablesScssToFigma(msg.tokensToSync);
+                figma.notify(`🎨 variables.scss 컬러 변수 ${count}개가 현재 피그마 파일에 등록되었습니다!`);
+            }
+            catch (err) {
+                figma.notify(`❌ 변수 등록 실패: ${(err === null || err === void 0 ? void 0 : err.message) || String(err)}`, { error: true });
+            }
         }
-    }
-    else if (msg.type === 'CLOSE_PLUGIN') {
-        figma.closePlugin();
-    }
-};
+        else if (msg.type === 'APPLY_OTA_UPDATE' && msg.uiHtml && typeof msg.buildTime === 'number') {
+            if (msg.buildTime > lastAppliedOtaBuildTime && msg.uiHtml.includes('NanoCharts')) {
+                lastAppliedOtaBuildTime = msg.buildTime;
+                try {
+                    if (figma.clientStorage && typeof figma.clientStorage.setAsync === 'function') {
+                        await figma.clientStorage.setAsync(OTA_CACHE_KEY, {
+                            version: msg.version || 'latest',
+                            buildId: msg.buildId || String(msg.buildTime),
+                            buildTime: msg.buildTime,
+                            uiHtml: msg.uiHtml,
+                        });
+                    }
+                }
+                catch (_g) {
+                    // 캐시 저장 실패 시에도 현재 세션 UI는 즉시 최신으로 교체
+                }
+                figma.showUI(msg.uiHtml, {
+                    width: currentPluginWidth,
+                    height: currentPluginHeight,
+                    themeColors: true,
+                });
+                notifySelectionState();
+                await notifyProjectVariables();
+                figma.notify(`🚀 NanoCharts 최신 버전(v${msg.version || 'latest'})이 GitHub에서 자동 업데이트되었습니다!`);
+            }
+        }
+        else if (msg.type === 'RESIZE_PLUGIN_WINDOW' &&
+            typeof msg.windowWidth === 'number' &&
+            typeof msg.windowHeight === 'number') {
+            currentPluginWidth = Math.max(920, Math.min(2200, Math.round(msg.windowWidth)));
+            currentPluginHeight = Math.max(640, Math.min(1500, Math.round(msg.windowHeight)));
+            if (figma.ui && typeof figma.ui.resize === 'function') {
+                figma.ui.resize(currentPluginWidth, currentPluginHeight);
+            }
+        }
+        else if (msg.type === 'CLOSE_PLUGIN') {
+            figma.closePlugin();
+        }
+    };
+}
