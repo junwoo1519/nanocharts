@@ -128,9 +128,10 @@ export class BarSeries {
     const x = rawX + (rawWidth - width) / 2;
 
     const baseZero = yScale.scale(0);
-    const targetY = yScale.scale(item.value);
+    const safeValue = typeof item.value === 'number' && Number.isFinite(item.value) ? item.value : 0;
+    const targetY = yScale.scale(safeValue);
 
-    const isPositive = item.value >= 0;
+    const isPositive = safeValue >= 0;
     const fullHeight = isPositive ? baseZero - targetY : targetY - baseZero;
     const height = Math.max(0, fullHeight * progress);
     const y = isPositive ? baseZero - height : baseZero;
@@ -172,8 +173,9 @@ export class BarSeries {
         if (!item) continue;
 
         const x = groupStartX + s * stepWidth + (stepWidth - barWidth) / 2;
-        const targetY = yScale.scale(item.value);
-        const isPositive = item.value >= 0;
+        const safeValue = typeof item.value === 'number' && Number.isFinite(item.value) ? item.value : 0;
+        const targetY = yScale.scale(safeValue);
+        const isPositive = safeValue >= 0;
         const fullHeight = isPositive ? baseZero - targetY : targetY - baseZero;
         const height = Math.max(0, fullHeight * progress);
         const y = isPositive ? baseZero - height : baseZero;
@@ -203,7 +205,8 @@ export class BarSeries {
     let bottomNegSeriesIdx = -1;
 
     for (let s = 0; s < seriesCount; s++) {
-      const val = activeSeries[s].items[slotIndex]?.value ?? 0;
+      const raw = activeSeries[s].items[slotIndex]?.value;
+      const val = typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
       if (val > 0) {
         posTotal += val;
         topPosSeriesIdx = s;
@@ -221,7 +224,7 @@ export class BarSeries {
       const item = series.items[slotIndex];
       if (!item) continue;
 
-      const rawVal = item.value;
+      const rawVal = typeof item.value === 'number' && Number.isFinite(item.value) ? item.value : 0;
       const isPositive = rawVal >= 0;
       let effectiveVal = rawVal;
       let percentage: number | undefined;
@@ -479,12 +482,14 @@ export class BarSeries {
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
 
+    const safeValStr =
+      typeof item.value === 'number' && Number.isFinite(item.value) ? item.value.toLocaleString() : '-';
     const text =
       geom.percentage !== undefined && this.getMode() === 'percent' && !opts.formatter
         ? `${geom.percentage.toFixed(0)}%`
         : opts.formatter
           ? opts.formatter(item.value, item, index)
-          : item.value.toLocaleString();
+          : safeValStr;
 
     const centerX = x + width / 2;
     let labelY = y;
@@ -655,12 +660,16 @@ export class BarSeries {
               ? this.labelOptions.color(geom.item, geom.index)
               : this.labelOptions.color || (pos.startsWith('inside') ? '#FFFFFF' : '#94A3B8');
 
+          const safeValStr =
+            typeof geom.item.value === 'number' && Number.isFinite(geom.item.value)
+              ? geom.item.value.toLocaleString()
+              : '-';
           const text =
             geom.percentage !== undefined && this.getMode() === 'percent' && !this.labelOptions.formatter
               ? `${geom.percentage.toFixed(0)}%`
               : this.labelOptions.formatter
                 ? this.labelOptions.formatter(geom.item.value, geom.item, geom.index)
-                : geom.item.value.toLocaleString();
+                : safeValStr;
 
           const centerX = geom.x + geom.width / 2;
           let labelY = geom.y;

@@ -31,7 +31,16 @@ import {
 } from '../utils/responsive';
 import { buildCssFontString } from '../utils/tokens';
 
-export class PieChart extends EventEmitter {
+/**
+ * PieChart 이벤트 맵 (IDE 자동완성 및 페이로드 타입 추론용)
+ */
+export interface PieChartEventMap {
+  hover: { item: DataItem; index: number; slice: PieSliceGeometry } | null;
+  resize: { width: number; height: number; isCompact: boolean };
+  legendToggle: { item: LegendItem; active: boolean };
+}
+
+export class PieChart extends EventEmitter<PieChartEventMap> {
   private container: HTMLElement;
   private options: PieChartOptions;
   private layerManager: LayerManager;
@@ -43,7 +52,7 @@ export class PieChart extends EventEmitter {
   private height: number = 0;
   private padding: Padding;
 
-  private resizeObserver: ResizeObserver;
+  private resizeObserver: ResizeObserver | null = null;
   private animator: Animator = new Animator();
   private hasRenderedOnce: boolean = false;
   private slices: PieSliceGeometry[] = [];
@@ -55,6 +64,10 @@ export class PieChart extends EventEmitter {
 
   constructor(container: string | HTMLElement, options: PieChartOptions) {
     super();
+
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('[nanocharts] PieChart can only be initialized in a browser environment.');
+    }
 
     const el = typeof container === 'string' ? document.querySelector<HTMLElement>(container) : container;
     if (!el) {
@@ -127,24 +140,26 @@ export class PieChart extends EventEmitter {
 
     this.setupInteractions();
 
-    this.resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const rawW = Math.round(entry.contentRect.width);
-        const rawH = Math.round(entry.contentRect.height);
-        if (rawW > 0) {
-          const { height } = resolveContainerDimensions(
-            this.container,
-            this.options.responsive,
-            1.35
-          );
-          const effectiveH = rawH > 10 ? rawH : height;
-          if (rawW !== this.width || effectiveH !== this.height) {
-            this.resize(rawW, effectiveH);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const rawW = Math.round(entry.contentRect.width);
+          const rawH = Math.round(entry.contentRect.height);
+          if (rawW > 0) {
+            const { height } = resolveContainerDimensions(
+              this.container,
+              this.options.responsive,
+              1.35
+            );
+            const effectiveH = rawH > 10 ? rawH : height;
+            if (rawW !== this.width || effectiveH !== this.height) {
+              this.resize(rawW, effectiveH);
+            }
           }
         }
-      }
-    });
-    this.resizeObserver.observe(this.container);
+      });
+      this.resizeObserver.observe(this.container);
+    }
 
     const initialDims = resolveContainerDimensions(this.container, this.options.responsive, 1.35);
     if (initialDims.width > 0 && initialDims.height > 0) {
@@ -153,6 +168,9 @@ export class PieChart extends EventEmitter {
   }
 
   public resize(width: number, height: number): void {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      return;
+    }
     this.width = width;
     this.height = height;
     this.layerManager.resize(width, height);
@@ -295,6 +313,7 @@ export class PieChart extends EventEmitter {
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null;
         this.startHoverTransition();
+        this.emit('hover', null);
       }
       this.legend.setHoveredKey(null);
       this.tooltip.hide();
@@ -394,6 +413,7 @@ export class PieChart extends EventEmitter {
         this.startHoverTransition();
         this.legend.setHoveredKey(null);
         this.tooltip.hide();
+        this.emit('hover', null);
       }
     }
   }
@@ -518,7 +538,7 @@ export class PieChart extends EventEmitter {
   public destroy(): void {
     this.animator.cancel();
     this.stopHoverTransition();
-    this.resizeObserver.disconnect();
+    this.resizeObserver?.disconnect();
     this.layerManager.destroy();
     this.tooltip.destroy();
     this.legend.destroy();

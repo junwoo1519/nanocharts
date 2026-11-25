@@ -146,6 +146,9 @@ export class Legend {
     const el = this.rootEl;
     const { side, align } = parseLegendAnchor(this.options.position, this.options.align ?? 'end');
 
+    el.style.boxSizing = 'border-box';
+    el.style.margin = '0';
+    el.style.padding = '0';
     el.style.position = 'absolute';
     el.style.zIndex = '10';
     el.style.display = this.visible && this.items.length > 0 ? 'flex' : 'none';
@@ -317,6 +320,14 @@ export class Legend {
     for (const item of this.items) {
       const btn = document.createElement('button');
       btn.type = 'button';
+      btn.style.boxSizing = 'border-box';
+      btn.style.margin = '0';
+      btn.style.appearance = 'none';
+      btn.style.textTransform = 'none';
+      btn.style.letterSpacing = 'normal';
+      btn.style.outline = 'none';
+      btn.style.minHeight = '0';
+      btn.style.minWidth = '0';
       btn.style.display = 'inline-flex';
       btn.style.alignItems = 'center';
       btn.style.gap = '6px';

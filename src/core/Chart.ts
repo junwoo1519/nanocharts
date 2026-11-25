@@ -43,7 +43,21 @@ import {
 } from '../utils/responsive';
 import { buildCssFontString } from '../utils/tokens';
 
-export class BarChart extends EventEmitter {
+/**
+ * BarChart 이벤트 맵 (IDE 자동완성 및 페이로드 타입 추론용)
+ */
+export interface BarChartEventMap {
+  hover: {
+    item: DataItem;
+    index: number;
+    seriesKey?: string | null;
+    geometry: BarGeometry;
+  } | null;
+  resize: { width: number; height: number; isCompact: boolean };
+  legendToggle: { item: LegendItem; active: boolean };
+}
+
+export class BarChart extends EventEmitter<BarChartEventMap> {
   /** 차트가 마운트될 부모 DOM 엘리먼트 */
   private container: HTMLElement;
   /** 사용자 설정 옵션 객체 */
@@ -81,7 +95,7 @@ export class BarChart extends EventEmitter {
   private padding: Padding;
 
   /** 컨테이너 크기 변경 감지 옵저버 */
-  private resizeObserver: ResizeObserver;
+  private resizeObserver: ResizeObserver | null = null;
   /** 애니메이션 엔진 인스턴스 */
   private animator: Animator = new Animator();
   /** 최초 1회 마운트 애니메이션 실행 여부 */
@@ -103,6 +117,10 @@ export class BarChart extends EventEmitter {
    */
   constructor(container: string | HTMLElement, options: BarChartOptions) {
     super();
+
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('[nanocharts] BarChart can only be initialized in a browser environment.');
+    }
 
     const el = typeof container === 'string' ? document.querySelector<HTMLElement>(container) : container;
     if (!el) {
@@ -178,24 +196,26 @@ export class BarChart extends EventEmitter {
     this.setupInteractions();
 
     // 부모 컨테이너 크기 변화를 실시간 감지하여 자동 리사이징 & 리렌더링
-    this.resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const rawW = Math.round(entry.contentRect.width);
-        const rawH = Math.round(entry.contentRect.height);
-        if (rawW > 0) {
-          const { height } = resolveContainerDimensions(
-            this.container,
-            this.options.responsive,
-            1.6
-          );
-          const effectiveH = rawH > 10 ? rawH : height;
-          if (rawW !== this.width || effectiveH !== this.height) {
-            this.resize(rawW, effectiveH);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const rawW = Math.round(entry.contentRect.width);
+          const rawH = Math.round(entry.contentRect.height);
+          if (rawW > 0) {
+            const { height } = resolveContainerDimensions(
+              this.container,
+              this.options.responsive,
+              1.6
+            );
+            const effectiveH = rawH > 10 ? rawH : height;
+            if (rawW !== this.width || effectiveH !== this.height) {
+              this.resize(rawW, effectiveH);
+            }
           }
         }
-      }
-    });
-    this.resizeObserver.observe(this.container);
+      });
+      this.resizeObserver.observe(this.container);
+    }
 
     // 컨테이너가 레이아웃 크기를 가지고 있거나 반응형 자동 높이 계산이 가능한 경우 즉시 첫 렌더링 수행
     const initialDims = resolveContainerDimensions(this.container, this.options.responsive, 1.6);
@@ -395,7 +415,8 @@ export class BarChart extends EventEmitter {
           let posSum = 0;
           let negSum = 0;
           for (const s of this.activeSeries) {
-            const v = s.items[i]?.value ?? 0;
+            const raw = s.items[i]?.value;
+            const v = typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
             if (v >= 0) posSum += v;
             else negSum += v;
           }
@@ -405,6 +426,7 @@ export class BarChart extends EventEmitter {
       } else {
         for (const s of this.activeSeries) {
           for (const d of s.items) {
+            if (typeof d.value !== 'number' || !Number.isFinite(d.value)) continue;
             if (d.value > maxVal) maxVal = d.value;
             if (d.value < minVal) minVal = d.value;
           }
@@ -432,6 +454,7 @@ export class BarChart extends EventEmitter {
     let maxVal = 0;
     let minVal = 0;
     for (const d of data) {
+      if (typeof d.value !== 'number' || !Number.isFinite(d.value)) continue;
       if (d.value > maxVal) maxVal = d.value;
       if (d.value < minVal) minVal = d.value;
     }
@@ -440,8 +463,8 @@ export class BarChart extends EventEmitter {
       maxVal = 100;
     }
 
-    // Y축 범위 계산 (상단 10% 여유 패딩 적용 후 nice 확장)
-    const yMin = minVal < 0 ? minVal : 0;
+    // Y축 범위 계산 (상/하단 10% 여유 패딩 적용 후 nice 확장)
+    const yMin = minVal < 0 ? minVal * 1.1 : 0;
     const yMax = maxVal > 0 ? maxVal * 1.1 : 0;
     this.yScale.domain([yMin, yMax]).nice(5);
   }
@@ -450,6 +473,9 @@ export class BarChart extends EventEmitter {
    * 차트 크기를 재설정하고 모든 레이어를 다시 그립니다.
    */
   public resize(width: number, height: number): void {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      return;
+    }
     this.width = width;
     this.height = height;
 
@@ -547,12 +573,14 @@ export class BarChart extends EventEmitter {
 
     // 캔버스 밖으로 마우스가 나갔을 때
     interactionCanvas.addEventListener('mouseleave', () => {
+      const hadHover = this.hoveredIndex !== null || this.hoveredSeriesKey !== null;
       this.hoveredIndex = null;
       this.hoveredSeriesKey = null;
       this.legend.setHoveredKey(null);
       this.layerManager.clear('interaction');
       this.tooltip.hide();
       this.isDragging = false;
+      if (hadHover) this.emit('hover', null);
     });
 
     // 드래그 좌우 스크롤 (Pan)
@@ -730,8 +758,9 @@ export class BarChart extends EventEmitter {
 
     const geom = this.barSeries.getBarGeometry(slotItem, index, this.xScale, this.yScale);
 
-    // 마우스가 바의 가로 폭 안에 위치하는지 판정
-    const isInsideBarX = mouseX >= geom.x && mouseX <= geom.x + geom.width;
+    // 마우스가 바의 가로 폭(얇은 바의 경우 최소 12px 히트 영역 보장) 안에 위치하는지 판정
+    const hitPad = geom.width < 12 ? (12 - geom.width) / 2 : 0;
+    const isInsideBarX = mouseX >= geom.x - hitPad && mouseX <= geom.x + geom.width + hitPad;
     if (isInsideBarX) {
       if (this.hoveredIndex !== index) {
         this.hoveredIndex = index;
@@ -746,6 +775,7 @@ export class BarChart extends EventEmitter {
         this.legend.setHoveredKey(null);
         this.layerManager.clear('interaction');
         this.tooltip.hide();
+        this.emit('hover', null);
       }
     }
   }
@@ -872,7 +902,8 @@ export class BarChart extends EventEmitter {
     const effPadding = this.getEffectivePadding();
     const rect = this.layerManager.getCanvas('interaction').getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
-    const mouseRatio = Math.max(0, Math.min(1, (mouseX - effPadding.left) / (this.width - effPadding.left - effPadding.right)));
+    const plotWidth = Math.max(1, this.width - effPadding.left - effPadding.right);
+    const mouseRatio = Math.max(0, Math.min(1, (mouseX - effPadding.left) / plotWidth));
 
     const change = newCount - currentCount;
     let newStart = Math.round(start - change * mouseRatio);
@@ -1030,8 +1061,10 @@ export class BarChart extends EventEmitter {
    */
   public destroy(): void {
     this.animator.cancel();
-    window.removeEventListener('mouseup', this.boundMouseUp);
-    this.resizeObserver.disconnect();
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('mouseup', this.boundMouseUp);
+    }
+    this.resizeObserver?.disconnect();
     this.layerManager.destroy();
     this.tooltip.destroy();
     this.legend.destroy();

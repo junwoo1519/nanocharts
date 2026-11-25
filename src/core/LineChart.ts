@@ -46,7 +46,21 @@ import {
 } from '../utils/responsive';
 import { buildCssFontString } from '../utils/tokens';
 
-export class LineChart extends EventEmitter {
+/**
+ * LineChart 이벤트 맵 (IDE 자동완성 및 페이로드 타입 추론용)
+ */
+export interface LineChartEventMap {
+  hover: {
+    item: DataItem;
+    index: number;
+    seriesKey?: string | null;
+    point: LinePointGeometry;
+  } | null;
+  resize: { width: number; height: number; isCompact: boolean };
+  legendToggle: { item: LegendItem; active: boolean };
+}
+
+export class LineChart extends EventEmitter<LineChartEventMap> {
   /** 차트가 마운트될 부모 DOM 엘리먼트 */
   private container: HTMLElement;
   /** 사용자 설정 옵션 객체 */
@@ -84,7 +98,7 @@ export class LineChart extends EventEmitter {
   private padding: Padding;
 
   /** 컨테이너 크기 변경 감지 옵저버 */
-  private resizeObserver: ResizeObserver;
+  private resizeObserver: ResizeObserver | null = null;
   /** 애니메이션 엔진 인스턴스 */
   private animator: Animator = new Animator();
   /** 최초 1회 마운트 애니메이션 실행 여부 */
@@ -106,6 +120,10 @@ export class LineChart extends EventEmitter {
    */
   constructor(container: string | HTMLElement, options: LineChartOptions) {
     super();
+
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('[nanocharts] LineChart can only be initialized in a browser environment.');
+    }
 
     const el = typeof container === 'string' ? document.querySelector<HTMLElement>(container) : container;
     if (!el) {
@@ -185,24 +203,26 @@ export class LineChart extends EventEmitter {
     this.setupInteractions();
 
     // 부모 컨테이너 크기 변화를 실시간 감지하여 자동 리사이징 & 리렌더링
-    this.resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const rawW = Math.round(entry.contentRect.width);
-        const rawH = Math.round(entry.contentRect.height);
-        if (rawW > 0) {
-          const { height } = resolveContainerDimensions(
-            this.container,
-            this.options.responsive,
-            1.6
-          );
-          const effectiveH = rawH > 10 ? rawH : height;
-          if (rawW !== this.width || effectiveH !== this.height) {
-            this.resize(rawW, effectiveH);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const rawW = Math.round(entry.contentRect.width);
+          const rawH = Math.round(entry.contentRect.height);
+          if (rawW > 0) {
+            const { height } = resolveContainerDimensions(
+              this.container,
+              this.options.responsive,
+              1.6
+            );
+            const effectiveH = rawH > 10 ? rawH : height;
+            if (rawW !== this.width || effectiveH !== this.height) {
+              this.resize(rawW, effectiveH);
+            }
           }
         }
-      }
-    });
-    this.resizeObserver.observe(this.container);
+      });
+      this.resizeObserver.observe(this.container);
+    }
 
     // 컨테이너가 레이아웃 크기를 가지고 있거나 반응형 자동 높이 계산이 가능한 경우 즉시 첫 렌더링 수행
     const initialDims = resolveContainerDimensions(this.container, this.options.responsive, 1.6);
@@ -435,7 +455,8 @@ export class LineChart extends EventEmitter {
           s.baseValues = [...runningSum];
           s.stackedValues = new Array<number>(slotCount);
           for (let i = 0; i < slotCount; i++) {
-            const val = s.items[i]?.value ?? 0;
+            const raw = s.items[i]?.value;
+            const val = typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
             runningSum[i] += val;
             s.stackedValues[i] = runningSum[i];
             if (runningSum[i] > maxVal) maxVal = runningSum[i];
@@ -447,6 +468,7 @@ export class LineChart extends EventEmitter {
           s.baseValues = undefined;
           s.stackedValues = undefined;
           for (const d of s.items) {
+            if (typeof d.value !== 'number' || !Number.isFinite(d.value)) continue;
             if (d.value > maxVal) maxVal = d.value;
             if (d.value < minVal) minVal = d.value;
           }
@@ -474,6 +496,7 @@ export class LineChart extends EventEmitter {
     let maxVal = 0;
     let minVal = 0;
     for (const d of data) {
+      if (typeof d.value !== 'number' || !Number.isFinite(d.value)) continue;
       if (d.value > maxVal) maxVal = d.value;
       if (d.value < minVal) minVal = d.value;
     }
@@ -491,6 +514,9 @@ export class LineChart extends EventEmitter {
    * 차트 크기를 재설정하고 모든 레이어를 다시 그립니다.
    */
   public resize(width: number, height: number): void {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      return;
+    }
     this.width = width;
     this.height = height;
 
@@ -608,12 +634,14 @@ export class LineChart extends EventEmitter {
     });
 
     interactionCanvas.addEventListener('mouseleave', () => {
+      const hadHover = this.hoveredIndex !== null || this.hoveredSeriesKey !== null;
       this.hoveredIndex = null;
       this.hoveredSeriesKey = null;
       this.legend.setHoveredKey(null);
       this.layerManager.clear('interaction');
       this.tooltip.hide();
       this.isDragging = false;
+      if (hadHover) this.emit('hover', null);
     });
 
     if (this.options.pan?.enabled !== false) {
@@ -902,9 +930,10 @@ export class LineChart extends EventEmitter {
     const effPadding = this.getEffectivePadding();
     const rect = this.layerManager.getCanvas('interaction').getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
+    const plotWidth = Math.max(1, this.width - effPadding.left - effPadding.right);
     const mouseRatio = Math.max(
       0,
-      Math.min(1, (mouseX - effPadding.left) / (this.width - effPadding.left - effPadding.right))
+      Math.min(1, (mouseX - effPadding.left) / plotWidth)
     );
 
     const change = newCount - currentCount;
@@ -1106,8 +1135,10 @@ export class LineChart extends EventEmitter {
    */
   public destroy(): void {
     this.animator.cancel();
-    window.removeEventListener('mouseup', this.boundMouseUp);
-    this.resizeObserver.disconnect();
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('mouseup', this.boundMouseUp);
+    }
+    this.resizeObserver?.disconnect();
     this.layerManager.destroy();
     this.tooltip.destroy();
     this.legend.destroy();

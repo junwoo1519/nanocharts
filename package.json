@@ -1,8 +1,9 @@
 {
   "name": "@ju9nu7/nanocharts",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "High-performance, ultra-lightweight, and designer-friendly Canvas chart library.",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,7 +14,7 @@
         "default": "./dist/index.js"
       },
       "require": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
     }

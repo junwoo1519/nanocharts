@@ -50,8 +50,19 @@ export function resolveContainerDimensions(
 ): { width: number; height: number; isCompact: boolean } {
   const norm = normalizeResponsiveOptions(responsiveOpt, defaultAspectRatio);
   const rect = container.getBoundingClientRect();
-  const rawWidth = container.clientWidth || Math.round(rect.width) || 320;
+  const measuredWidth = container.clientWidth || Math.round(rect.width) || 0;
   let rawHeight = container.clientHeight || Math.round(rect.height) || 0;
+
+  // 컨테이너가 display: none 등 비가시 상태(width <= 0)라면 DOM을 변형하지 않고 0x0 반환
+  if (measuredWidth <= 0) {
+    return {
+      width: 0,
+      height: 0,
+      isCompact: false,
+    };
+  }
+
+  const rawWidth = measuredWidth;
 
   const hasExplicitAspectRatio =
     typeof responsiveOpt === 'object' &&

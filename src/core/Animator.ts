@@ -68,7 +68,11 @@ export class Animator {
     this.cancel();
 
     const resolved = Animator.resolveOptions(options);
-    if (!resolved.enabled || resolved.duration <= 0) {
+    if (
+      !resolved.enabled ||
+      resolved.duration <= 0 ||
+      typeof requestAnimationFrame === 'undefined'
+    ) {
       onFrame(1);
       resolved.onComplete?.();
       return;
@@ -79,7 +83,8 @@ export class Animator {
         ? resolved.easing
         : EASINGS[resolved.easing] || EASINGS.easeOutQuart;
 
-    const startTime = performance.now();
+    const nowFn = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    const startTime = nowFn();
     const duration = resolved.duration;
 
     const tick = (now: number) => {
@@ -112,7 +117,9 @@ export class Animator {
    */
   public cancel(): void {
     if (this.rafId !== null) {
-      cancelAnimationFrame(this.rafId);
+      if (typeof cancelAnimationFrame !== 'undefined') {
+        cancelAnimationFrame(this.rafId);
+      }
       this.rafId = null;
     }
   }

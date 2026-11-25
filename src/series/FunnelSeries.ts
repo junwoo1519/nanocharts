@@ -85,8 +85,11 @@ export class FunnelSeries {
     const count = data.length;
     if (count === 0) return [];
 
-    const maxVal = Math.max(1, ...data.map((d) => Math.max(0, d.value)));
-    const firstVal = Math.max(1, data[0]?.value ?? maxVal);
+    const safeVal = (v: unknown): number =>
+      typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : 0;
+
+    const maxVal = Math.max(1, ...data.map((d) => safeVal(d.value)));
+    const firstVal = Math.max(1, safeVal(data[0]?.value) || maxVal);
 
     const direction = this.styleOptions.direction || 'vertical';
     const shape = this.styleOptions.shape || 'trapezoid';
@@ -110,7 +113,7 @@ export class FunnelSeries {
     const centerY = plotTop + availH / 2;
 
     const ratios = data.map((d) => {
-      const r = Math.max(0, d.value) / maxVal;
+      const r = safeVal(d.value) / maxVal;
       return minRatio + (1 - minRatio) * r;
     });
 
@@ -122,9 +125,10 @@ export class FunnelSeries {
 
       for (let i = 0; i < count; i++) {
         const item = data[i];
-        const prevVal = i > 0 ? Math.max(1, data[i - 1].value) : Math.max(1, item.value);
-        const overallRatio = Math.max(0, item.value) / firstVal;
-        const stepConversionRate = i === 0 ? 1 : Math.max(0, item.value) / prevVal;
+        const currVal = safeVal(item.value);
+        const prevVal = i > 0 ? Math.max(1, safeVal(data[i - 1].value)) : Math.max(1, currVal);
+        const overallRatio = currVal / firstVal;
+        const stepConversionRate = i === 0 ? 1 : currVal / prevVal;
 
         const rStart = ratios[i] * clampedProgress;
         const rEnd =
@@ -171,9 +175,10 @@ export class FunnelSeries {
 
       for (let i = 0; i < count; i++) {
         const item = data[i];
-        const prevVal = i > 0 ? Math.max(1, data[i - 1].value) : Math.max(1, item.value);
-        const overallRatio = Math.max(0, item.value) / firstVal;
-        const stepConversionRate = i === 0 ? 1 : Math.max(0, item.value) / prevVal;
+        const currVal = safeVal(item.value);
+        const prevVal = i > 0 ? Math.max(1, safeVal(data[i - 1].value)) : Math.max(1, currVal);
+        const overallRatio = currVal / firstVal;
+        const stepConversionRate = i === 0 ? 1 : currVal / prevVal;
 
         const rTop = ratios[i] * clampedProgress;
         const rBottom =
@@ -335,11 +340,15 @@ export class FunnelSeries {
       for (const stage of stages) {
         const rate = convBase === 'first' ? stage.overallRatio : stage.stepConversionRate;
         const pctStr = `${Math.round(rate * 100)}%`;
+        const valStr =
+          typeof stage.item.value === 'number' && Number.isFinite(stage.item.value)
+            ? stage.item.value.toLocaleString()
+            : '-';
         const text = lOpts.formatter
           ? lOpts.formatter(stage.item, stage)
           : showConv && stage.index > 0
-            ? `${stage.item.label} · ${stage.item.value.toLocaleString()} (${pctStr})`
-            : `${stage.item.label} · ${stage.item.value.toLocaleString()}`;
+            ? `${stage.item.label} · ${valStr} (${pctStr})`
+            : `${stage.item.label} · ${valStr}`;
 
         if (lOpts.position === 'outside') {
           ctx.fillStyle = resolveTokenColor(lOpts.color || '#64748B');
@@ -417,11 +426,15 @@ export class FunnelSeries {
       if (lOpts.visible !== false && lOpts.position !== 'none') {
         const rate = convBase === 'first' ? stage.overallRatio : stage.stepConversionRate;
         const pctStr = `${Math.round(rate * 100)}%`;
+        const valStr =
+          typeof stage.item.value === 'number' && Number.isFinite(stage.item.value)
+            ? stage.item.value.toLocaleString()
+            : '-';
         const text = lOpts.formatter
           ? lOpts.formatter(stage.item, stage)
           : showConv && stage.index > 0
-            ? `${stage.item.label} · ${stage.item.value.toLocaleString()} (${pctStr})`
-            : `${stage.item.label} · ${stage.item.value.toLocaleString()}`;
+            ? `${stage.item.label} · ${valStr} (${pctStr})`
+            : `${stage.item.label} · ${valStr}`;
 
         if (lOpts.position === 'outside') {
           const fill = lOpts.color || '#64748B';

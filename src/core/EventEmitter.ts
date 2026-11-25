@@ -1,27 +1,33 @@
+/**
+ * @fileoverview 초경량 타입 안전 이벤트 버스 (EventEmitter)
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyEventMap = Record<string, any>;
 type Handler<T = unknown> = (data: T) => void;
 
-export class EventEmitter {
-  private events: Map<string, Handler[]> = new Map();
+export class EventEmitter<TEvents extends AnyEventMap = AnyEventMap> {
+  private events: Map<keyof TEvents, Handler<unknown>[]> = new Map();
 
-  on<T = unknown>(event: string, handler: Handler<T>): () => void {
+  on<K extends keyof TEvents>(event: K, handler: Handler<TEvents[K]>): () => void {
     if (!this.events.has(event)) {
       this.events.set(event, []);
     }
-    this.events.get(event)!.push(handler as Handler);
+    this.events.get(event)!.push(handler as Handler<unknown>);
 
     return () => this.off(event, handler);
   }
 
-  off<T = unknown>(event: string, handler: Handler<T>): void {
+  off<K extends keyof TEvents>(event: K, handler: Handler<TEvents[K]>): void {
     const handlers = this.events.get(event);
     if (!handlers) return;
     this.events.set(
       event,
-      handlers.filter((h) => h !== handler)
+      handlers.filter((h) => h !== (handler as Handler<unknown>))
     );
   }
 
-  emit<T = unknown>(event: string, data?: T): void {
+  emit<K extends keyof TEvents>(event: K, data: TEvents[K]): void {
     const handlers = this.events.get(event);
     if (!handlers) return;
     for (const handler of handlers) {

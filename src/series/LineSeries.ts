@@ -235,6 +235,8 @@ export class LineSeries {
     for (let i = drawStart; i <= drawEnd; i++) {
       const item = data[i];
       if (!item) continue;
+      const effectiveVal = stackedValues ? stackedValues[i] : item.value;
+      if (typeof effectiveVal !== 'number' || !Number.isFinite(effectiveVal)) continue;
       const topVal = stackedValues ? stackedValues[i] : undefined;
       const pt = this.getPointGeometry(item, i, xScale, yScale, topVal);
       if (verticalProgress < 1) {
@@ -542,6 +544,13 @@ export class LineSeries {
     if (!opts || !opts.visible || opts.position === 'none') return;
 
     const { x, y, item, index } = pt;
+
+    // 개발자가 완전 커스텀 렌더러 함수를 지정한 경우 제어권 위임
+    if (opts.renderCustom) {
+      opts.renderCustom(ctx, { x, y, width: 0, height: 0, item, index });
+      return;
+    }
+
     const offset = opts.offset ?? 8;
     const font = opts.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     const color = resolveTokenColor(
@@ -550,9 +559,11 @@ export class LineSeries {
         : opts.color || '#94A3B8'
     );
 
+    const safeValStr =
+      typeof item.value === 'number' && Number.isFinite(item.value) ? item.value.toLocaleString() : '-';
     const text = opts.formatter
       ? opts.formatter(item.value, item, index)
-      : item.value.toLocaleString();
+      : safeValStr;
 
     ctx.save();
     ctx.font = font;

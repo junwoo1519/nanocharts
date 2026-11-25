@@ -23,6 +23,9 @@ export class LayerManager {
   private dpr: number = 1;
 
   constructor(container: HTMLElement) {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('[nanocharts] LayerManager requires a browser environment.');
+    }
     this.container = container;
     this.container.style.position = 'relative';
     this.container.style.userSelect = 'none';
@@ -39,6 +42,9 @@ export class LayerManager {
    */
   private createLayer(type: LayerType, zIndex: number): void {
     const canvas = document.createElement('canvas');
+    canvas.style.display = 'block';
+    canvas.style.maxWidth = 'none';
+    canvas.style.boxSizing = 'border-box';
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
@@ -61,9 +67,12 @@ export class LayerManager {
    * High-DPI(Retina) 보정을 위해 버퍼는 (크기 * dpr)로 확장하고, 컨텍스트 좌표계는 dpr 배율로 맞춥니다.
    */
   resize(width: number, height: number): void {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      return;
+    }
     this.width = width;
     this.height = height;
-    this.dpr = window.devicePixelRatio || 1;
+    this.dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
 
     for (const [type, canvas] of this.canvases.entries()) {
       // 1. 실제 캔버스 내부 메모리 해상도 (물리 픽셀)

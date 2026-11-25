@@ -47,7 +47,9 @@ export class LinearScale implements Scale<number, number> {
   scale(value: number): number {
     const [d0, d1] = this._domain;
     const [r0, r1] = this._range;
-    if (d1 === d0) return r0;
+    if (!Number.isFinite(value) || !Number.isFinite(d0) || !Number.isFinite(d1) || d1 === d0) {
+      return r0;
+    }
     const t = (value - d0) / (d1 - d0);
     return r0 + t * (r1 - r0);
   }
@@ -58,7 +60,9 @@ export class LinearScale implements Scale<number, number> {
   invert(pixel: number): number {
     const [d0, d1] = this._domain;
     const [r0, r1] = this._range;
-    if (r1 === r0) return d0;
+    if (!Number.isFinite(pixel) || !Number.isFinite(r0) || !Number.isFinite(r1) || r1 === r0) {
+      return d0;
+    }
     const t = (pixel - r0) / (r1 - r0);
     return d0 + t * (d1 - d0);
   }
@@ -71,11 +75,16 @@ export class LinearScale implements Scale<number, number> {
    * @returns 눈금 숫자 배열 (예: [0, 20, 40, 60, 80, 100])
    */
   ticks(count = 5): number[] {
-    const [d0, d1] = this._domain;
-    if (d0 === d1) return [d0];
+    const [rawD0, rawD1] = this._domain;
+    if (!Number.isFinite(rawD0) || !Number.isFinite(rawD1)) return [0];
+    if (rawD0 === rawD1) return [rawD0];
 
+    const d0 = Math.min(rawD0, rawD1);
+    const d1 = Math.max(rawD0, rawD1);
     const span = d1 - d0;
     const rawStep = span / Math.max(count, 1);
+    if (rawStep <= 0 || !Number.isFinite(rawStep)) return [d0];
+
     const power = Math.floor(Math.log10(rawStep));
     const base = Math.pow(10, power);
     const fraction = rawStep / base;
@@ -91,11 +100,12 @@ export class LinearScale implements Scale<number, number> {
     const ticks: number[] = [];
     
     // 부동소수점 오차 방지
-    const precision = Math.max(0, -power);
-    for (let val = start; val <= d1 + step * 0.001; val += step) {
+    const precision = Math.min(20, Math.max(0, -power));
+    const maxTicks = 500;
+    for (let val = start; val <= d1 + step * 0.001 && ticks.length < maxTicks; val += step) {
       ticks.push(Number(val.toFixed(precision)));
     }
-    return ticks;
+    return rawD0 > rawD1 ? ticks.reverse() : ticks;
   }
 
   /**
@@ -103,11 +113,17 @@ export class LinearScale implements Scale<number, number> {
    * (예: [3, 97] -> [0, 100])
    */
   nice(count = 5): this {
-    const [d0, d1] = this._domain;
-    if (d0 === d1) return this;
+    const [rawD0, rawD1] = this._domain;
+    if (!Number.isFinite(rawD0) || !Number.isFinite(rawD1) || rawD0 === rawD1) {
+      return this;
+    }
 
+    const d0 = Math.min(rawD0, rawD1);
+    const d1 = Math.max(rawD0, rawD1);
     const span = d1 - d0;
     const rawStep = span / Math.max(count, 1);
+    if (rawStep <= 0 || !Number.isFinite(rawStep)) return this;
+
     const power = Math.floor(Math.log10(rawStep));
     const base = Math.pow(10, power);
     const fraction = rawStep / base;
@@ -120,7 +136,7 @@ export class LinearScale implements Scale<number, number> {
 
     const niceMin = Math.floor(d0 / step) * step;
     const niceMax = Math.ceil(d1 / step) * step;
-    this._domain = [niceMin, niceMax];
+    this._domain = rawD0 > rawD1 ? [niceMax, niceMin] : [niceMin, niceMax];
     return this;
   }
 }

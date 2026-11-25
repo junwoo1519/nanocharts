@@ -259,7 +259,7 @@ animation: {
 
 ### 5. 피그마(Figma) 호환 순수 벡터(SVG) 추출 (`toSVG`)
 
-모든 차트 인스턴스(`BarChart`, `LineChart`, `PieChart`)는 현재 렌더링 상태를 피그마(`figma.createNodeFromSvg`)에서 Frame, Vector, Rectangle, Text 레이어로 분해하여 개별 편집할 수 있는 표준 SVG 문자열로 추출하는 `toSVG()` 메서드를 제공합니다.
+모든 차트 인스턴스(`BarChart`, `LineChart`, `PieChart`, `FunnelChart`)는 현재 렌더링 상태를 피그마(`figma.createNodeFromSvg`)에서 Frame, Vector, Rectangle, Text 레이어로 분해하여 개별 편집할 수 있는 표준 SVG 문자열로 추출하는 `toSVG()` 메서드를 제공합니다.
 
 ```typescript
 const svgString = chart.toSVG({
@@ -277,25 +277,40 @@ const node = figma.createNodeFromSvg(svgString);
 
 ---
 
-## 🛠 API Options
+## 🛠 API Options & Methods
+
+### 공통 및 차트별 주요 옵션
 
 | 옵션명 | 타입 | 설명 |
 | :--- | :--- | :--- |
 | `data` | `DataItem[]` | 단일 시리즈 데이터 배열 (`{ label, value, ... }`) |
 | `series` | `BarSeriesDataset[] \| LineSeriesDataset[]` | 다중 시리즈 데이터셋 배열 (`{ name, data, color, ... }`) |
 | `xLabels` | `string[]` | 다중 시리즈에서 `number[]` 데이터를 사용할 때 지정할 X축 라벨 배열 |
-| `bar.mode` | `'grouped' \| 'stacked' \| 'percent'` | 다중 바 배치 모드 (그룹형 / 누적형 / 100% 비율 누적형) |
-| `bar.fill` | `ColorAccessor` | 단색, 그라데이션 객체, 또는 `(item, index) => string` 콜백 |
-| `bar.borderRadius`| `number \| number[]` | 둥근 모서리 반지름 (예: `8` 또는 `[6, 6, 0, 0]`) |
-| `bar.border` | `BarBorderStyle` | 테두리 색상, 굵기, 대시선 옵션 |
-| `bar.widthRatio` | `number` | 바 두께 비율 (`0.1` ~ `1.0`, 기본 `0.65`) |
-| `stacked` | `boolean` | `LineChart` 다중 시리즈 누적(Stacked Area/Line) 활성화 여부 |
-| `legend` | `boolean \| LegendOptions` | 범례 표시 위치, 마커 모양, 클릭 데이터 토글 옵션 |
+| `font` | `ChartFontOptions` | 차트 전역 폰트 (`{ family, size, weight }`) |
+| `responsive` | `boolean \| ResponsiveOptions` | `ResizeObserver` 기반 반응형 크기·비율(`aspectRatio`)·브레이크포인트 자동 보정 |
+| `grid` | `GridOptions` | X/Y 격자선(`solid` \| `dashed` \| `dotted`), 외곽 박스(`border`), 줄무늬 배경(`alternateBand`) |
+| `xAxis` / `yAxis` | `AxisOptions` | 축선, 눈금 라벨 폰트/색상, `formatter` (긴 라벨 자동 말줄임 지원) |
+| `tooltip` | `TooltipOptions` | 부동형 툴팁 (`enabled`, `shared`, `formatter`, `multiFormatter`, 경계 자동 반전/클램핑) |
+| `legend` | `boolean \| LegendOptions` | 12방향 범례 배치, 마커 모양, 클릭 데이터 토글 및 양방향 호버 연동 |
 | `animation` | `boolean \| AnimationOptions` | 렌더링 애니메이션 시간(`duration`) 및 이징(`easing`) 옵션 |
-| `labels.position`| `LabelPosition` | `'top-outside'` \| `'inside-top'` \| `'inside-center'` \| `'inside-bottom'` \| `'none'` |
-| `labels.formatter`| `Function` | 텍스트 포맷팅 함수 |
-| `zoom.enabled` | `boolean` | 마우스 휠 줌 활성화 여부 |
-| `pan.enabled` | `boolean` | 마우스 드래그 좌우 스크롤 탐색 활성화 여부 |
+| `bar` | `BarStyleOptions` | `mode`(`'grouped' \| 'stacked' \| 'percent'`), `fill`, `borderRadius`, `border`, `widthRatio` |
+| `line` / `area` / `stacked` | `LineStyleOptions` / `AreaStyleOptions` / `boolean` | 라인 곡률(`smooth` \| `linear` \| `step`), Area HSL 그라데이션 채도·명도, 누적 영역 |
+| `pie` / `center` | `PieStyleOptions` / `PieCenterContentOptions` | 도넛 비율(`innerRadiusRatio`), `maxValue`/`trackColor`, `hoverExplode`, 중앙 텍스트 |
+| `funnel` | `FunnelStyleOptions` | `direction`(`'vertical' \| 'horizontal'`), `shape`(`'trapezoid' \| 'bar'`), `showConversion` |
+| `labels` | `DataLabelOptions \| PieLabelOptions \| FunnelLabelOptions` | 라벨 위치, `formatter`, 캔버스 직접 렌더러(`renderCustom`) |
+| `zoom` / `pan` | `{ enabled?: boolean; minPoints?: number }` | 마우스 휠 커서 중심 줌 & 드래그 좌우 팬 탐색 (`BarChart`, `LineChart`) |
+
+### 인스턴스 메서드 및 이벤트
+
+| 메서드 / 이벤트 | 설명 |
+| :--- | :--- |
+| `chart.update(partialOptions)` | 런타임 데이터 및 스타일 옵션 동적 갱신 |
+| `chart.resize(width, height)` | 차트 크기 수동 재설정 및 리렌더링 |
+| `chart.resetZoom()` | 줌/팬 뷰포트 초기화 (`BarChart`, `LineChart`) |
+| `chart.replayAnimation()` | 등장 애니메이션 처음부터 다시 재생 |
+| `chart.toSVG(options?)` | 피그마 호환 순수 벡터 SVG 문자열 추출 |
+| `chart.on(event, handler)` / `off()` | 타입 안전 이벤트 구독 (`'hover'`, `'resize'`, `'legendToggle'`, 이탈 시 `'hover'`에 `null` 전달) |
+| `chart.destroy()` | `ResizeObserver`, DOM 캔버스, 이벤트 리스너, 애니메이션 자원 완전 해제 |
 
 ---
 

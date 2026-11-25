@@ -1,7 +1,11 @@
 export { BarChart } from './core/Chart';
+export type { BarChartEventMap } from './core/Chart';
 export { PieChart } from './core/PieChart';
+export type { PieChartEventMap } from './core/PieChart';
 export { LineChart } from './core/LineChart';
+export type { LineChartEventMap } from './core/LineChart';
 export { FunnelChart } from './core/FunnelChart';
+export type { FunnelChartEventMap } from './core/FunnelChart';
 export { LayerManager } from './core/LayerManager';
 export { EventEmitter } from './core/EventEmitter';
 export { Animator, EASINGS } from './core/Animator';

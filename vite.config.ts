@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { copyFileSync, existsSync } from 'fs';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
@@ -7,6 +8,13 @@ export default defineConfig({
     dts({
       include: ['src'],
       rollupTypes: true,
+      afterBuild: () => {
+        const dtsPath = resolve(__dirname, 'dist/index.d.ts');
+        const dctsPath = resolve(__dirname, 'dist/index.d.cts');
+        if (existsSync(dtsPath)) {
+          copyFileSync(dtsPath, dctsPath);
+        }
+      },
     }),
   ],
   build: {

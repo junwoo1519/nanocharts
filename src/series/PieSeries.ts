@@ -86,7 +86,8 @@ export class PieSeries {
       return [];
     }
 
-    const dataTotal = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+    const safeVal = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : 0);
+    const dataTotal = data.reduce((sum, item) => sum + safeVal(item.value), 0);
     const configuredMax =
       this.styleOptions.maxValue ??
       (this.styleOptions.trackColor && dataTotal < 100 ? 100 : undefined);
@@ -126,13 +127,13 @@ export class PieSeries {
     let currentAngle = -Math.PI / 2;
     const defaultPadAngle = innerRatio > 0.001 ? 0.02 : 0;
     const rawPadAngle = this.styleOptions.padAngle ?? defaultPadAngle;
-    const activeSliceCount = data.filter((item) => item.value > 0).length;
+    const activeSliceCount = data.filter((item) => safeVal(item.value) > 0).length;
     const segmentCount = activeSliceCount + (hasTrackSlice ? 1 : 0);
     const padAngle = segmentCount > 1 ? Math.max(0, rawPadAngle) : 0;
     const slices: PieSliceGeometry[] = [];
 
     data.forEach((item, index) => {
-      const val = Math.max(0, item.value);
+      const val = safeVal(item.value);
       const percentage = val / baseTotal;
       const sweepAngle = percentage * 2 * Math.PI;
       const slicePad = sweepAngle > 0 ? Math.min(padAngle, sweepAngle * 0.8) : 0;
@@ -365,7 +366,10 @@ export class PieSeries {
     }
 
     const data = slices.filter((s) => !s.isTrack).map((s) => s.item);
-    const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+    const total = data.reduce(
+      (sum, item) => sum + (typeof item.value === 'number' && Number.isFinite(item.value) ? Math.max(0, item.value) : 0),
+      0
+    );
     const configuredMax =
       this.styleOptions.maxValue ??
       (this.styleOptions.trackColor && total < 100 ? 100 : undefined);
@@ -532,7 +536,10 @@ export class PieSeries {
     if (slices[0] && slices[0].innerRadius > 15) {
       const { cx, cy } = slices[0];
       const data = slices.filter((s) => !s.isTrack).map((s) => s.item);
-      const total = data.reduce((sum, item) => sum + Math.max(0, item.value), 0);
+      const total = data.reduce(
+      (sum, item) => sum + (typeof item.value === 'number' && Number.isFinite(item.value) ? Math.max(0, item.value) : 0),
+      0
+    );
       const opts = this.centerOptions;
       const configuredMax =
         this.styleOptions.maxValue ??
