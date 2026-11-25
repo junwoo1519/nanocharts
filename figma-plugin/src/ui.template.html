@@ -911,10 +911,17 @@
                 </div>
               </div>
               <div class="field">
-                <label>조각 간격 (Pad) <span class="val-badge" id="pie-pad-txt">1.5°</span></label>
-                <div class="slider-box">
-                  <input type="range" id="pie-pad-slider" min="0" max="5" value="1.5" step="0.5" />
-                </div>
+                <label>간격 방식 (Gap Mode)</label>
+                <select id="pie-gap-mode-select">
+                  <option value="px" selected>일정 간격 (px · 평행)</option>
+                  <option value="angle">각도 간격 (° · PadAngle)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>조각 간격 (Gap) <span class="val-badge" id="pie-pad-txt">3px</span></label>
+              <div class="slider-box">
+                <input type="range" id="pie-pad-slider" min="0" max="16" value="3" step="1" />
               </div>
             </div>
             <div class="row-2">
@@ -1094,14 +1101,14 @@
           <span class="section-sub">5.Spacing & Export</span>
         </div>
         <div class="section-body">
-          <div class="row-2">
+          <div class="row-2" id="spacing-row">
             <div class="field">
               <label>차트 여백 <span class="val-badge" id="padding-txt">24px</span></label>
               <div class="slider-box">
                 <input type="range" id="padding-slider" min="0" max="11" value="7" step="1" />
               </div>
             </div>
-            <div class="field">
+            <div class="field" id="gap-field">
               <label>요소 간격 <span class="val-badge" id="gap-txt">8px</span></label>
               <div class="slider-box">
                 <input type="range" id="gap-slider" min="0" max="11" value="3" step="1" />
@@ -1282,6 +1289,8 @@
       areaSatDelta: 0,
       areaLightDelta: 0,
       holeRatio: 0.6,
+      pieGapMode: 'px',
+      pieSliceGap: 3,
       piePadDeg: 1.5,
       pieMaxValue: 0,
       pieTrackToken: 'auto',
@@ -1675,6 +1684,11 @@
       document.getElementById('pie-controls').style.display = isPie ? 'flex' : 'none';
       document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
       document.getElementById('grid-controls').style.display = isBar || isLine ? '' : 'none';
+      const showElementGap = isBar || isLine;
+      const gapFieldEl = document.getElementById('gap-field');
+      const spacingRowEl = document.getElementById('spacing-row');
+      if (gapFieldEl) gapFieldEl.style.display = showElementGap ? '' : 'none';
+      if (spacingRowEl) spacingRowEl.style.gridTemplateColumns = showElementGap ? '' : '1fr';
       document.getElementById('custom-font-field').style.display =
         state.fontFamilyPreset === 'custom' ? '' : 'none';
 
@@ -1900,7 +1914,10 @@
           legend: legendOpt,
         });
       } else {
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
         const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
         const padRad = ((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
@@ -1918,7 +1935,7 @@
           responsive: { enabled: true },
           pie: {
             innerRadiusRatio: state.holeRatio,
-            padAngle: padRad,
+            ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
             maxValue: maxVal,
             trackColor: trackHex,
             colors: palette,
@@ -2188,31 +2205,62 @@
       renderPreview();
     });
 
+    function syncPieGapControlUI() {
+      const mode = state.pieGapMode || 'px';
+      const modeSelect = document.getElementById('pie-gap-mode-select');
+      const padSlider = document.getElementById('pie-pad-slider');
+      const padTxt = document.getElementById('pie-pad-txt');
+      if (modeSelect) modeSelect.value = mode;
+      if (mode === 'px') {
+        const pxVal = state.pieSliceGap ?? (state.holeRatio > 0 ? 3 : 0);
+        padSlider.min = '0';
+        padSlider.max = '16';
+        padSlider.step = '1';
+        padSlider.value = String(pxVal);
+        padTxt.innerText = `${pxVal}px`;
+      } else {
+        const degVal = state.piePadDeg ?? (state.holeRatio > 0 ? 1.5 : 0);
+        padSlider.min = '0';
+        padSlider.max = '5';
+        padSlider.step = '0.5';
+        padSlider.value = String(degVal);
+        padTxt.innerText = `${degVal}°`;
+      }
+    }
+
     document.getElementById('hole-slider').addEventListener('input', (e) => {
       const pct = parseInt(e.target.value, 10);
       const prevHole = state.holeRatio;
       state.holeRatio = pct / 100;
       document.getElementById('hole-txt').innerText = `${pct}%`;
 
-      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격(padAngle)을 0°로 자동 전환
-      const padSlider = document.getElementById('pie-pad-slider');
-      const padTxt = document.getElementById('pie-pad-txt');
+      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격을 0으로 자동 전환
       if (pct === 0) {
+        state.pieSliceGap = 0;
         state.piePadDeg = 0;
-        padSlider.value = 0;
-        padTxt.innerText = '0°';
-      } else if (prevHole === 0 && state.piePadDeg === 0) {
-        state.piePadDeg = 1.5;
-        padSlider.value = 1.5;
-        padTxt.innerText = '1.5°';
+      } else if (prevHole === 0) {
+        if ((state.pieSliceGap ?? 0) === 0) state.pieSliceGap = 3;
+        if ((state.piePadDeg ?? 0) === 0) state.piePadDeg = 1.5;
       }
+      syncPieGapControlUI();
+      renderPreview();
+    });
+
+    document.getElementById('pie-gap-mode-select').addEventListener('change', (e) => {
+      state.pieGapMode = e.target.value === 'angle' ? 'angle' : 'px';
+      syncPieGapControlUI();
       renderPreview();
     });
 
     document.getElementById('pie-pad-slider').addEventListener('input', (e) => {
-      const deg = parseFloat(e.target.value);
-      state.piePadDeg = deg;
-      document.getElementById('pie-pad-txt').innerText = `${deg}°`;
+      const val = parseFloat(e.target.value);
+      if ((state.pieGapMode || 'px') === 'px') {
+        state.pieSliceGap = val;
+        document.getElementById('pie-pad-txt').innerText = `${val}px`;
+      } else {
+        state.piePadDeg = val;
+        document.getElementById('pie-pad-txt').innerText = `${val}°`;
+      }
       renderPreview();
     });
 
@@ -2521,8 +2569,14 @@
         optionsLines.push(legendCode);
       } else {
         className = 'PieChart';
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
         const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
         const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const gapCodeLine = isPxGap
+          ? `    sliceGap: ${sliceGapVal},`
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -2534,8 +2588,8 @@
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(
           maxVal
-            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
         );
         if (state.holeRatio >= 0.35) {
           optionsLines.push(
@@ -2812,9 +2866,15 @@
           document.getElementById('area-light-txt').innerText = `${state.areaLightDelta ?? 0}%`;
           document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
           document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
-          const restoredPadDeg = state.holeRatio <= 0 ? 0 : (state.piePadDeg ?? 1.5);
-          document.getElementById('pie-pad-slider').value = restoredPadDeg;
-          document.getElementById('pie-pad-txt').innerText = `${restoredPadDeg}°`;
+          state.pieGapMode = state.pieGapMode || 'px';
+          if (state.holeRatio <= 0) {
+            state.pieSliceGap = 0;
+            state.piePadDeg = 0;
+          } else {
+            state.pieSliceGap = state.pieSliceGap ?? 3;
+            state.piePadDeg = state.piePadDeg ?? 1.5;
+          }
+          syncPieGapControlUI();
           document.getElementById('pie-max-input').value =
             state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : '';
           document.getElementById('pie-max-txt').innerText =

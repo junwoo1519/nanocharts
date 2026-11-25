@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.16","buildId":"0.1.16-1795584217939","buildTime":1795584217939,"builtAt":"2026-11-25T05:23:37.939Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.16","buildId":"0.1.16-1795596581793","buildTime":1795596581793,"builtAt":"2026-11-25T08:49:41.793Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -319,10 +319,10 @@ function computePaddingForCodegen(state) {
  * Dev Mode Codegen용 코드 블록(React+Tailwind / Vanilla TS / Options)을 생성합니다.
  */
 function generateDevModeCodeBlocks(rawState, chartNode, language) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e;
     const liveW = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.width) || rawState.exportW || 640);
     const liveH = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.height) || rawState.exportH || 400);
-    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
+    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, pieGapMode: 'px', pieSliceGap: 3, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
     const { xLabels, singleData, multiSeries } = parseSavedDataForCodegen(state);
     const tokenList = state.theme === 'custom' && state.customTokens
         ? String(state.customTokens)
@@ -421,8 +421,14 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
     }
     else {
         className = 'PieChart';
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
         const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
-        const padRad = Number(((((_c = state.piePadDeg) !== null && _c !== void 0 ? _c : defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const sliceGapVal = (_c = state.pieSliceGap) !== null && _c !== void 0 ? _c : defaultGapPx;
+        const padRad = Number(((((_d = state.piePadDeg) !== null && _d !== void 0 ? _d : defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const gapCodeLine = isPxGap
+            ? `    sliceGap: ${sliceGapVal},`
+            : `    padAngle: ${padRad}, // ${(_e = state.piePadDeg) !== null && _e !== void 0 ? _e : defaultPadDeg}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken = state.pieTrackToken && state.pieTrackToken !== 'auto'
             ? state.pieTrackToken
@@ -432,8 +438,8 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
         const trackCssToken = toCssVarTokenForCodegen(resolvedTrackToken);
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(maxVal
-            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`);
+            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`);
         if (state.holeRatio >= 0.35) {
             optionsLines.push(maxVal
                 ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`

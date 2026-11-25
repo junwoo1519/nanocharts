@@ -386,6 +386,8 @@ function generateDevModeCodeBlocks(
     areaSatDelta: 0,
     areaLightDelta: 0,
     holeRatio: 0.6,
+    pieGapMode: 'px',
+    pieSliceGap: 3,
     piePadDeg: 1.5,
     pieMaxValue: 0,
     pieTrackToken: 'auto',
@@ -545,8 +547,14 @@ function generateDevModeCodeBlocks(
     optionsLines.push(legendCode);
   } else {
     className = 'PieChart';
+    const isPxGap = (state.pieGapMode || 'px') === 'px';
+    const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
     const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+    const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
     const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+    const gapCodeLine = isPxGap
+      ? `    sliceGap: ${sliceGapVal},`
+      : `    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°`;
     const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
     const resolvedTrackToken =
       state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -559,8 +567,8 @@ function generateDevModeCodeBlocks(
     optionsLines.push(`  data: [\n${dataCode}\n  ],`);
     optionsLines.push(
       maxVal
-        ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-        : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad},\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+        ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+        : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
     );
     if (state.holeRatio >= 0.35) {
       optionsLines.push(

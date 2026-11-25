@@ -125,30 +125,101 @@ export class PieSeries {
     // 12시 방향(-PI/2)에서 시작
     // 내부 구멍이 없는 순수 파이 차트(innerRatio === 0)는 기본적으로 조각 간격(padAngle)을 0으로 설정하여 빈틈을 방지합니다.
     let currentAngle = -Math.PI / 2;
+    const useSliceGap = this.styleOptions.sliceGap !== undefined;
+    const rawSliceGap =
+      useSliceGap && typeof this.styleOptions.sliceGap === 'number' && Number.isFinite(this.styleOptions.sliceGap)
+        ? Math.max(0, this.styleOptions.sliceGap)
+        : 0;
     const defaultPadAngle = innerRatio > 0.001 ? 0.02 : 0;
     const rawPadAngle = this.styleOptions.padAngle ?? defaultPadAngle;
     const activeSliceCount = data.filter((item) => safeVal(item.value) > 0).length;
     const segmentCount = activeSliceCount + (hasTrackSlice ? 1 : 0);
-    const padAngle = segmentCount > 1 ? Math.max(0, rawPadAngle) : 0;
+    const effectiveSliceGap = useSliceGap && segmentCount > 1 ? rawSliceGap : 0;
+    const padAngle = !useSliceGap && segmentCount > 1 ? Math.max(0, rawPadAngle) : 0;
     const slices: PieSliceGeometry[] = [];
+
+    const computeArcAngles = (rawStart: number, sweepAngle: number) => {
+      const midAngle = rawStart + sweepAngle / 2;
+      if (sweepAngle <= 0) {
+        return {
+          startAngle: rawStart,
+          endAngle: rawStart,
+          midAngle,
+          innerStartAngle: undefined as number | undefined,
+          innerEndAngle: undefined as number | undefined,
+          innerArcRadius: undefined as number | undefined,
+        };
+      }
+
+      if (effectiveSliceGap > 0) {
+        // 평행 직선 간격(px): 외곽과 내부 아크에 반지름에 반비례하는 arcsin 각도 오프셋을 적용
+        const maxHalfGap = outerRadius * Math.sin(Math.min(Math.PI / 2, sweepAngle / 2)) * 0.9;
+        const halfGap = Math.min(effectiveSliceGap / 2, maxHalfGap);
+        const outerOffset = Math.asin(Math.min(1, halfGap / outerRadius));
+        const startAngle = rawStart + outerOffset;
+        const endAngle = rawStart + sweepAngle - outerOffset;
+
+        let innerArcRadius: number;
+        let innerStartAngle: number;
+        let innerEndAngle: number;
+
+        if (sweepAngle < Math.PI) {
+          const meetRadius = halfGap / Math.sin(sweepAngle / 2);
+          if (innerRadius <= meetRadius) {
+            // 조각이 좁거나 순수 파이여서 두 평행 경계선이 내부 원 이전에 교차하는 경우 교점으로 수렴
+            innerArcRadius = Math.min(meetRadius, outerRadius * 0.98);
+            innerStartAngle = midAngle;
+            innerEndAngle = midAngle;
+          } else {
+            const innerOffset = Math.asin(Math.min(1, halfGap / innerRadius));
+            innerArcRadius = innerRadius;
+            innerStartAngle = rawStart + innerOffset;
+            innerEndAngle = rawStart + sweepAngle - innerOffset;
+          }
+        } else {
+          innerArcRadius = Math.max(innerRadius, halfGap);
+          const innerOffset = Math.asin(Math.min(1, halfGap / innerArcRadius));
+          innerStartAngle = rawStart + innerOffset;
+          innerEndAngle = rawStart + sweepAngle - innerOffset;
+        }
+
+        return {
+          startAngle,
+          endAngle,
+          midAngle,
+          innerStartAngle,
+          innerEndAngle,
+          innerArcRadius,
+        };
+      }
+
+      const slicePad = Math.min(padAngle, sweepAngle * 0.8);
+      return {
+        startAngle: rawStart + slicePad / 2,
+        endAngle: rawStart + sweepAngle - slicePad / 2,
+        midAngle,
+        innerStartAngle: undefined as number | undefined,
+        innerEndAngle: undefined as number | undefined,
+        innerArcRadius: undefined as number | undefined,
+      };
+    };
 
     data.forEach((item, index) => {
       const val = safeVal(item.value);
       const percentage = val / baseTotal;
       const sweepAngle = percentage * 2 * Math.PI;
-      const slicePad = sweepAngle > 0 ? Math.min(padAngle, sweepAngle * 0.8) : 0;
-
-      const startAngle = currentAngle + slicePad / 2;
-      const endAngle = currentAngle + sweepAngle - slicePad / 2;
-      const midAngle = currentAngle + sweepAngle / 2;
+      const arc = computeArcAngles(currentAngle, sweepAngle);
 
       // 색상 결정
       const color = this.resolveSliceColor(item, index);
 
       slices.push({
-        startAngle,
-        endAngle,
-        midAngle,
+        startAngle: arc.startAngle,
+        endAngle: arc.endAngle,
+        midAngle: arc.midAngle,
+        innerStartAngle: arc.innerStartAngle,
+        innerEndAngle: arc.innerEndAngle,
+        innerArcRadius: arc.innerArcRadius,
         innerRadius,
         outerRadius,
         percentage,
@@ -165,12 +236,15 @@ export class PieSeries {
     if (hasTrackSlice && rawTrackColor) {
       const trackPercentage = remainingValue / baseTotal;
       const trackSweepAngle = trackPercentage * 2 * Math.PI;
-      const trackPad = trackSweepAngle > 0 ? Math.min(padAngle, trackSweepAngle * 0.8) : 0;
+      const trackArc = computeArcAngles(currentAngle, trackSweepAngle);
 
       slices.push({
-        startAngle: currentAngle + trackPad / 2,
-        endAngle: currentAngle + trackSweepAngle - trackPad / 2,
-        midAngle: currentAngle + trackSweepAngle / 2,
+        startAngle: trackArc.startAngle,
+        endAngle: trackArc.endAngle,
+        midAngle: trackArc.midAngle,
+        innerStartAngle: trackArc.innerStartAngle,
+        innerEndAngle: trackArc.innerEndAngle,
+        innerArcRadius: trackArc.innerArcRadius,
         innerRadius,
         outerRadius,
         percentage: trackPercentage,
@@ -229,13 +303,24 @@ export class PieSeries {
         return;
       }
 
+      const animatedInnerEnd =
+        slice.innerEndAngle !== undefined ? Math.min(slice.innerEndAngle, maxSweepAngle) : undefined;
+      const animatedInnerStart =
+        slice.innerStartAngle !== undefined && animatedInnerEnd !== undefined
+          ? Math.min(slice.innerStartAngle, animatedInnerEnd)
+          : slice.innerStartAngle;
+
       const animatedSlice: PieSliceGeometry =
         progress >= 1
           ? slice
           : {
               ...slice,
               endAngle: Math.min(slice.endAngle, maxSweepAngle),
+              innerStartAngle: animatedInnerStart,
+              innerEndAngle: animatedInnerEnd,
               innerRadius: slice.innerRadius * radiusScale,
+              innerArcRadius:
+                slice.innerArcRadius !== undefined ? slice.innerArcRadius * radiusScale : undefined,
               outerRadius: slice.outerRadius * radiusScale,
             };
 
@@ -304,17 +389,30 @@ export class PieSeries {
       ctx.shadowOffsetY = offsetY * 0.35;
     }
 
+    const effectiveInnerRadius = slice.innerArcRadius ?? innerRadius;
+    const innerStart = slice.innerStartAngle ?? startAngle;
+    const innerEnd = slice.innerEndAngle ?? endAngle;
+
     ctx.beginPath();
 
-    if (innerRadius <= 0) {
+    if (effectiveInnerRadius <= 0) {
       // 1. 순수 파이 차트 (부채꼴)
       ctx.moveTo(currentCx, currentCy);
       ctx.arc(currentCx, currentCy, currentOuterRadius, startAngle, endAngle, false);
       ctx.closePath();
-    } else {
-      // 2. 도넛 차트 (도넛 링 형태: 외곽 아크 -> 안쪽 역방향 아크)
+    } else if (innerEnd <= innerStart + 0.0001) {
+      // 2. 평행 간격(sliceGap)에서 좁은 조각의 양 변이 내부 교점으로 수렴하는 형태
+      const innerMid = (innerStart + innerEnd) / 2;
       ctx.arc(currentCx, currentCy, currentOuterRadius, startAngle, endAngle, false);
-      ctx.arc(currentCx, currentCy, innerRadius, endAngle, startAngle, true);
+      ctx.lineTo(
+        currentCx + Math.cos(innerMid) * effectiveInnerRadius,
+        currentCy + Math.sin(innerMid) * effectiveInnerRadius
+      );
+      ctx.closePath();
+    } else {
+      // 3. 도넛 차트 (도넛 링 형태: 외곽 아크 -> 안쪽 역방향 아크)
+      ctx.arc(currentCx, currentCy, currentOuterRadius, startAngle, endAngle, false);
+      ctx.arc(currentCx, currentCy, effectiveInnerRadius, innerEnd, innerStart, true);
       ctx.closePath();
     }
 
@@ -327,7 +425,10 @@ export class PieSeries {
 
     // 기본 테두리 또는 호버 하이라이트 테두리
     const border = this.styleOptions.border;
-    const effectivePad = this.styleOptions.padAngle ?? (innerRadius > 0 ? 0.02 : 0);
+    const hasSliceGap =
+      this.styleOptions.sliceGap !== undefined
+        ? this.styleOptions.sliceGap > 0.0005
+        : (this.styleOptions.padAngle ?? (innerRadius > 0 ? 0.02 : 0)) > 0.0005;
     if (hoverRatio > 0.05) {
       ctx.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, hoverRatio)})`;
       ctx.lineWidth = 1.5 * Math.min(1, hoverRatio);
@@ -336,8 +437,8 @@ export class PieSeries {
       ctx.strokeStyle = border.color || '#151C2C';
       ctx.lineWidth = border.width;
       ctx.stroke();
-    } else if (effectivePad <= 0.0005) {
-      // 조각 간격(padAngle)이 0일 때 인접 조각 사이의 안티앨리어싱 미세 실금(Seam)을 메우기 위한 동색 미세 테두리
+    } else if (!hasSliceGap) {
+      // 조각 간격이 0일 때 인접 조각 사이의 안티앨리어싱 미세 실금(Seam)을 메우기 위한 동색 미세 테두리
       ctx.strokeStyle = color;
       ctx.lineWidth = 0.6;
       ctx.lineJoin = 'round';
@@ -492,7 +593,10 @@ export class PieSeries {
     const labelEls: string[] = [];
     const border = this.styleOptions.border;
     const hasInnerHole = (slices[0]?.innerRadius ?? 0) > 0.5;
-    const effectivePad = this.styleOptions.padAngle ?? (hasInnerHole ? 0.02 : 0);
+    const hasSliceGap =
+      this.styleOptions.sliceGap !== undefined
+        ? this.styleOptions.sliceGap > 0.0005
+        : (this.styleOptions.padAngle ?? (hasInnerHole ? 0.02 : 0)) > 0.0005;
     let customStrokeAttr = '';
     if (border && border.width && border.width > 0) {
       const parsedBorder = parseSvgColor(border.color || '#151C2C');
@@ -503,20 +607,22 @@ export class PieSeries {
       const pathD = buildSvgPieSlicePathData(
         slice.cx,
         slice.cy,
-        slice.innerRadius,
+        slice.innerArcRadius ?? slice.innerRadius,
         slice.outerRadius,
         slice.startAngle,
-        slice.endAngle
+        slice.endAngle,
+        slice.innerStartAngle,
+        slice.innerEndAngle
       );
       if (!pathD) return;
       const parsedFill = parseSvgColor(slice.color);
       const fillOpacityAttr =
         parsedFill.opacity < 0.999 ? ` fill-opacity="${fmt(parsedFill.opacity)}"` : '';
       const pctText = `${(slice.percentage * 100).toFixed(1)}%`;
-      // padAngle이 0이고 별도 border가 없을 때는 조각 경계 안티앨리어싱 실금을 막기 위해 0.5px 동색 stroke 부여
+      // 조각 간격이 0이고 별도 border가 없을 때는 조각 경계 안티앨리어싱 실금을 막기 위해 0.5px 동색 stroke 부여
       const sliceStrokeAttr =
         customStrokeAttr ||
-        (effectivePad <= 0.0005 && parsedFill.opacity >= 0.999
+        (!hasSliceGap && parsedFill.opacity >= 0.999
           ? ` stroke="${escapeXml(parsedFill.color)}" stroke-width="0.5" stroke-linejoin="round"`
           : '');
       const sliceId = slice.isTrack

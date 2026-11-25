@@ -315,6 +315,8 @@ export function buildSvgLinePathData(
 
 /**
  * 파이/도넛 부채꼴 조각의 SVG `<path d="..." />` 문자열을 생성합니다.
+ * `innerStartAngle` / `innerEndAngle`이 전달되면 외곽과 내부 아크의 각도를 분리하여
+ * 평행한 일정 픽셀 간격(`sliceGap`) 도넛/파이 벡터를 생성합니다.
  */
 export function buildSvgPieSlicePathData(
   cx: number,
@@ -322,7 +324,9 @@ export function buildSvgPieSlicePathData(
   innerRadius: number,
   outerRadius: number,
   startAngle: number,
-  endAngle: number
+  endAngle: number,
+  innerStartAngle?: number,
+  innerEndAngle?: number
 ): string {
   const sweep = endAngle - startAngle;
   if (sweep <= 0) return '';
@@ -337,7 +341,7 @@ export function buildSvgPieSlicePathData(
     );
   }
 
-  const largeArc = sweep > Math.PI ? 1 : 0;
+  const outerLargeArc = sweep > Math.PI ? 1 : 0;
 
   const ox1 = cx + Math.cos(startAngle) * outerRadius;
   const oy1 = cy + Math.sin(startAngle) * outerRadius;
@@ -348,21 +352,39 @@ export function buildSvgPieSlicePathData(
     return [
       `M ${fmt(cx)} ${fmt(cy)}`,
       `L ${fmt(ox1)} ${fmt(oy1)}`,
-      `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 ${largeArc} 1 ${fmt(ox2)} ${fmt(oy2)}`,
+      `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 ${outerLargeArc} 1 ${fmt(ox2)} ${fmt(oy2)}`,
       'Z',
     ].join(' ');
   }
 
-  const ix1 = cx + Math.cos(endAngle) * innerRadius;
-  const iy1 = cy + Math.sin(endAngle) * innerRadius;
-  const ix2 = cx + Math.cos(startAngle) * innerRadius;
-  const iy2 = cy + Math.sin(startAngle) * innerRadius;
+  const iStart = innerStartAngle ?? startAngle;
+  const iEnd = innerEndAngle ?? endAngle;
+  const innerSweep = iEnd - iStart;
+
+  // 좁은 조각에서 평행 경계선이 내부 아크 도달 전에 한 점으로 만나는 경우
+  if (innerSweep <= 0.0001) {
+    const midAngle = (iStart + iEnd) / 2;
+    const mx = cx + Math.cos(midAngle) * innerRadius;
+    const my = cy + Math.sin(midAngle) * innerRadius;
+    return [
+      `M ${fmt(ox1)} ${fmt(oy1)}`,
+      `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 ${outerLargeArc} 1 ${fmt(ox2)} ${fmt(oy2)}`,
+      `L ${fmt(mx)} ${fmt(my)}`,
+      'Z',
+    ].join(' ');
+  }
+
+  const innerLargeArc = innerSweep > Math.PI ? 1 : 0;
+  const ix1 = cx + Math.cos(iEnd) * innerRadius;
+  const iy1 = cy + Math.sin(iEnd) * innerRadius;
+  const ix2 = cx + Math.cos(iStart) * innerRadius;
+  const iy2 = cy + Math.sin(iStart) * innerRadius;
 
   return [
     `M ${fmt(ox1)} ${fmt(oy1)}`,
-    `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 ${largeArc} 1 ${fmt(ox2)} ${fmt(oy2)}`,
+    `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 ${outerLargeArc} 1 ${fmt(ox2)} ${fmt(oy2)}`,
     `L ${fmt(ix1)} ${fmt(iy1)}`,
-    `A ${fmt(innerRadius)} ${fmt(innerRadius)} 0 ${largeArc} 0 ${fmt(ix2)} ${fmt(iy2)}`,
+    `A ${fmt(innerRadius)} ${fmt(innerRadius)} 0 ${innerLargeArc} 0 ${fmt(ix2)} ${fmt(iy2)}`,
     'Z',
   ].join(' ');
 }

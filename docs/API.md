@@ -107,6 +107,7 @@
 | `pie.maxValue` | `number` | - | 100%(360°) 기준 목표 최대값 (잔여 영역 트랙 자동 생성) |
 | `pie.trackColor` | `string` | `'var(--surface-low)'` (`maxValue` 지정 시) | 잔여 영역 배경 트랙 색상 (`'transparent'`/`'none'` 시 숨김) |
 | `pie.padAngle` | `number` | 도넛 `0.02`, 파이 `0` | 조각 사이 여백 각도 (라디안) |
+| `pie.sliceGap` | `number` | - | 조각 사이 일정한 평행 픽셀 간격 (px). 지정 시 `padAngle`보다 우선 적용되어 안쪽~바깥쪽이 동일한 폭으로 분리됨 |
 | `pie.colors` | `string[] \| ((item, index) => string)` | `DEFAULT_PALETTE` | 조각 팔레트 또는 동적 색상 함수 |
 | `pie.hoverExplode` | `number` | `8` (일부 계산 `10` 폴백) | 호버 시 바깥으로 튀어나오는 거리 (px) |
 | `pie.border` | `{ color?: string; width?: number }` | - | 조각 외곽선 |

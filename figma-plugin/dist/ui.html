@@ -911,10 +911,17 @@
                 </div>
               </div>
               <div class="field">
-                <label>조각 간격 (Pad) <span class="val-badge" id="pie-pad-txt">1.5°</span></label>
-                <div class="slider-box">
-                  <input type="range" id="pie-pad-slider" min="0" max="5" value="1.5" step="0.5" />
-                </div>
+                <label>간격 방식 (Gap Mode)</label>
+                <select id="pie-gap-mode-select">
+                  <option value="px" selected>일정 간격 (px · 평행)</option>
+                  <option value="angle">각도 간격 (° · PadAngle)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>조각 간격 (Gap) <span class="val-badge" id="pie-pad-txt">3px</span></label>
+              <div class="slider-box">
+                <input type="range" id="pie-pad-slider" min="0" max="16" value="3" step="1" />
               </div>
             </div>
             <div class="row-2">
@@ -1094,14 +1101,14 @@
           <span class="section-sub">5.Spacing & Export</span>
         </div>
         <div class="section-body">
-          <div class="row-2">
+          <div class="row-2" id="spacing-row">
             <div class="field">
               <label>차트 여백 <span class="val-badge" id="padding-txt">24px</span></label>
               <div class="slider-box">
                 <input type="range" id="padding-slider" min="0" max="11" value="7" step="1" />
               </div>
             </div>
-            <div class="field">
+            <div class="field" id="gap-field">
               <label>요소 간격 <span class="val-badge" id="gap-txt">8px</span></label>
               <div class="slider-box">
                 <input type="range" id="gap-slider" min="0" max="11" value="3" step="1" />
@@ -1225,12 +1232,12 @@
   </div>
 
   <script type="module">
-    const NANOCHARTS_BUILD_META = {"version":"0.1.16","buildId":"0.1.16-1795584217939","buildTime":1795584217939,"builtAt":"2026-11-25T05:23:37.939Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+    const NANOCHARTS_BUILD_META = {"version":"0.1.16","buildId":"0.1.16-1795596581793","buildTime":1795596581793,"builtAt":"2026-11-25T08:49:41.793Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 
-var Te = Object.defineProperty;
-var Pe = (u, t, e) => t in u ? Te(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
-var M = (u, t, e) => Pe(u, typeof t != "symbol" ? t + "" : t, e);
-class re {
+var Ke = Object.defineProperty;
+var Ve = (u, t, e) => t in u ? Ke(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
+var M = (u, t, e) => Ve(u, typeof t != "symbol" ? t + "" : t, e);
+class ce {
   constructor(t) {
     M(this, "container");
     M(this, "canvases", /* @__PURE__ */ new Map());
@@ -1307,7 +1314,7 @@ class re {
     return { width: this.width, height: this.height, dpr: this.dpr };
   }
 }
-class ae {
+class de {
   constructor() {
     M(this, "events", /* @__PURE__ */ new Map());
   }
@@ -1331,7 +1338,7 @@ class ae {
     this.events.clear();
   }
 }
-const ve = {
+const $e = {
   linear: (u) => u,
   easeOutCubic: (u) => 1 - Math.pow(1 - u, 3),
   easeOutQuart: (u) => 1 - Math.pow(1 - u, 4),
@@ -1376,7 +1383,7 @@ class J {
       e(1), (a = i.onComplete) == null || a.call(i);
       return;
     }
-    const s = typeof i.easing == "function" ? i.easing : ve[i.easing] || ve.easeOutQuart, o = typeof performance < "u" ? performance.now() : Date.now(), r = i.duration, l = (c) => {
+    const s = typeof i.easing == "function" ? i.easing : $e[i.easing] || $e.easeOutQuart, o = typeof performance < "u" ? performance.now() : Date.now(), r = i.duration, l = (c) => {
       var g;
       const h = c - o, d = Math.min(1, Math.max(0, h / r)), f = s(d);
       e(f), d < 1 ? this.rafId = requestAnimationFrame(l) : (this.rafId = null, (g = i.onComplete) == null || g.call(i));
@@ -1396,7 +1403,7 @@ class J {
     this.rafId !== null && (typeof cancelAnimationFrame < "u" && cancelAnimationFrame(this.rafId), this.rafId = null);
   }
 }
-class xe {
+class Ie {
   constructor(t, e) {
     /** 데이터 도메인 [최솟값, 최댓값] */
     M(this, "_domain", [0, 1]);
@@ -1448,8 +1455,8 @@ class xe {
     let h;
     c <= 1 ? h = 1 * a : c <= 2 ? h = 2 * a : c <= 5 ? h = 5 * a : h = 10 * a;
     const d = Math.ceil(s / h) * h, f = [], g = Math.min(20, Math.max(0, -l)), m = 500;
-    for (let y = d; y <= n + h * 1e-3 && f.length < m; y += h)
-      f.push(Number(y.toFixed(g)));
+    for (let p = d; p <= n + h * 1e-3 && f.length < m; p += h)
+      f.push(Number(p.toFixed(g)));
     return e > i ? f.reverse() : f;
   }
   /**
@@ -1469,7 +1476,7 @@ class xe {
     return this._domain = e > i ? [f, d] : [d, f], this;
   }
 }
-class Ee {
+class Re {
   constructor(t = 0, e = [0, 1]) {
     /** 전체 데이터 개수 */
     M(this, "_domainCount", 0);
@@ -1560,7 +1567,7 @@ class Ee {
     return n < 0 || n >= this._domainCount ? -1 : n;
   }
 }
-const te = {
+const oe = {
   // Primary
   primary: "#226CFF",
   "primary-ultra-low": "#EFF5FF",
@@ -1897,7 +1904,7 @@ const te = {
   "on-pink-high": "#8C1C58",
   "on-pink-higher": "#681541",
   "on-pink-highest": "#460E2C"
-}, je = {
+}, Qe = {
   "rounded-xxs": 2,
   "rounded-xs": 3,
   "rounded-sm": 4,
@@ -1906,7 +1913,7 @@ const te = {
   "rounded-xl": 12,
   "rounded-xxl": 16,
   "rounded-full": 999
-}, ze = {
+}, Ne = {
   "padding/p-0_5": 2,
   "padding/p-1": 4,
   "padding/p-1_5": 6,
@@ -1919,7 +1926,7 @@ const te = {
   "padding/p-8": 32,
   "padding/p-9": 36,
   "padding/p-10": 40
-}, He = {
+}, We = {
   "gap/gap-0_5": 2,
   "gap/gap-1": 4,
   "gap/gap-1_5": 6,
@@ -1932,10 +1939,10 @@ const te = {
   "gap/gap-8": 32,
   "gap/gap-9": 36,
   "gap/gap-10": 40
-}, Ye = {
-  ...ze,
-  ...He
-}, Oe = /* @__PURE__ */ new Set([
+}, Je = {
+  ...Ne,
+  ...We
+}, _e = /* @__PURE__ */ new Set([
   "red",
   "orange",
   "amber",
@@ -1950,7 +1957,7 @@ const te = {
   "purple",
   "violet",
   "pink"
-]), be = {
+]), Ce = {
   30: ["ultra-low", "lower", "lowest"],
   40: ["ultra-low", "lowest"],
   50: ["lowest", "low", "ultra-low"],
@@ -1964,7 +1971,7 @@ const te = {
   800: ["ultra-high", "highest", "high"],
   900: ["ultra-high", "highest", "higher"],
   950: ["ultra-high", "highest"]
-}, Ke = {
+}, Ge = {
   30: ["lower"],
   50: ["low"],
   100: ["lower", "low"],
@@ -1975,7 +1982,7 @@ const te = {
   800: ["highest"],
   900: ["highest", "higher"],
   950: ["highest"]
-}, we = {
+}, ke = {
   20: "overlay-gray",
   30: "overlay-gray-lower",
   40: "overlay-gray-low",
@@ -1983,31 +1990,31 @@ const te = {
   100: "overlay-gray-high",
   200: "overlay-gray-higher"
 };
-function ue(u) {
+function be(u) {
   let t = (u || "").trim();
   const e = t.match(/^var\(\s*--([a-zA-Z0-9_/-]+)(?:\s*,\s*([^)]+))?\s*\)$/);
   e && (t = e[1]), t = t.replace(/^--+/, ""), t = t.replace(/^(?:color|colors|token|tokens|point|theme|palette|weseed|semantic|primitive)[\s/-]+/i, ""), t = t.replace(/[/-](?:default|base|-)+$/i, ""), t = t.replace(/\//g, "-").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase();
   const i = t.match(/^transparency-(\d+)$/);
-  if (i && we[i[1]])
-    return we[i[1]];
+  if (i && ke[i[1]])
+    return ke[i[1]];
   const s = t.match(/^([a-z-]+)-(\d+)$/);
   if (s) {
-    const n = s[1], o = s[2], r = Oe.has(n) && Ke[o] || be[o];
+    const n = s[1], o = s[2], r = _e.has(n) && Ge[o] || Ce[o];
     if (r)
       for (const l of r) {
         const a = l ? `${n}-${l}` : n;
-        if (te[a])
+        if (oe[a])
           return a;
       }
   }
   return t;
 }
-function Ue(u) {
+function et(u) {
   const t = (u || "").trim();
   if (!t) return "primary/-";
   if (t.includes("/"))
     return t.replace(/\s*\/\s*/g, "/");
-  const e = ue(t), i = e.match(
+  const e = be(t), i = e.match(
     /^overlay-(white|gray|black)(?:-(ultra-low|lowest|lower|low|mid|high|higher|highest|ultra-high|\d+))?$/
   );
   if (i)
@@ -2019,7 +2026,7 @@ function Ue(u) {
   );
   return s ? `${s[1]}/${s[2]}` : `${e}/-`;
 }
-function I(u, t) {
+function T(u, t) {
   if (!u) return "#226CFF";
   const e = u.trim();
   let i = null, s = null;
@@ -2029,8 +2036,8 @@ function I(u, t) {
   else if (e.startsWith("--"))
     i = e;
   else {
-    const o = ue(e);
-    te[o] && (i = `--${o}`);
+    const o = be(e);
+    oe[o] && (i = `--${o}`);
   }
   if (i) {
     if (typeof window < "u" && typeof document < "u")
@@ -2039,16 +2046,16 @@ function I(u, t) {
         if (l) return l;
       } catch {
       }
-    const o = ue(i);
-    if (te[o])
-      return te[o];
+    const o = be(i);
+    if (oe[o])
+      return oe[o];
     if (s)
-      return I(s, t);
+      return T(s, t);
   }
   return e;
 }
-function Ve(u) {
-  const t = I(u).trim();
+function Xe(u) {
+  const t = T(u).trim();
   if (t.startsWith("#")) {
     let i = t.slice(1);
     if (i.length === 3 && (i = i.split("").map((s) => s + s).join("")), i.length >= 6)
@@ -2069,8 +2076,8 @@ function Ve(u) {
     a: e[4] !== void 0 ? Math.max(0, Math.min(1, parseFloat(e[4]))) : 1
   } : { r: 34, g: 108, b: 255, a: 1 };
 }
-function Fe(u, t) {
-  const { r: e, g: i, b: s, a: n } = Ve(u), o = e / 255, r = i / 255, l = s / 255, a = Math.max(o, r, l), c = Math.min(o, r, l);
+function Ee(u, t) {
+  const { r: e, g: i, b: s, a: n } = Xe(u), o = e / 255, r = i / 255, l = s / 255, a = Math.max(o, r, l), c = Math.min(o, r, l);
   let h = 0, d = 0, f = (a + c) / 2;
   if (a !== c) {
     const F = a - c;
@@ -2089,24 +2096,24 @@ function Fe(u, t) {
   }
   let g = d * 100, m = f * 100;
   t.saturation !== void 0 && (g = t.saturation), t.saturationDelta !== void 0 && (g += t.saturationDelta), t.lightness !== void 0 && (m = t.lightness), t.lightnessDelta !== void 0 && (m += t.lightnessDelta), d = Math.max(0, Math.min(100, g)) / 100, f = Math.max(0, Math.min(100, m)) / 100;
-  let y, v, b;
+  let p, v, b;
   if (d === 0)
-    y = v = b = f;
+    p = v = b = f;
   else {
-    const F = (C, D, A) => {
-      let B = A;
-      return B < 0 && (B += 1), B > 1 && (B -= 1), B < 0.16666666666666666 ? C + (D - C) * 6 * B : B < 0.5 ? D : B < 0.6666666666666666 ? C + (D - C) * (0.6666666666666666 - B) * 6 : C;
-    }, E = f < 0.5 ? f * (1 + d) : f + d - f * d, k = 2 * f - E;
-    y = F(k, E, h + 1 / 3), v = F(k, E, h), b = F(k, E, h - 1 / 3);
+    const F = (k, B, D) => {
+      let A = D;
+      return A < 0 && (A += 1), A > 1 && (A -= 1), A < 0.16666666666666666 ? k + (B - k) * 6 * A : A < 0.5 ? B : A < 0.6666666666666666 ? k + (B - k) * (0.6666666666666666 - A) * 6 : k;
+    }, x = f < 0.5 ? f * (1 + d) : f + d - f * d, E = 2 * f - x;
+    p = F(E, x, h + 1 / 3), v = F(E, x, h), b = F(E, x, h - 1 / 3);
   }
-  const w = Math.round(y * 255), S = Math.round(v * 255), $ = Math.round(b * 255), x = t.alpha !== void 0 ? Math.max(0, Math.min(1, t.alpha)) : n;
-  return x < 0.999 ? `rgba(${w}, ${S}, ${$}, ${Number(x.toFixed(3))})` : "#" + [w, S, $].map((F) => F.toString(16).padStart(2, "0")).join("").toUpperCase();
+  const w = Math.round(p * 255), S = Math.round(v * 255), $ = Math.round(b * 255), C = t.alpha !== void 0 ? Math.max(0, Math.min(1, t.alpha)) : n;
+  return C < 0.999 ? `rgba(${w}, ${S}, ${$}, ${Number(C.toFixed(3))})` : "#" + [w, S, $].map((F) => F.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
 function Y(u, t = 11, e = 500) {
   const i = (u == null ? void 0 : u.family) || 'Pretendard, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', s = (u == null ? void 0 : u.size) ?? t;
   return `${(u == null ? void 0 : u.weight) ?? e} ${s}px ${i}`;
 }
-function We(u) {
+function je(u) {
   if (u == null)
     return [0, 0, 0, 0];
   if (typeof u == "number")
@@ -2118,42 +2125,42 @@ function We(u) {
   }
   return [0, 0, 0, 0];
 }
-function ie(u, t, e, i, s, n) {
+function re(u, t, e, i, s, n) {
   if (i <= 0 || s === 0) return;
   let o = e, r = s;
   s < 0 && (o = e + s, r = -s);
-  const [l, a, c, h] = We(n), d = Math.min(i / 2, r / 2), f = Math.min(l, d), g = Math.min(a, d), m = Math.min(c, d), y = Math.min(h, d);
-  u.beginPath(), u.moveTo(t + f, o), u.lineTo(t + i - g, o), g > 0 && u.quadraticCurveTo(t + i, o, t + i, o + g), u.lineTo(t + i, o + r - m), m > 0 && u.quadraticCurveTo(t + i, o + r, t + i - m, o + r), u.lineTo(t + y, o + r), y > 0 && u.quadraticCurveTo(t, o + r, t, o + r - y), u.lineTo(t, o + f), f > 0 && u.quadraticCurveTo(t, o, t + f, o), u.closePath();
+  const [l, a, c, h] = je(n), d = Math.min(i / 2, r / 2), f = Math.min(l, d), g = Math.min(a, d), m = Math.min(c, d), p = Math.min(h, d);
+  u.beginPath(), u.moveTo(t + f, o), u.lineTo(t + i - g, o), g > 0 && u.quadraticCurveTo(t + i, o, t + i, o + g), u.lineTo(t + i, o + r - m), m > 0 && u.quadraticCurveTo(t + i, o + r, t + i - m, o + r), u.lineTo(t + p, o + r), p > 0 && u.quadraticCurveTo(t, o + r, t, o + r - p), u.lineTo(t, o + f), f > 0 && u.quadraticCurveTo(t, o, t + f, o), u.closePath();
 }
-function se(u, t, e, i, s, n) {
+function ae(u, t, e, i, s, n) {
   let o;
   const r = s < 0 ? e + s : e, l = Math.abs(s);
-  return n.direction === "horizontal" ? o = u.createLinearGradient(t, r, t + i, r) : o = u.createLinearGradient(t, r, t, r + l), o.addColorStop(0, I(n.from)), o.addColorStop(1, I(n.to)), o;
+  return n.direction === "horizontal" ? o = u.createLinearGradient(t, r, t + i, r) : o = u.createLinearGradient(t, r, t, r + l), o.addColorStop(0, T(n.from)), o.addColorStop(1, T(n.to)), o;
 }
-function ne(u, t = [3, 3]) {
+function le(u, t = [3, 3]) {
   return u ? u.style === "solid" ? [] : u.style === "dotted" ? [2, 3] : u.style === "dashed" ? u.lineDash && u.lineDash.length > 0 ? u.lineDash : [5, 4] : u.lineDash !== void 0 ? u.lineDash : t : t;
 }
-class Be {
+class Te {
   /**
    * 배경 격자선(수평 Y, 수직 X), 줄무늬 배경(Alternate Band), 플롯 외곽 테두리(Plot Border)를 렌더링합니다.
    */
   static render(t, e, i, s, n, o, r) {
     var S;
-    const l = n.left, a = s - n.right, [c, h] = i.range(), d = Math.min(h, c), f = r ? r - n.bottom : Math.max(h, c), g = Math.max(0, a - l), m = Math.max(0, f - d), y = i.ticks(5);
+    const l = n.left, a = s - n.right, [c, h] = i.range(), d = Math.min(h, c), f = r ? r - n.bottom : Math.max(h, c), g = Math.max(0, a - l), m = Math.max(0, f - d), p = i.ticks(5);
     if ((S = e == null ? void 0 : e.alternateBand) != null && S.visible && g > 0 && m > 0) {
-      const $ = I(e.alternateBand.color || "rgba(148, 163, 184, 0.06)"), x = e.alternateBand.direction || "horizontal";
-      if (t.save(), t.fillStyle = $, x === "vertical" && o) {
-        const [F, E] = o.getViewport(), k = o.step(), C = o.bandwidth();
-        for (let D = F; D <= E; D++)
-          if (D % 2 === 1) {
-            const A = o.scale(D) - (k - C) / 2, B = Math.max(l, A), T = Math.min(a, A + k) - B;
-            T > 0 && t.fillRect(B, d, T, m);
+      const $ = T(e.alternateBand.color || "rgba(148, 163, 184, 0.06)"), C = e.alternateBand.direction || "horizontal";
+      if (t.save(), t.fillStyle = $, C === "vertical" && o) {
+        const [F, x] = o.getViewport(), E = o.step(), k = o.bandwidth();
+        for (let B = F; B <= x; B++)
+          if (B % 2 === 1) {
+            const D = o.scale(B) - (E - k) / 2, A = Math.max(l, D), z = Math.min(a, D + E) - A;
+            z > 0 && t.fillRect(A, d, z, m);
           }
-      } else if (y.length >= 2) {
-        for (let F = 0; F < y.length - 1; F++)
+      } else if (p.length >= 2) {
+        for (let F = 0; F < p.length - 1; F++)
           if (F % 2 === 0) {
-            const E = i.scale(y[F]), k = i.scale(y[F + 1]), C = Math.min(E, k), D = Math.abs(E - k);
-            t.fillRect(l, C, g, D);
+            const x = i.scale(p[F]), E = i.scale(p[F + 1]), k = Math.min(x, E), B = Math.abs(x - E);
+            t.fillRect(l, k, g, B);
           }
       }
       t.restore();
@@ -2165,32 +2172,32 @@ class Be {
       lineDash: [3, 3]
     };
     if (v.visible !== !1) {
-      t.save(), t.strokeStyle = I(v.color || "#F1F5F9"), t.lineWidth = v.lineWidth ?? 1, v.opacity !== void 0 && (t.globalAlpha = Math.max(0, Math.min(1, v.opacity)));
-      const $ = ne(v, [3, 3]);
+      t.save(), t.strokeStyle = T(v.color || "#F1F5F9"), t.lineWidth = v.lineWidth ?? 1, v.opacity !== void 0 && (t.globalAlpha = Math.max(0, Math.min(1, v.opacity)));
+      const $ = le(v, [3, 3]);
       t.setLineDash($);
-      for (const x of y) {
-        const F = Math.round(i.scale(x)) + 0.5;
+      for (const C of p) {
+        const F = Math.round(i.scale(C)) + 0.5;
         t.beginPath(), t.moveTo(l, F), t.lineTo(a, F), t.stroke();
       }
       t.restore();
     }
     const b = e == null ? void 0 : e.x;
     if (b != null && b.visible && o) {
-      const [$, x] = o.getViewport(), F = o.bandwidth();
-      t.save(), t.strokeStyle = I(b.color || "#F1F5F9"), t.lineWidth = b.lineWidth ?? 1, b.opacity !== void 0 && (t.globalAlpha = Math.max(0, Math.min(1, b.opacity)));
-      const E = ne(b, [3, 3]);
-      t.setLineDash(E);
-      for (let k = $; k <= x; k++) {
-        const C = Math.round(o.scale(k) + F / 2) + 0.5;
-        C >= l && C <= a && (t.beginPath(), t.moveTo(C, d), t.lineTo(C, f), t.stroke());
+      const [$, C] = o.getViewport(), F = o.bandwidth();
+      t.save(), t.strokeStyle = T(b.color || "#F1F5F9"), t.lineWidth = b.lineWidth ?? 1, b.opacity !== void 0 && (t.globalAlpha = Math.max(0, Math.min(1, b.opacity)));
+      const x = le(b, [3, 3]);
+      t.setLineDash(x);
+      for (let E = $; E <= C; E++) {
+        const k = Math.round(o.scale(E) + F / 2) + 0.5;
+        k >= l && k <= a && (t.beginPath(), t.moveTo(k, d), t.lineTo(k, f), t.stroke());
       }
       t.restore();
     }
     const w = e == null ? void 0 : e.border;
-    w != null && w.visible && g > 0 && m > 0 && (t.save(), t.strokeStyle = I(w.color || "#CBD5E1"), t.lineWidth = w.lineWidth ?? 1, w.lineDash && w.lineDash.length > 0 ? t.setLineDash(w.lineDash) : t.setLineDash([]), ie(t, l, d, g, m, w.radius ?? 0), t.stroke(), t.restore());
+    w != null && w.visible && g > 0 && m > 0 && (t.save(), t.strokeStyle = T(w.color || "#CBD5E1"), t.lineWidth = w.lineWidth ?? 1, w.lineDash && w.lineDash.length > 0 ? t.setLineDash(w.lineDash) : t.setLineDash([]), re(t, l, d, g, m, w.radius ?? 0), t.stroke(), t.restore());
   }
 }
-function Se(u, t, e) {
+function xe(u, t, e) {
   if (e <= 0 || !t) return "";
   if (u.measureText(t).width <= e) return t;
   const i = "…", s = u.measureText(i).width;
@@ -2202,48 +2209,48 @@ function Se(u, t, e) {
   }
   return n > 0 ? t.slice(0, n) + i : i;
 }
-class oe {
+class he {
   static renderYAxis(t, e, i, s) {
     if ((e == null ? void 0 : e.visible) === !1) return;
-    const n = i.ticks(5), o = (e == null ? void 0 : e.font) || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', r = I((e == null ? void 0 : e.labelColor) || "#94A3B8"), l = (e == null ? void 0 : e.labelOffset) ?? 8, a = s.left - l, c = Math.max(12, s.left - l - 2);
+    const n = i.ticks(5), o = (e == null ? void 0 : e.font) || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', r = T((e == null ? void 0 : e.labelColor) || "#94A3B8"), l = (e == null ? void 0 : e.labelOffset) ?? 8, a = s.left - l, c = Math.max(12, s.left - l - 2);
     t.save(), t.font = o, t.fillStyle = r, t.textAlign = "right", t.textBaseline = "middle";
     for (const h of n) {
-      const d = i.scale(h), f = e != null && e.formatter ? e.formatter(h) : h.toLocaleString(), g = Se(t, f, c);
+      const d = i.scale(h), f = e != null && e.formatter ? e.formatter(h) : h.toLocaleString(), g = xe(t, f, c);
       t.fillText(g, a, d);
     }
     if (e != null && e.lineWidth && e.lineWidth > 0) {
-      t.strokeStyle = I(e.color || "#CBD5E1"), t.lineWidth = e.lineWidth;
+      t.strokeStyle = T(e.color || "#CBD5E1"), t.lineWidth = e.lineWidth;
       const [h, d] = i.range();
       t.beginPath(), t.moveTo(s.left, h), t.lineTo(s.left, d), t.stroke();
     }
     t.restore();
   }
   static renderXAxis(t, e, i, s, n, o) {
-    var D;
+    var B;
     if ((e == null ? void 0 : e.visible) === !1) return;
     const [r, l] = i.getViewport(), a = l - r + 1;
     if (a <= 0 || s.length === 0) return;
-    const c = (e == null ? void 0 : e.font) || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', h = I((e == null ? void 0 : e.labelColor) || "#64748B"), d = (e == null ? void 0 : e.labelOffset) ?? 10, f = n - o.bottom + d;
+    const c = (e == null ? void 0 : e.font) || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', h = T((e == null ? void 0 : e.labelColor) || "#64748B"), d = (e == null ? void 0 : e.labelOffset) ?? 10, f = n - o.bottom + d;
     t.save(), t.font = c, t.fillStyle = h, t.textAlign = "center", t.textBaseline = "top";
-    const g = i.bandwidth(), m = i.step(), [y, v] = i.range(), b = Math.max(1, v - y);
+    const g = i.bandwidth(), m = i.step(), [p, v] = i.range(), b = Math.max(1, v - p);
     let w = 0;
     const S = Math.max(1, Math.floor(a / 24));
-    for (let A = r; A <= l; A += S) {
-      const B = ((D = s[A]) == null ? void 0 : D.label) ?? "", T = e != null && e.formatter ? e.formatter(B) : B, R = t.measureText(T).width;
-      R > w && (w = R);
+    for (let D = r; D <= l; D += S) {
+      const A = ((B = s[D]) == null ? void 0 : B.label) ?? "", z = e != null && e.formatter ? e.formatter(A) : A, V = t.measureText(z).width;
+      V > w && (w = V);
     }
-    const x = Math.min(w, Math.max(48, b * 0.45)) + 12, F = Math.max(1, Math.ceil(x / (m || 1))), E = Math.max(20, Math.min(b, (m || b) * F - 8));
-    for (let A = r; A <= l; A += F) {
-      const B = s[A];
-      if (!B) continue;
-      const R = i.scale(A) + g / 2, z = e != null && e.formatter ? e.formatter(B.label ?? "") : B.label ?? "", V = Se(t, z, E);
-      t.fillText(V, R, f);
+    const C = Math.min(w, Math.max(48, b * 0.45)) + 12, F = Math.max(1, Math.ceil(C / (m || 1))), x = Math.max(20, Math.min(b, (m || b) * F - 8));
+    for (let D = r; D <= l; D += F) {
+      const A = s[D];
+      if (!A) continue;
+      const V = i.scale(D) + g / 2, N = e != null && e.formatter ? e.formatter(A.label ?? "") : A.label ?? "", W = xe(t, N, x);
+      t.fillText(W, V, f);
     }
-    const k = I((e == null ? void 0 : e.color) || "#E2E8F0"), C = (e == null ? void 0 : e.lineWidth) ?? 1;
-    if (C > 0) {
-      t.strokeStyle = k, t.lineWidth = C;
-      const A = n - o.bottom;
-      t.beginPath(), t.moveTo(y, A), t.lineTo(v, A), t.stroke();
+    const E = T((e == null ? void 0 : e.color) || "#E2E8F0"), k = (e == null ? void 0 : e.lineWidth) ?? 1;
+    if (k > 0) {
+      t.strokeStyle = E, t.lineWidth = k;
+      const D = n - o.bottom;
+      t.beginPath(), t.moveTo(p, D), t.lineTo(v, D), t.stroke();
     }
     t.restore();
   }
@@ -2251,10 +2258,10 @@ class oe {
 function Q(u) {
   return String(u ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-function Me(u) {
+function Ae(u) {
   return typeof u == "number" ? Number.isFinite(u) ? u.toLocaleString() : "-" : u == null ? "-" : Q(u);
 }
-class le {
+class fe {
   constructor(t, e) {
     M(this, "element");
     M(this, "container");
@@ -2270,7 +2277,7 @@ class le {
     ((n = this.options) == null ? void 0 : n.enabled) !== !1 && ((o = this.options) != null && o.formatter ? this.element.innerHTML = this.options.formatter(i, s) : this.element.innerHTML = `
         <div style="font-weight: 600; color: #94A3B8; margin-bottom: 2px;">${Q(i.label)}</div>
         <div style="font-size: 14px; font-weight: 700; color: #F8FAFC;">
-          ${Me(i.value)}
+          ${Ae(i.value)}
         </div>
       `, this.positionTooltip(t, e));
   }
@@ -2284,7 +2291,7 @@ class le {
         this.element.innerHTML = this.options.multiFormatter(i, s, n);
       else {
         const c = s.map((d) => {
-          const f = d.highlighted ? "700" : "500", g = d.highlighted ? "#F8FAFC" : "#CBD5E1", m = Q(d.color), y = typeof d.percentage == "number" && Number.isFinite(d.percentage) ? ` <span style="color:#94A3B8;font-size:11px;">(${d.percentage.toFixed(1)}%)</span>` : "";
+          const f = d.highlighted ? "700" : "500", g = d.highlighted ? "#F8FAFC" : "#CBD5E1", m = Q(d.color), p = typeof d.percentage == "number" && Number.isFinite(d.percentage) ? ` <span style="color:#94A3B8;font-size:11px;">(${d.percentage.toFixed(1)}%)</span>` : "";
           return `
             <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:3px;">
               <div style="display:flex;align-items:center;gap:6px;">
@@ -2292,7 +2299,7 @@ class le {
                 <span style="color:${g};font-weight:${f};">${Q(d.seriesName)}</span>
               </div>
               <div style="font-weight:700;color:#F8FAFC;">
-                ${Me(d.value)}${y}
+                ${Ae(d.value)}${p}
               </div>
             </div>
           `;
@@ -2333,7 +2340,7 @@ class le {
     this.element.remove();
   }
 }
-function me(u, t = "end") {
+function we(u, t = "end") {
   const e = u ?? "top";
   switch (e) {
     case "top-left":
@@ -2370,7 +2377,7 @@ function me(u, t = "end") {
       return { side: e, align: t };
   }
 }
-class he {
+class ge {
   /**
    * Legend 인스턴스를 생성합니다.
    * 
@@ -2424,7 +2431,7 @@ class he {
    * 범례 컨테이너의 위치 및 레이아웃 CSS 스타일을 적용합니다.
    */
   applyRootStyles() {
-    const t = this.rootEl, { side: e, align: i } = me(this.options.position, this.options.align ?? "end");
+    const t = this.rootEl, { side: e, align: i } = we(this.options.position, this.options.align ?? "end");
     t.style.boxSizing = "border-box", t.style.margin = "0", t.style.padding = "0", t.style.position = "absolute", t.style.zIndex = "10", t.style.display = this.visible && this.items.length > 0 ? "flex" : "none", t.style.flexWrap = "wrap", t.style.gap = "6px 12px", t.style.pointerEvents = "auto", t.style.userSelect = "none", t.style.fontFamily = this.options.fontFamily || "'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", t.style.top = "", t.style.bottom = "", t.style.left = "", t.style.right = "", t.style.flexDirection = "row", t.style.maxWidth = "", t.style.maxHeight = "";
     const s = {
       start: "flex-start",
@@ -2439,7 +2446,7 @@ class he {
   getReservedPadding() {
     if (!this.visible || this.items.length === 0)
       return {};
-    const { side: t } = me(this.options.position, this.options.align ?? "end");
+    const { side: t } = we(this.options.position, this.options.align ?? "end");
     switch (t) {
       case "top":
         return { top: 28 };
@@ -2545,7 +2552,7 @@ class he {
    * 각 범례 항목의 활성/비활성 및 호버 상태에 맞춰 스타일을 갱신합니다.
    */
   syncItemStyles() {
-    const t = I(this.options.textColor ?? "#E2E8F0"), e = I(this.options.inactiveColor ?? "#64748B");
+    const t = T(this.options.textColor ?? "#E2E8F0"), e = T(this.options.inactiveColor ?? "#64748B");
     for (const i of this.items) {
       const s = this.itemElements.get(i.key);
       if (!s) continue;
@@ -2560,14 +2567,14 @@ class he {
     this.rootEl.remove(), this.itemElements.clear();
   }
 }
-function L(u) {
+function I(u) {
   return String(u).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
-function p(u) {
+function y(u) {
   return Number.isFinite(u) ? Number(u.toFixed(2)).toString() : "0";
 }
-function X(u) {
-  const e = I(u || "#226CFF").trim();
+function G(u) {
+  const e = T(u || "#226CFF").trim();
   if (e === "transparent" || e === "none")
     return { color: "none", opacity: 0 };
   const i = e.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)$/i);
@@ -2577,21 +2584,21 @@ function X(u) {
   }
   return { color: e, opacity: 1 };
 }
-function Ne(u, t, e, i, s, n, o) {
-  const r = e.direction === "horizontal", l = p(i), a = p(s), c = p(r ? i + n : i), h = p(r ? s : s + o), d = X(e.from), f = X(e.to);
+function Ye(u, t, e, i, s, n, o) {
+  const r = e.direction === "horizontal", l = y(i), a = y(s), c = y(r ? i + n : i), h = y(r ? s : s + o), d = G(e.from), f = G(e.to);
   return u.push(
-    `<linearGradient id="${L(t)}" x1="${l}" y1="${a}" x2="${c}" y2="${h}" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${L(d.color)}" stop-opacity="${p(d.opacity)}" /><stop offset="100%" stop-color="${L(f.color)}" stop-opacity="${p(f.opacity)}" /></linearGradient>`
+    `<linearGradient id="${I(t)}" x1="${l}" y1="${a}" x2="${c}" y2="${h}" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${I(d.color)}" stop-opacity="${y(d.opacity)}" /><stop offset="100%" stop-color="${I(f.color)}" stop-opacity="${y(f.opacity)}" /></linearGradient>`
   ), `url(#${t})`;
 }
-function ye(u, t, e, i, s, n, o, r, l = 1) {
+function Fe(u, t, e, i, s, n, o, r, l = 1) {
   if (typeof t == "string") {
-    const h = X(t), d = h.opacity * l, f = d < 0.999 ? ` ${u}-opacity="${p(d)}"` : "";
-    return `${u}="${L(h.color)}"${f}`;
+    const h = G(t), d = h.opacity * l, f = d < 0.999 ? ` ${u}-opacity="${y(d)}"` : "";
+    return `${u}="${I(h.color)}"${f}`;
   }
-  const a = Ne(e, i, t, s, n, o, r), c = l < 0.999 ? ` ${u}-opacity="${p(l)}"` : "";
+  const a = Ye(e, i, t, s, n, o, r), c = l < 0.999 ? ` ${u}-opacity="${y(l)}"` : "";
   return `${u}="${a}"${c}`;
 }
-function _e(u) {
+function Ue(u) {
   const t = {
     fontWeight: "500",
     fontSize: 11,
@@ -2602,133 +2609,143 @@ function _e(u) {
   return { fontWeight: n, fontSize: i, fontFamily: r };
 }
 function j(u) {
-  const { id: t, x: e, y: i, text: s, font: n, fill: o = "#94A3B8", align: r = "center", baseline: l = "middle" } = u, { fontWeight: a, fontSize: c, fontFamily: h } = _e(n), d = X(o);
+  const { id: t, x: e, y: i, text: s, font: n, fill: o = "#94A3B8", align: r = "center", baseline: l = "middle" } = u, { fontWeight: a, fontSize: c, fontFamily: h } = Ue(n), d = G(o);
   let f = "middle";
   r === "left" ? f = "start" : r === "right" && (f = "end");
   let g = i;
   l === "middle" ? g = i + c * 0.35 : l === "top" ? g = i + c * 0.85 : l === "bottom" && (g = i - c * 0.1);
-  const m = t ? ` id="${L(t)}"` : "", y = d.opacity < 0.999 ? ` fill-opacity="${p(d.opacity)}"` : "";
-  return `<text${m} x="${p(e)}" y="${p(g)}" text-anchor="${f}" fill="${L(d.color)}"${y} font-family="${L(h)}" font-size="${p(c)}" font-weight="${L(a)}">${L(s)}</text>`;
+  const m = t ? ` id="${I(t)}"` : "", p = d.opacity < 0.999 ? ` fill-opacity="${y(d.opacity)}"` : "";
+  return `<text${m} x="${y(e)}" y="${y(g)}" text-anchor="${f}" fill="${I(d.color)}"${p} font-family="${I(h)}" font-size="${y(c)}" font-weight="${I(a)}">${I(s)}</text>`;
 }
-function De(u) {
+function Pe(u) {
   const { id: t, x: e, y: i, width: s, height: n, radius: o = 0, fillAttrs: r, strokeAttrs: l = "" } = u;
   if (s <= 0 || n <= 0) return "";
   let a = 0, c = 0, h = 0, d = 0;
   typeof o == "number" ? a = c = h = d = Math.max(0, o) : Array.isArray(o) && (a = Math.max(0, o[0] || 0), c = Math.max(0, o[1] || 0), h = Math.max(0, o[2] || 0), d = Math.max(0, o[3] || 0));
-  const f = Math.min(s / 2, n / 2), g = Math.max(0, Math.min(a, f)), m = Math.max(0, Math.min(c, f)), y = Math.max(0, Math.min(h, f)), v = Math.max(0, Math.min(d, f)), b = t ? ` id="${L(t)}"` : "", w = l ? ` ${l}` : "", S = a > 0 || c > 0 || h > 0 || d > 0 ? ` data-corners="${p(a)},${p(c)},${p(h)},${p(d)}" data-box="${p(e)},${p(i)},${p(s)},${p(n)}"` : "";
+  const f = Math.min(s / 2, n / 2), g = Math.max(0, Math.min(a, f)), m = Math.max(0, Math.min(c, f)), p = Math.max(0, Math.min(h, f)), v = Math.max(0, Math.min(d, f)), b = t ? ` id="${I(t)}"` : "", w = l ? ` ${l}` : "", S = a > 0 || c > 0 || h > 0 || d > 0 ? ` data-corners="${y(a)},${y(c)},${y(h)},${y(d)}" data-box="${y(e)},${y(i)},${y(s)},${y(n)}"` : "";
   if (a === c && c === h && h === d) {
-    const x = a > 0 ? ` rx="${p(a)}" ry="${p(a)}"` : "";
-    return `<rect${b} x="${p(e)}" y="${p(i)}" width="${p(s)}" height="${p(n)}"${x}${S} ${r}${w} />`;
+    const C = a > 0 ? ` rx="${y(a)}" ry="${y(a)}"` : "";
+    return `<rect${b} x="${y(e)}" y="${y(i)}" width="${y(s)}" height="${y(n)}"${C}${S} ${r}${w} />`;
   }
   const $ = [
-    `M ${p(e + g)} ${p(i)}`,
-    `L ${p(e + s - m)} ${p(i)}`,
-    m > 0 ? `A ${p(m)} ${p(m)} 0 0 1 ${p(e + s)} ${p(i + m)}` : "",
-    `L ${p(e + s)} ${p(i + n - y)}`,
-    y > 0 ? `A ${p(y)} ${p(y)} 0 0 1 ${p(e + s - y)} ${p(i + n)}` : "",
-    `L ${p(e + v)} ${p(i + n)}`,
-    v > 0 ? `A ${p(v)} ${p(v)} 0 0 1 ${p(e)} ${p(i + n - v)}` : "",
-    `L ${p(e)} ${p(i + g)}`,
-    g > 0 ? `A ${p(g)} ${p(g)} 0 0 1 ${p(e + g)} ${p(i)}` : "",
+    `M ${y(e + g)} ${y(i)}`,
+    `L ${y(e + s - m)} ${y(i)}`,
+    m > 0 ? `A ${y(m)} ${y(m)} 0 0 1 ${y(e + s)} ${y(i + m)}` : "",
+    `L ${y(e + s)} ${y(i + n - p)}`,
+    p > 0 ? `A ${y(p)} ${y(p)} 0 0 1 ${y(e + s - p)} ${y(i + n)}` : "",
+    `L ${y(e + v)} ${y(i + n)}`,
+    v > 0 ? `A ${y(v)} ${y(v)} 0 0 1 ${y(e)} ${y(i + n - v)}` : "",
+    `L ${y(e)} ${y(i + g)}`,
+    g > 0 ? `A ${y(g)} ${y(g)} 0 0 1 ${y(e + g)} ${y(i)}` : "",
     "Z"
   ].filter(Boolean).join(" ");
   return `<path${b}${S} d="${$}" ${r}${w} />`;
 }
-function fe(u, t = "smooth", e = 0.35, i = !1) {
+function pe(u, t = "smooth", e = 0.35, i = !1) {
   if (u.length === 0) return "";
   const s = [];
-  if (s.push(`${i ? "L" : "M"} ${p(u[0].x)} ${p(u[0].y)}`), u.length === 1) return s.join(" ");
+  if (s.push(`${i ? "L" : "M"} ${y(u[0].x)} ${y(u[0].y)}`), u.length === 1) return s.join(" ");
   const n = Math.max(0, Math.min(1, e));
   if (t === "linear")
     for (let o = 1; o < u.length; o++)
-      s.push(`L ${p(u[o].x)} ${p(u[o].y)}`);
+      s.push(`L ${y(u[o].x)} ${y(u[o].y)}`);
   else if (t === "step")
     for (let o = 1; o < u.length; o++) {
       const r = u[o - 1], l = u[o], a = (r.x + l.x) / 2;
-      s.push(`L ${p(a)} ${p(r.y)}`), s.push(`L ${p(a)} ${p(l.y)}`), s.push(`L ${p(l.x)} ${p(l.y)}`);
+      s.push(`L ${y(a)} ${y(r.y)}`), s.push(`L ${y(a)} ${y(l.y)}`), s.push(`L ${y(l.x)} ${y(l.y)}`);
     }
   else
     for (let o = 0; o < u.length - 1; o++) {
       const r = u[o > 0 ? o - 1 : 0], l = u[o], a = u[o + 1], c = u[o + 2 < u.length ? o + 2 : o + 1], h = l.x + (a.x - r.x) * n / 2, d = l.y + (a.y - r.y) * n / 2, f = a.x - (c.x - l.x) * n / 2, g = a.y - (c.y - l.y) * n / 2;
       s.push(
-        `C ${p(h)} ${p(d)}, ${p(f)} ${p(g)}, ${p(a.x)} ${p(a.y)}`
+        `C ${y(h)} ${y(d)}, ${y(f)} ${y(g)}, ${y(a.x)} ${y(a.y)}`
       );
     }
   return s.join(" ");
 }
-function pe(u, t, e, i, s, n) {
-  const o = n - s;
-  if (o <= 0) return "";
-  if (o >= Math.PI * 2 - 1e-4) {
-    const y = s + Math.PI;
-    return pe(u, t, e, i, s, y - 5e-4) + " " + pe(u, t, e, i, y - 5e-4, n);
+function Se(u, t, e, i, s, n, o, r) {
+  const l = n - s;
+  if (l <= 0) return "";
+  if (l >= Math.PI * 2 - 1e-4) {
+    const C = s + Math.PI;
+    return Se(u, t, e, i, s, C - 5e-4) + " " + Se(u, t, e, i, C - 5e-4, n);
   }
-  const r = o > Math.PI ? 1 : 0, l = u + Math.cos(s) * i, a = t + Math.sin(s) * i, c = u + Math.cos(n) * i, h = t + Math.sin(n) * i;
+  const a = l > Math.PI ? 1 : 0, c = u + Math.cos(s) * i, h = t + Math.sin(s) * i, d = u + Math.cos(n) * i, f = t + Math.sin(n) * i;
   if (e <= 0)
     return [
-      `M ${p(u)} ${p(t)}`,
-      `L ${p(l)} ${p(a)}`,
-      `A ${p(i)} ${p(i)} 0 ${r} 1 ${p(c)} ${p(h)}`,
+      `M ${y(u)} ${y(t)}`,
+      `L ${y(c)} ${y(h)}`,
+      `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
       "Z"
     ].join(" ");
-  const d = u + Math.cos(n) * e, f = t + Math.sin(n) * e, g = u + Math.cos(s) * e, m = t + Math.sin(s) * e;
+  const g = o ?? s, m = r ?? n, p = m - g;
+  if (p <= 1e-4) {
+    const C = (g + m) / 2, F = u + Math.cos(C) * e, x = t + Math.sin(C) * e;
+    return [
+      `M ${y(c)} ${y(h)}`,
+      `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
+      `L ${y(F)} ${y(x)}`,
+      "Z"
+    ].join(" ");
+  }
+  const v = p > Math.PI ? 1 : 0, b = u + Math.cos(m) * e, w = t + Math.sin(m) * e, S = u + Math.cos(g) * e, $ = t + Math.sin(g) * e;
   return [
-    `M ${p(l)} ${p(a)}`,
-    `A ${p(i)} ${p(i)} 0 ${r} 1 ${p(c)} ${p(h)}`,
-    `L ${p(d)} ${p(f)}`,
-    `A ${p(e)} ${p(e)} 0 ${r} 0 ${p(g)} ${p(m)}`,
+    `M ${y(c)} ${y(h)}`,
+    `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
+    `L ${y(b)} ${y(w)}`,
+    `A ${y(e)} ${y(e)} 0 ${v} 0 ${y(S)} ${y($)}`,
     "Z"
   ].join(" ");
 }
-function Ae(u, t, e, i, s, n) {
+function ze(u, t, e, i, s, n) {
   var w;
   const o = i.left, r = e - i.right, [l, a] = t.range(), c = Math.min(a, l), h = n ? n - i.bottom : Math.max(a, l), d = Math.max(0, r - o), f = Math.max(0, h - c), g = t.ticks(5), m = [];
   if ((w = u == null ? void 0 : u.alternateBand) != null && w.visible && d > 0 && f > 0) {
-    const S = X(u.alternateBand.color || "rgba(148, 163, 184, 0.06)"), $ = S.opacity < 0.999 ? ` fill-opacity="${p(S.opacity)}"` : "";
+    const S = G(u.alternateBand.color || "rgba(148, 163, 184, 0.06)"), $ = S.opacity < 0.999 ? ` fill-opacity="${y(S.opacity)}"` : "";
     if ((u.alternateBand.direction || "horizontal") === "vertical" && s) {
-      const [F, E] = s.getViewport(), k = s.step(), C = s.bandwidth();
-      for (let D = F; D <= E; D++)
-        if (D % 2 === 1) {
-          const A = s.scale(D) - (k - C) / 2, B = Math.max(o, A), T = Math.min(r, A + k) - B;
-          T > 0 && m.push(
-            `<rect id="Grid Band X (${D})" x="${p(B)}" y="${p(c)}" width="${p(T)}" height="${p(f)}" fill="${L(S.color)}"${$} />`
+      const [F, x] = s.getViewport(), E = s.step(), k = s.bandwidth();
+      for (let B = F; B <= x; B++)
+        if (B % 2 === 1) {
+          const D = s.scale(B) - (E - k) / 2, A = Math.max(o, D), z = Math.min(r, D + E) - A;
+          z > 0 && m.push(
+            `<rect id="Grid Band X (${B})" x="${y(A)}" y="${y(c)}" width="${y(z)}" height="${y(f)}" fill="${I(S.color)}"${$} />`
           );
         }
     } else if (g.length >= 2) {
       for (let F = 0; F < g.length - 1; F++)
         if (F % 2 === 0) {
-          const E = t.scale(g[F]), k = t.scale(g[F + 1]), C = Math.min(E, k), D = Math.abs(E - k);
+          const x = t.scale(g[F]), E = t.scale(g[F + 1]), k = Math.min(x, E), B = Math.abs(x - E);
           m.push(
-            `<rect id="Grid Band Y (${F})" x="${p(o)}" y="${p(C)}" width="${p(d)}" height="${p(D)}" fill="${L(S.color)}"${$} />`
+            `<rect id="Grid Band Y (${F})" x="${y(o)}" y="${y(k)}" width="${y(d)}" height="${y(B)}" fill="${I(S.color)}"${$} />`
           );
         }
     }
   }
-  const y = (u == null ? void 0 : u.y) ?? { visible: !0, color: "#1E293B", lineWidth: 1, lineDash: [3, 3] };
-  if (y.visible !== !1) {
-    const S = X(y.color || "#1E293B"), $ = ne(y, [3, 3]), x = $.length > 0 ? ` stroke-dasharray="${$.join(" ")}"` : "", F = S.opacity * (y.opacity ?? 1), E = F < 0.999 ? ` stroke-opacity="${p(F)}"` : "";
-    for (const k of g) {
-      const C = Math.round(t.scale(k)) + 0.5;
+  const p = (u == null ? void 0 : u.y) ?? { visible: !0, color: "#1E293B", lineWidth: 1, lineDash: [3, 3] };
+  if (p.visible !== !1) {
+    const S = G(p.color || "#1E293B"), $ = le(p, [3, 3]), C = $.length > 0 ? ` stroke-dasharray="${$.join(" ")}"` : "", F = S.opacity * (p.opacity ?? 1), x = F < 0.999 ? ` stroke-opacity="${y(F)}"` : "";
+    for (const E of g) {
+      const k = Math.round(t.scale(E)) + 0.5;
       m.push(
-        `<line id="Grid Line (${k})" x1="${p(o)}" y1="${p(C)}" x2="${p(r)}" y2="${p(C)}" stroke="${L(S.color)}"${E} stroke-width="${p(y.lineWidth || 1)}"${x} />`
+        `<line id="Grid Line (${E})" x1="${y(o)}" y1="${y(k)}" x2="${y(r)}" y2="${y(k)}" stroke="${I(S.color)}"${x} stroke-width="${y(p.lineWidth || 1)}"${C} />`
       );
     }
   }
   const v = u == null ? void 0 : u.x;
   if (v != null && v.visible && s) {
-    const [S, $] = s.getViewport(), x = s.bandwidth(), F = X(v.color || "#1E293B"), E = ne(v, [3, 3]), k = E.length > 0 ? ` stroke-dasharray="${E.join(" ")}"` : "", C = F.opacity * (v.opacity ?? 1), D = C < 0.999 ? ` stroke-opacity="${p(C)}"` : "";
-    for (let A = S; A <= $; A++) {
-      const B = Math.round(s.scale(A) + x / 2) + 0.5;
-      B >= o && B <= r && m.push(
-        `<line id="Grid Line X (${A})" x1="${p(B)}" y1="${p(c)}" x2="${p(B)}" y2="${p(h)}" stroke="${L(F.color)}"${D} stroke-width="${p(v.lineWidth || 1)}"${k} />`
+    const [S, $] = s.getViewport(), C = s.bandwidth(), F = G(v.color || "#1E293B"), x = le(v, [3, 3]), E = x.length > 0 ? ` stroke-dasharray="${x.join(" ")}"` : "", k = F.opacity * (v.opacity ?? 1), B = k < 0.999 ? ` stroke-opacity="${y(k)}"` : "";
+    for (let D = S; D <= $; D++) {
+      const A = Math.round(s.scale(D) + C / 2) + 0.5;
+      A >= o && A <= r && m.push(
+        `<line id="Grid Line X (${D})" x1="${y(A)}" y1="${y(c)}" x2="${y(A)}" y2="${y(h)}" stroke="${I(F.color)}"${B} stroke-width="${y(v.lineWidth || 1)}"${E} />`
       );
     }
   }
   const b = u == null ? void 0 : u.border;
   if (b != null && b.visible && d > 0 && f > 0) {
-    const S = X(b.color || "#CBD5E1"), $ = b.lineDash && b.lineDash.length > 0 ? ` stroke-dasharray="${b.lineDash.join(" ")}"` : "", x = b.radius && b.radius > 0 ? ` rx="${p(b.radius)}"` : "";
+    const S = G(b.color || "#CBD5E1"), $ = b.lineDash && b.lineDash.length > 0 ? ` stroke-dasharray="${b.lineDash.join(" ")}"` : "", C = b.radius && b.radius > 0 ? ` rx="${y(b.radius)}"` : "";
     m.push(
-      `<rect id="Plot Border" x="${p(o)}" y="${p(c)}" width="${p(d)}" height="${p(f)}"${x} fill="none" stroke="${L(S.color)}" stroke-width="${p(b.lineWidth || 1)}"${$} />`
+      `<rect id="Plot Border" x="${y(o)}" y="${y(c)}" width="${y(d)}" height="${y(f)}"${C} fill="none" stroke="${I(S.color)}" stroke-width="${y(b.lineWidth || 1)}"${$} />`
     );
   }
   return m.length === 0 ? "" : `<g id="Grid">
@@ -2736,24 +2753,24 @@ function Ae(u, t, e, i, s, n) {
     `)}
   </g>`;
 }
-function Le(u, t, e, i, s, n, o) {
+function Oe(u, t, e, i, s, n, o) {
   var l;
   const r = [];
   if ((t == null ? void 0 : t.visible) !== !1) {
     const a = i.ticks(5), c = (t == null ? void 0 : t.font) || "11px Pretendard, sans-serif", h = (t == null ? void 0 : t.labelColor) || "#94A3B8", d = (t == null ? void 0 : t.labelOffset) ?? 8, f = o.left - d, g = [];
     if (t != null && t.lineWidth && t.lineWidth > 0) {
-      const [m, y] = i.range(), v = X(t.color || "#CBD5E1");
+      const [m, p] = i.range(), v = G(t.color || "#CBD5E1");
       g.push(
-        `<line id="Y-Axis Line" x1="${p(o.left)}" y1="${p(m)}" x2="${p(o.left)}" y2="${p(y)}" stroke="${L(v.color)}" stroke-width="${p(t.lineWidth)}" />`
+        `<line id="Y-Axis Line" x1="${y(o.left)}" y1="${y(m)}" x2="${y(o.left)}" y2="${y(p)}" stroke="${I(v.color)}" stroke-width="${y(t.lineWidth)}" />`
       );
     }
     for (const m of a) {
-      const y = i.scale(m), v = t != null && t.formatter ? t.formatter(m) : m.toLocaleString();
+      const p = i.scale(m), v = t != null && t.formatter ? t.formatter(m) : m.toLocaleString();
       g.push(
         j({
           id: `Y-Tick: ${v}`,
           x: f,
-          y,
+          y: p,
           text: v,
           font: c,
           fill: h,
@@ -2770,24 +2787,24 @@ function Le(u, t, e, i, s, n, o) {
   if ((u == null ? void 0 : u.visible) !== !1) {
     const [a, c] = e.getViewport();
     if (c - a + 1 > 0) {
-      const d = (u == null ? void 0 : u.font) || "11px Pretendard, sans-serif", f = (u == null ? void 0 : u.labelColor) || "#64748B", g = (u == null ? void 0 : u.labelOffset) ?? 10, m = n - o.bottom + g, y = [], v = (u == null ? void 0 : u.color) || "#1E293B", b = (u == null ? void 0 : u.lineWidth) ?? 1;
+      const d = (u == null ? void 0 : u.font) || "11px Pretendard, sans-serif", f = (u == null ? void 0 : u.labelColor) || "#64748B", g = (u == null ? void 0 : u.labelOffset) ?? 10, m = n - o.bottom + g, p = [], v = (u == null ? void 0 : u.color) || "#1E293B", b = (u == null ? void 0 : u.lineWidth) ?? 1;
       if (b > 0) {
-        const [k, C] = e.range(), D = n - o.bottom, A = X(v);
-        y.push(
-          `<line id="X-Axis Baseline" x1="${p(k)}" y1="${p(D)}" x2="${p(C)}" y2="${p(D)}" stroke="${L(A.color)}" stroke-width="${p(b)}" />`
+        const [E, k] = e.range(), B = n - o.bottom, D = G(v);
+        p.push(
+          `<line id="X-Axis Baseline" x1="${y(E)}" y1="${y(B)}" x2="${y(k)}" y2="${y(B)}" stroke="${I(D.color)}" stroke-width="${y(b)}" />`
         );
       }
-      const S = (((l = s[a]) == null ? void 0 : l.label) || "Sample").length * 6.5, $ = e.bandwidth(), x = e.step(), F = S + 12, E = Math.max(1, Math.ceil(F / (x || 1)));
-      for (let k = a; k <= c; k += E) {
-        const C = s[k];
-        if (!C) continue;
-        const A = e.scale(k) + $ / 2, B = u != null && u.formatter ? u.formatter(C.label) : C.label;
-        y.push(
+      const S = (((l = s[a]) == null ? void 0 : l.label) || "Sample").length * 6.5, $ = e.bandwidth(), C = e.step(), F = S + 12, x = Math.max(1, Math.ceil(F / (C || 1)));
+      for (let E = a; E <= c; E += x) {
+        const k = s[E];
+        if (!k) continue;
+        const D = e.scale(E) + $ / 2, A = u != null && u.formatter ? u.formatter(k.label) : k.label;
+        p.push(
           j({
-            id: `X-Tick: ${B}`,
-            x: A,
+            id: `X-Tick: ${A}`,
+            x: D,
             y: m,
-            text: B,
+            text: A,
             font: d,
             fill: f,
             align: "center",
@@ -2796,7 +2813,7 @@ function Le(u, t, e, i, s, n, o) {
         );
       }
       r.push(`<g id="X-Axis">
-    ${y.join(`
+    ${p.join(`
     `)}
   </g>`);
     }
@@ -2804,45 +2821,45 @@ function Le(u, t, e, i, s, n, o) {
   return r.join(`
   `);
 }
-function ce(u, t, e, i) {
+function ue(u, t, e, i) {
   if (t === !1 || u.length === 0) return "";
   const s = typeof t == "object" ? t : {};
   if (s.visible === !1) return "";
-  const { side: n, align: o } = me(s.position, s.align ?? "end"), r = s.markerShape || "rounded", l = s.fontSize ?? 12, a = s.fontFamily || "Pretendard, sans-serif", c = s.fontWeight ?? 500, h = s.textColor || "#E2E8F0", d = s.inactiveColor || "#64748B", f = s.maxItems ?? 12, g = u.slice(0, f), m = g.map((v) => 16 + (s.formatter ? s.formatter(v) : v.label).length * (l * 0.62) + 16), y = [];
+  const { side: n, align: o } = we(s.position, s.align ?? "end"), r = s.markerShape || "rounded", l = s.fontSize ?? 12, a = s.fontFamily || "Pretendard, sans-serif", c = s.fontWeight ?? 500, h = s.textColor || "#E2E8F0", d = s.inactiveColor || "#64748B", f = s.maxItems ?? 12, g = u.slice(0, f), m = g.map((v) => 16 + (s.formatter ? s.formatter(v) : v.label).length * (l * 0.62) + 16), p = [];
   if (n === "top" || n === "bottom") {
     const v = m.reduce((S, $) => S + $, 0);
     let b = Math.max(16, (e - v) / 2);
     o === "start" ? b = 16 : o === "end" && (b = Math.max(16, e - v - 16));
     const w = n === "top" ? 18 : i - 16;
     g.forEach((S, $) => {
-      const x = S.active !== !1, F = x ? S.color : d, E = s.formatter ? s.formatter(S) : S.label, k = X(F);
-      let C = "";
+      const C = S.active !== !1, F = C ? S.color : d, x = s.formatter ? s.formatter(S) : S.label, E = G(F);
+      let k = "";
       if (r === "circle")
-        C = `<circle id="Marker: ${L(E)}" cx="${p(b + 5)}" cy="${p(w)}" r="5" fill="${L(k.color)}" />`;
+        k = `<circle id="Marker: ${I(x)}" cx="${y(b + 5)}" cy="${y(w)}" r="5" fill="${I(E.color)}" />`;
       else if (r === "line")
-        C = `<rect id="Marker: ${L(E)}" x="${p(b)}" y="${p(w - 1.5)}" width="12" height="3" rx="1.5" fill="${L(k.color)}" />`;
+        k = `<rect id="Marker: ${I(x)}" x="${y(b)}" y="${y(w - 1.5)}" width="12" height="3" rx="1.5" fill="${I(E.color)}" />`;
       else {
-        const A = r === "rounded" ? 3 : 0;
-        C = `<rect id="Marker: ${L(E)}" x="${p(b)}" y="${p(w - 5)}" width="10" height="10" rx="${A}" fill="${L(k.color)}" />`;
+        const D = r === "rounded" ? 3 : 0;
+        k = `<rect id="Marker: ${I(x)}" x="${y(b)}" y="${y(w - 5)}" width="10" height="10" rx="${D}" fill="${I(E.color)}" />`;
       }
-      const D = j({
-        id: `Label: ${L(E)}`,
+      const B = j({
+        id: `Label: ${I(x)}`,
         x: b + 16,
         y: w,
-        text: E,
+        text: x,
         font: `${c} ${l}px ${a}`,
-        fill: x ? h : d,
+        fill: C ? h : d,
         align: "left",
         baseline: "middle"
       });
-      y.push(`<g id="Legend Item: ${L(E)}">${C}${D}</g>`), b += m[$];
+      p.push(`<g id="Legend Item: ${I(x)}">${k}${B}</g>`), b += m[$];
     });
   } else {
     const v = n === "left" ? 16 : e - 115, b = g.length * 22;
     let w = Math.max(24, (i - b) / 2);
     o === "start" ? w = 24 : o === "end" && (w = Math.max(24, i - b - 12)), g.forEach((S) => {
-      const $ = S.active !== !1, x = $ ? S.color : d, F = s.formatter ? s.formatter(S) : S.label, E = X(x), k = r === "circle" ? `<circle id="Marker: ${L(F)}" cx="${p(v + 5)}" cy="${p(w)}" r="5" fill="${L(E.color)}" />` : `<rect id="Marker: ${L(F)}" x="${p(v)}" y="${p(w - 5)}" width="10" height="10" rx="3" fill="${L(E.color)}" />`, C = j({
-        id: `Label: ${L(F)}`,
+      const $ = S.active !== !1, C = $ ? S.color : d, F = s.formatter ? s.formatter(S) : S.label, x = G(C), E = r === "circle" ? `<circle id="Marker: ${I(F)}" cx="${y(v + 5)}" cy="${y(w)}" r="5" fill="${I(x.color)}" />` : `<rect id="Marker: ${I(F)}" x="${y(v)}" y="${y(w - 5)}" width="10" height="10" rx="3" fill="${I(x.color)}" />`, k = j({
+        id: `Label: ${I(F)}`,
         x: v + 16,
         y: w,
         text: F,
@@ -2851,15 +2868,15 @@ function ce(u, t, e, i) {
         align: "left",
         baseline: "middle"
       });
-      y.push(`<g id="Legend Item: ${L(F)}">${k}${C}</g>`), w += 22;
+      p.push(`<g id="Legend Item: ${I(F)}">${E}${k}</g>`), w += 22;
     });
   }
   return `<g id="Legend">
-    ${y.join(`
+    ${p.join(`
     `)}
   </g>`;
 }
-function de(u) {
+function me(u) {
   const { width: t, height: e, defs: i, body: s, backgroundColor: n, backgroundRadius: o = 0 } = u, r = i.length > 0 ? `
   <defs>
     ${i.join(`
@@ -2867,17 +2884,17 @@ function de(u) {
   </defs>` : "";
   let l = "";
   if (n && n !== "transparent" && n !== "none") {
-    const c = X(n), h = o > 0 ? ` rx="${p(o)}" ry="${p(o)}"` : "", d = c.opacity < 0.999 ? ` fill-opacity="${p(c.opacity)}"` : "";
+    const c = G(n), h = o > 0 ? ` rx="${y(o)}" ry="${y(o)}"` : "", d = c.opacity < 0.999 ? ` fill-opacity="${y(c.opacity)}"` : "";
     l = `
-  <rect id="Chart Background" x="0" y="0" width="${p(t)}" height="${p(e)}"${h} fill="${L(c.color)}"${d} />`;
+  <rect id="Chart Background" x="0" y="0" width="${y(t)}" height="${y(e)}"${h} fill="${I(c.color)}"${d} />`;
   }
   const a = s.filter(Boolean).join(`
   `);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${p(t)}" height="${p(e)}" viewBox="0 0 ${p(t)} ${p(e)}" fill="none">${r}${l}
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${y(t)}" height="${y(e)}" viewBox="0 0 ${y(t)} ${y(e)}" fill="none">${r}${l}
   ${a}
 </svg>`;
 }
-class $e {
+class Be {
   constructor(t, e) {
     M(this, "barOptions");
     M(this, "labelOptions");
@@ -2905,8 +2922,8 @@ class $e {
    * @param progress 애니메이션 진행률 (0.0 ~ 1.0, 기본값: 1)
    */
   getBarGeometry(t, e, i, s, n = 1) {
-    const o = i.scale(e), r = i.bandwidth(), l = Math.max(0.05, Math.min(1, this.barOptions.widthRatio ?? 0.65)), a = r * l, c = o + (r - a) / 2, h = s.scale(0), d = typeof t.value == "number" && Number.isFinite(t.value) ? t.value : 0, f = s.scale(d), g = d >= 0, m = g ? h - f : f - h, y = Math.max(0, m * n), v = g ? h - y : h;
-    return { x: c, y: v, width: a, height: y, item: t, index: e };
+    const o = i.scale(e), r = i.bandwidth(), l = Math.max(0.05, Math.min(1, this.barOptions.widthRatio ?? 0.65)), a = r * l, c = o + (r - a) / 2, h = s.scale(0), d = typeof t.value == "number" && Number.isFinite(t.value) ? t.value : 0, f = s.scale(d), g = d >= 0, m = g ? h - f : f - h, p = Math.max(0, m * n), v = g ? h - p : h;
+    return { x: c, y: v, width: a, height: p, item: t, index: e };
   }
   /**
    * 다중 시리즈(Grouped / Stacked / Percent)의 특정 X축 슬롯(`slotIndex`)에 속한 모든 바의 기하 정보를 계산합니다.
@@ -2917,78 +2934,78 @@ class $e {
     if (o === 0) return [];
     const r = this.getMode(), l = i.scale(t), a = i.bandwidth(), c = Math.max(0.05, Math.min(1, this.barOptions.widthRatio ?? 0.65)), h = a * c, d = l + (a - h) / 2, f = [];
     if (r === "grouped") {
-      const $ = h / o, x = o > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0, F = Math.max(1, $ * (1 - x)), E = s.scale(0);
-      for (let k = 0; k < o; k++) {
-        const C = e[k], D = C.items[t];
-        if (!D) continue;
-        const A = d + k * $ + ($ - F) / 2, B = typeof D.value == "number" && Number.isFinite(D.value) ? D.value : 0, T = s.scale(B), R = B >= 0, z = R ? E - T : T - E, V = Math.max(0, z * n), P = R ? E - V : E;
+      const $ = h / o, C = o > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0, F = Math.max(1, $ * (1 - C)), x = s.scale(0);
+      for (let E = 0; E < o; E++) {
+        const k = e[E], B = k.items[t];
+        if (!B) continue;
+        const D = d + E * $ + ($ - F) / 2, A = typeof B.value == "number" && Number.isFinite(B.value) ? B.value : 0, z = s.scale(A), V = A >= 0, N = V ? x - z : z - x, W = Math.max(0, N * n), O = V ? x - W : x;
         f.push({
-          x: A,
-          y: P,
+          x: D,
+          y: O,
           width: F,
-          height: V,
-          item: D,
+          height: W,
+          item: B,
           index: t,
-          seriesKey: C.key,
-          seriesName: C.name,
-          seriesIndex: k,
-          seriesColor: C.color,
-          seriesBorder: C.border,
-          swatchColor: C.swatchColor
+          seriesKey: k.key,
+          seriesName: k.name,
+          seriesIndex: E,
+          seriesColor: k.color,
+          seriesBorder: k.border,
+          swatchColor: k.swatchColor
         });
       }
       return f;
     }
-    let g = 0, m = 0, y = -1, v = -1;
+    let g = 0, m = 0, p = -1, v = -1;
     for (let $ = 0; $ < o; $++) {
-      const x = (S = e[$].items[t]) == null ? void 0 : S.value, F = typeof x == "number" && Number.isFinite(x) ? x : 0;
-      F > 0 ? (g += F, y = $) : F < 0 && (m += Math.abs(F), v = $);
+      const C = (S = e[$].items[t]) == null ? void 0 : S.value, F = typeof C == "number" && Number.isFinite(C) ? C : 0;
+      F > 0 ? (g += F, p = $) : F < 0 && (m += Math.abs(F), v = $);
     }
     let b = 0, w = 0;
     for (let $ = 0; $ < o; $++) {
-      const x = e[$], F = x.items[t];
+      const C = e[$], F = C.items[t];
       if (!F) continue;
-      const E = typeof F.value == "number" && Number.isFinite(F.value) ? F.value : 0, k = E >= 0;
-      let C = E, D;
-      if (r === "percent" && (k ? (D = g > 0 ? E / g * 100 : 0, C = D) : (D = m > 0 ? Math.abs(E) / m * 100 : 0, C = -D)), k) {
-        const A = b * n, B = (b + C) * n;
-        b += C;
-        const T = s.scale(A), R = s.scale(B), z = Math.max(0, T - R), V = R, P = $ === y;
+      const x = typeof F.value == "number" && Number.isFinite(F.value) ? F.value : 0, E = x >= 0;
+      let k = x, B;
+      if (r === "percent" && (E ? (B = g > 0 ? x / g * 100 : 0, k = B) : (B = m > 0 ? Math.abs(x) / m * 100 : 0, k = -B)), E) {
+        const D = b * n, A = (b + k) * n;
+        b += k;
+        const z = s.scale(D), V = s.scale(A), N = Math.max(0, z - V), W = V, O = $ === p;
         f.push({
           x: d,
-          y: V,
+          y: W,
           width: h,
-          height: z,
+          height: N,
           item: F,
           index: t,
-          seriesKey: x.key,
-          seriesName: x.name,
+          seriesKey: C.key,
+          seriesName: C.name,
           seriesIndex: $,
-          seriesColor: x.color,
-          seriesBorder: x.border,
-          swatchColor: x.swatchColor,
-          borderRadiusOverride: P ? this.barOptions.borderRadius : 0,
-          percentage: D
+          seriesColor: C.color,
+          seriesBorder: C.border,
+          swatchColor: C.swatchColor,
+          borderRadiusOverride: O ? this.barOptions.borderRadius : 0,
+          percentage: B
         });
       } else {
-        const A = w * n, B = (w + C) * n;
-        w += C;
-        const T = s.scale(A), R = s.scale(B), z = Math.max(0, R - T), V = T, P = $ === v;
+        const D = w * n, A = (w + k) * n;
+        w += k;
+        const z = s.scale(D), V = s.scale(A), N = Math.max(0, V - z), W = z, O = $ === v;
         f.push({
           x: d,
-          y: V,
+          y: W,
           width: h,
-          height: z,
+          height: N,
           item: F,
           index: t,
-          seriesKey: x.key,
-          seriesName: x.name,
+          seriesKey: C.key,
+          seriesName: C.name,
           seriesIndex: $,
-          seriesColor: x.color,
-          seriesBorder: x.border,
-          swatchColor: x.swatchColor,
-          borderRadiusOverride: P ? this.barOptions.borderRadius : 0,
-          percentage: D
+          seriesColor: C.color,
+          seriesBorder: C.border,
+          swatchColor: C.swatchColor,
+          borderRadiusOverride: O ? this.barOptions.borderRadius : 0,
+          percentage: B
         });
       }
     }
@@ -3039,9 +3056,9 @@ class $e {
     const { x: i, y: s, width: n, height: o } = e;
     if (n <= 0 || o <= 0) return;
     const r = e.borderRadiusOverride !== void 0 ? e.borderRadiusOverride : this.barOptions.borderRadius;
-    ie(t, i, s, n, o, r), t.fillStyle = this.resolveColor(t, e), t.fill();
+    re(t, i, s, n, o, r), t.fillStyle = this.resolveColor(t, e), t.fill();
     const l = this.resolveBorder(e);
-    l && l.width > 0 && (t.strokeStyle = I(l.color), t.lineWidth = l.width, l.dash ? t.setLineDash(l.dash) : t.setLineDash([]), t.stroke());
+    l && l.width > 0 && (t.strokeStyle = T(l.color), t.lineWidth = l.width, l.dash ? t.setLineDash(l.dash) : t.setLineDash([]), t.stroke());
   }
   /**
    * 인터랙션 레이어: 마우스 호버된 특정 바에 하이라이트 효과를 부여합니다.
@@ -3051,15 +3068,15 @@ class $e {
     if (n <= 0 || o <= 0) return;
     t.save();
     const a = e.borderRadiusOverride !== void 0 ? e.borderRadiusOverride : this.barOptions.borderRadius;
-    ie(t, i, s, n, o, a);
+    re(t, i, s, n, o, a);
     const c = this.barOptions.hover;
     if (c != null && c.fill && !e.seriesColor) {
       const d = typeof c.fill == "function" ? c.fill(r, l) : c.fill;
-      typeof d == "string" ? t.fillStyle = I(d) : t.fillStyle = se(t, i, s, n, o, d), t.fill();
+      typeof d == "string" ? t.fillStyle = T(d) : t.fillStyle = ae(t, i, s, n, o, d), t.fill();
     } else
       t.fillStyle = "rgba(255, 255, 255, 0.22)", t.fill();
     const h = (c == null ? void 0 : c.border) || { color: "rgba(255, 255, 255, 0.9)", width: 2 };
-    t.strokeStyle = I(h.color), t.lineWidth = h.width, h.dash && t.setLineDash(h.dash), t.stroke(), t.restore();
+    t.strokeStyle = T(h.color), t.lineWidth = h.width, h.dash && t.setLineDash(h.dash), t.stroke(), t.restore();
   }
   /**
    * 데이터 수치 라벨 렌더링 (다양한 위치 및 커스텀 포맷터 지원)
@@ -3071,11 +3088,11 @@ class $e {
       a.renderCustom(t, { x: i, y: s, width: n, height: o, item: r, index: l });
       return;
     }
-    const c = a.position || "top-outside", h = a.offset ?? 6, d = a.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', f = I(
+    const c = a.position || "top-outside", h = a.offset ?? 6, d = a.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', f = T(
       typeof a.color == "function" ? a.color(r, l) : a.color || (c.startsWith("inside") ? "#FFFFFF" : "#334155")
     );
     t.save(), t.font = d, t.fillStyle = f, t.textAlign = "center";
-    const g = typeof r.value == "number" && Number.isFinite(r.value) ? r.value.toLocaleString() : "-", m = e.percentage !== void 0 && this.getMode() === "percent" && !a.formatter ? `${e.percentage.toFixed(0)}%` : a.formatter ? a.formatter(r.value, r, l) : g, y = i + n / 2;
+    const g = typeof r.value == "number" && Number.isFinite(r.value) ? r.value.toLocaleString() : "-", m = e.percentage !== void 0 && this.getMode() === "percent" && !a.formatter ? `${e.percentage.toFixed(0)}%` : a.formatter ? a.formatter(r.value, r, l) : g, p = i + n / 2;
     let v = s;
     switch (c) {
       case "top-outside":
@@ -3097,7 +3114,7 @@ class $e {
         t.restore();
         return;
     }
-    t.fillText(m, y, v), t.restore();
+    t.fillText(m, p, v), t.restore();
   }
   /**
    * 범례(Legend) 아이콘 등에 표시할 대표 단색(Hex/RGB) 문자열을 반환합니다.
@@ -3106,7 +3123,7 @@ class $e {
     let s = t.color || "#4F46E5";
     t.color ? s = t.color : i ? s = typeof i == "function" ? i(t, e) : i : typeof this.barOptions.fill == "function" ? s = this.barOptions.fill(t, e) : this.barOptions.fill && (s = this.barOptions.fill);
     const n = typeof s == "string" ? s : s.from;
-    return I(n);
+    return T(n);
   }
   /**
    * 바의 원본 ColorStyle 객체(단색 문자열 또는 GradientConfig)를 반환합니다.
@@ -3120,7 +3137,7 @@ class $e {
    */
   resolveColor(t, e) {
     const { x: i, y: s, width: n, height: o } = e, r = this.resolveColorStyle(e);
-    return typeof r == "string" ? I(r) : se(t, i, s, n, o, r);
+    return typeof r == "string" ? T(r) : ae(t, i, s, n, o, r);
   }
   /**
    * 바의 테두리 옵션 계산
@@ -3135,10 +3152,10 @@ class $e {
   toSvgElements(t, e, i, s, n, o) {
     const [r, l] = s.getViewport();
     if (r > l) return "";
-    const a = [], c = [], h = this.getMode() !== "grouped", d = (g, m, y) => {
-      var E;
+    const a = [], c = [], h = this.getMode() !== "grouped", d = (g, m, p) => {
+      var x;
       if (g.width <= 0 || g.height <= 0) return;
-      const v = this.resolveColorStyle(g), b = ye(
+      const v = this.resolveColorStyle(g), b = Fe(
         "fill",
         v,
         o,
@@ -3150,11 +3167,11 @@ class $e {
       ), w = this.resolveBorder(g);
       let S = "";
       if (w && w.width > 0) {
-        const k = X(w.color), C = w.dash && w.dash.length > 0 ? ` stroke-dasharray="${w.dash.join(" ")}"` : "";
-        S = `stroke="${L(k.color)}" stroke-width="${p(w.width)}"${C}`;
+        const E = G(w.color), k = w.dash && w.dash.length > 0 ? ` stroke-dasharray="${w.dash.join(" ")}"` : "";
+        S = `stroke="${I(E.color)}" stroke-width="${y(w.width)}"${k}`;
       }
-      const $ = g.borderRadiusOverride !== void 0 ? g.borderRadiusOverride : this.barOptions.borderRadius, x = g.seriesName ? `Bar: ${g.seriesName} - ${g.item.label} (${g.item.value})` : `Bar: ${g.item.label} (${g.item.value})`, F = De({
-        id: x,
+      const $ = g.borderRadiusOverride !== void 0 ? g.borderRadiusOverride : this.barOptions.borderRadius, C = g.seriesName ? `Bar: ${g.seriesName} - ${g.item.label} (${g.item.value})` : `Bar: ${g.item.label} (${g.item.value})`, F = Pe({
+        id: C,
         x: g.x,
         y: g.y,
         width: g.width,
@@ -3163,38 +3180,38 @@ class $e {
         fillAttrs: b,
         strokeAttrs: S
       });
-      if (F && a.push(F), y && ((E = this.labelOptions) != null && E.visible) && g.width >= 14) {
-        const k = this.labelOptions.position || "top-outside";
-        if (k !== "none") {
-          const C = this.labelOptions.offset ?? 6, D = this.labelOptions.font || "600 11px Pretendard, sans-serif", A = typeof this.labelOptions.color == "function" ? this.labelOptions.color(g.item, g.index) : this.labelOptions.color || (k.startsWith("inside") ? "#FFFFFF" : "#94A3B8"), B = typeof g.item.value == "number" && Number.isFinite(g.item.value) ? g.item.value.toLocaleString() : "-", T = g.percentage !== void 0 && this.getMode() === "percent" && !this.labelOptions.formatter ? `${g.percentage.toFixed(0)}%` : this.labelOptions.formatter ? this.labelOptions.formatter(g.item.value, g.item, g.index) : B, R = g.x + g.width / 2;
-          let z = g.y, V = "bottom";
-          switch (k) {
+      if (F && a.push(F), p && ((x = this.labelOptions) != null && x.visible) && g.width >= 14) {
+        const E = this.labelOptions.position || "top-outside";
+        if (E !== "none") {
+          const k = this.labelOptions.offset ?? 6, B = this.labelOptions.font || "600 11px Pretendard, sans-serif", D = typeof this.labelOptions.color == "function" ? this.labelOptions.color(g.item, g.index) : this.labelOptions.color || (E.startsWith("inside") ? "#FFFFFF" : "#94A3B8"), A = typeof g.item.value == "number" && Number.isFinite(g.item.value) ? g.item.value.toLocaleString() : "-", z = g.percentage !== void 0 && this.getMode() === "percent" && !this.labelOptions.formatter ? `${g.percentage.toFixed(0)}%` : this.labelOptions.formatter ? this.labelOptions.formatter(g.item.value, g.item, g.index) : A, V = g.x + g.width / 2;
+          let N = g.y, W = "bottom";
+          switch (E) {
             case "top-outside":
-              V = "bottom", z = g.y - C;
+              W = "bottom", N = g.y - k;
               break;
             case "inside-top":
-              V = "top", z = g.y + C;
+              W = "top", N = g.y + k;
               break;
             case "inside-center":
-              V = "middle", z = g.y + g.height / 2;
+              W = "middle", N = g.y + g.height / 2;
               break;
             case "inside-bottom":
-              V = "bottom", z = g.y + g.height - C;
+              W = "bottom", N = g.y + g.height - k;
               break;
             case "bottom-outside":
-              V = "top", z = g.y + g.height + C;
+              W = "top", N = g.y + g.height + k;
               break;
           }
           c.push(
             j({
-              id: `Label: ${g.item.label} (${T})`,
-              x: R,
-              y: z,
-              text: T,
-              font: D,
-              fill: A,
+              id: `Label: ${g.item.label} (${z})`,
+              x: V,
+              y: N,
+              text: z,
+              font: B,
+              fill: D,
               align: "center",
-              baseline: V
+              baseline: W
             })
           );
         }
@@ -3203,18 +3220,18 @@ class $e {
     if (i)
       for (let g = r; g <= l; g++) {
         const m = this.getMultiBarGeometriesAtSlot(g, e, s, n, 1);
-        m.forEach((y, v) => {
+        m.forEach((p, v) => {
           var w;
-          const b = h && (((w = this.labelOptions) == null ? void 0 : w.position) || "top-outside") === "top-outside" ? v === m.length - 1 : !h || y.height >= 15;
-          d(y, `${g}-${v}`, b);
+          const b = h && (((w = this.labelOptions) == null ? void 0 : w.position) || "top-outside") === "top-outside" ? v === m.length - 1 : !h || p.height >= 15;
+          d(p, `${g}-${v}`, b);
         });
       }
     else
       for (let g = r; g <= l; g++) {
         const m = t[g];
         if (!m) continue;
-        const y = this.getBarGeometry(m, g, s, n, 1);
-        d(y, `${g}`, !0);
+        const p = this.getBarGeometry(m, g, s, n, 1);
+        d(p, `${g}`, !0);
       }
     const f = [];
     return a.length > 0 && f.push(`<g id="Bars">
@@ -3245,7 +3262,7 @@ const U = [
   "#14B8A6"
   // Teal
 ];
-class Ce {
+class De {
   constructor(t, e, i) {
     M(this, "styleOptions");
     M(this, "labelOptions");
@@ -3265,47 +3282,98 @@ class Ce {
    * 데이터 항목의 채우기 색상을 결정합니다.
    */
   resolveSliceColor(t, e) {
-    return t.color ? I(t.color) : typeof this.styleOptions.colors == "function" ? I(this.styleOptions.colors(t, e)) : Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0 ? I(this.styleOptions.colors[e % this.styleOptions.colors.length]) : U[e % U.length];
+    return t.color ? T(t.color) : typeof this.styleOptions.colors == "function" ? T(this.styleOptions.colors(t, e)) : Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0 ? T(this.styleOptions.colors[e % this.styleOptions.colors.length]) : U[e % U.length];
   }
   /**
    * 데이터와 컨테이너 크기로부터 각 파이 조각의 각도와 위치를 연산합니다.
    */
   calculateSlices(t, e, i, s) {
-    var T;
+    var O;
     if (t.length === 0 && !(this.styleOptions.maxValue && this.styleOptions.maxValue > 0))
       return [];
-    const n = (R) => typeof R == "number" && Number.isFinite(R) ? Math.max(0, R) : 0, o = t.reduce((R, z) => R + n(z.value), 0), r = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && o < 100 ? 100 : void 0), l = r !== void 0 && r > 0 ? Math.max(o, r) : o;
+    const n = (L) => typeof L == "number" && Number.isFinite(L) ? Math.max(0, L) : 0, o = t.reduce((L, R) => L + n(R.value), 0), r = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && o < 100 ? 100 : void 0), l = r !== void 0 && r > 0 ? Math.max(o, r) : o;
     if (l <= 0) return [];
-    const a = Math.max(0, l - o), c = this.styleOptions.trackColor ?? (r !== void 0 && r > 0 ? "var(--surface-low)" : void 0), h = a > l * 5e-4 && !!c && c !== "transparent" && c !== "none", d = e - s.left - s.right, f = i - s.top - s.bottom, g = s.left + d / 2, m = s.top + f / 2, y = Math.min(d, f), b = ((T = this.labelOptions) == null ? void 0 : T.position) === "outside" && this.labelOptions.visible ? y < 280 ? 22 : 35 : 10, w = Math.max(20, y / 2 - b), S = Math.max(0, Math.min(0.85, this.styleOptions.innerRadiusRatio ?? 0)), $ = w * S, x = w;
+    const a = Math.max(0, l - o), c = this.styleOptions.trackColor ?? (r !== void 0 && r > 0 ? "var(--surface-low)" : void 0), h = a > l * 5e-4 && !!c && c !== "transparent" && c !== "none", d = e - s.left - s.right, f = i - s.top - s.bottom, g = s.left + d / 2, m = s.top + f / 2, p = Math.min(d, f), b = ((O = this.labelOptions) == null ? void 0 : O.position) === "outside" && this.labelOptions.visible ? p < 280 ? 22 : 35 : 10, w = Math.max(20, p / 2 - b), S = Math.max(0, Math.min(0.85, this.styleOptions.innerRadiusRatio ?? 0)), $ = w * S, C = w;
     let F = -Math.PI / 2;
-    const E = S > 1e-3 ? 0.02 : 0, k = this.styleOptions.padAngle ?? E, A = t.filter((R) => n(R.value) > 0).length + (h ? 1 : 0) > 1 ? Math.max(0, k) : 0, B = [];
-    if (t.forEach((R, z) => {
-      const P = n(R.value) / l, H = P * 2 * Math.PI, O = H > 0 ? Math.min(A, H * 0.8) : 0, K = F + O / 2, W = F + H - O / 2, N = F + H / 2, _ = this.resolveSliceColor(R, z);
-      B.push({
-        startAngle: K,
-        endAngle: W,
-        midAngle: N,
+    const x = this.styleOptions.sliceGap !== void 0, E = x && typeof this.styleOptions.sliceGap == "number" && Number.isFinite(this.styleOptions.sliceGap) ? Math.max(0, this.styleOptions.sliceGap) : 0, k = S > 1e-3 ? 0.02 : 0, B = this.styleOptions.padAngle ?? k, A = t.filter((L) => n(L.value) > 0).length + (h ? 1 : 0), z = x && A > 1 ? E : 0, V = !x && A > 1 ? Math.max(0, B) : 0, N = [], W = (L, R) => {
+      const P = L + R / 2;
+      if (R <= 0)
+        return {
+          startAngle: L,
+          endAngle: L,
+          midAngle: P,
+          innerStartAngle: void 0,
+          innerEndAngle: void 0,
+          innerArcRadius: void 0
+        };
+      if (z > 0) {
+        const _ = C * Math.sin(Math.min(Math.PI / 2, R / 2)) * 0.9, K = Math.min(z / 2, _), X = Math.asin(Math.min(1, K / C)), Z = L + X, ye = L + R - X;
+        let te, se, ne;
+        if (R < Math.PI) {
+          const ie = K / Math.sin(R / 2);
+          if ($ <= ie)
+            te = Math.min(ie, C * 0.98), se = P, ne = P;
+          else {
+            const Me = Math.asin(Math.min(1, K / $));
+            te = $, se = L + Me, ne = L + R - Me;
+          }
+        } else {
+          te = Math.max($, K);
+          const ie = Math.asin(Math.min(1, K / te));
+          se = L + ie, ne = L + R - ie;
+        }
+        return {
+          startAngle: Z,
+          endAngle: ye,
+          midAngle: P,
+          innerStartAngle: se,
+          innerEndAngle: ne,
+          innerArcRadius: te
+        };
+      }
+      const H = Math.min(V, R * 0.8);
+      return {
+        startAngle: L + H / 2,
+        endAngle: L + R - H / 2,
+        midAngle: P,
+        innerStartAngle: void 0,
+        innerEndAngle: void 0,
+        innerArcRadius: void 0
+      };
+    };
+    if (t.forEach((L, R) => {
+      const H = n(L.value) / l, _ = H * 2 * Math.PI, K = W(F, _), X = this.resolveSliceColor(L, R);
+      N.push({
+        startAngle: K.startAngle,
+        endAngle: K.endAngle,
+        midAngle: K.midAngle,
+        innerStartAngle: K.innerStartAngle,
+        innerEndAngle: K.innerEndAngle,
+        innerArcRadius: K.innerArcRadius,
         innerRadius: $,
-        outerRadius: x,
-        percentage: P,
+        outerRadius: C,
+        percentage: H,
         cx: g,
         cy: m,
-        color: _,
-        item: R,
-        index: z
-      }), F += H;
+        color: X,
+        item: L,
+        index: R
+      }), F += _;
     }), h && c) {
-      const R = a / l, z = R * 2 * Math.PI, V = z > 0 ? Math.min(A, z * 0.8) : 0;
-      B.push({
-        startAngle: F + V / 2,
-        endAngle: F + z - V / 2,
-        midAngle: F + z / 2,
+      const L = a / l, R = L * 2 * Math.PI, P = W(F, R);
+      N.push({
+        startAngle: P.startAngle,
+        endAngle: P.endAngle,
+        midAngle: P.midAngle,
+        innerStartAngle: P.innerStartAngle,
+        innerEndAngle: P.innerEndAngle,
+        innerArcRadius: P.innerArcRadius,
         innerRadius: $,
-        outerRadius: x,
-        percentage: R,
+        outerRadius: C,
+        percentage: L,
         cx: g,
         cy: m,
-        color: I(c),
+        color: T(c),
         item: {
           label: "Track",
           value: Number(a.toFixed(2))
@@ -3314,7 +3382,7 @@ class Ce {
         isTrack: !0
       });
     }
-    return B;
+    return N;
   }
   /**
    * 데이터 레이어: 전체 파이/도넛 조각 및 라벨 렌더링
@@ -3336,13 +3404,16 @@ class Ce {
         a.push(f);
         return;
       }
-      const m = s >= 1 ? d : {
+      const m = d.innerEndAngle !== void 0 ? Math.min(d.innerEndAngle, o) : void 0, p = d.innerStartAngle !== void 0 && m !== void 0 ? Math.min(d.innerStartAngle, m) : d.innerStartAngle, v = s >= 1 ? d : {
         ...d,
         endAngle: Math.min(d.endAngle, o),
+        innerStartAngle: p,
+        innerEndAngle: m,
         innerRadius: d.innerRadius * r,
+        innerArcRadius: d.innerArcRadius !== void 0 ? d.innerArcRadius * r : void 0,
         outerRadius: d.outerRadius * r
       };
-      this.drawSingleSlice(t, m, 0);
+      this.drawSingleSlice(t, v, 0);
     });
     for (const d of a)
       this.drawSingleSlice(t, e[d], l(d));
@@ -3357,10 +3428,22 @@ class Ce {
   drawSingleSlice(t, e, i = 0) {
     const { startAngle: s, endAngle: n, innerRadius: o, outerRadius: r, midAngle: l, cx: a, cy: c, color: h } = e;
     if (n <= s) return;
-    const d = typeof i == "boolean" ? i ? 1 : 0 : Math.max(0, Math.min(1.2, i)), f = (this.styleOptions.hoverExplode ?? 10) * d, g = Math.cos(l) * f, m = Math.sin(l) * f, y = r + 4 * d, v = a + g, b = c + m;
-    t.save(), d > 0.02 && (t.shadowColor = h, t.shadowBlur = 16 * d, t.shadowOffsetX = g * 0.35, t.shadowOffsetY = m * 0.35), t.beginPath(), o <= 0 ? (t.moveTo(v, b), t.arc(v, b, y, s, n, !1), t.closePath()) : (t.arc(v, b, y, s, n, !1), t.arc(v, b, o, n, s, !0), t.closePath()), t.fillStyle = h, t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0;
-    const w = this.styleOptions.border, S = this.styleOptions.padAngle ?? (o > 0 ? 0.02 : 0);
-    d > 0.05 ? (t.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, d)})`, t.lineWidth = 1.5 * Math.min(1, d), t.stroke()) : w && w.width && w.width > 0 ? (t.strokeStyle = w.color || "#151C2C", t.lineWidth = w.width, t.stroke()) : S <= 5e-4 && (t.strokeStyle = h, t.lineWidth = 0.6, t.lineJoin = "round", t.stroke()), t.restore();
+    const d = typeof i == "boolean" ? i ? 1 : 0 : Math.max(0, Math.min(1.2, i)), f = (this.styleOptions.hoverExplode ?? 10) * d, g = Math.cos(l) * f, m = Math.sin(l) * f, p = r + 4 * d, v = a + g, b = c + m;
+    t.save(), d > 0.02 && (t.shadowColor = h, t.shadowBlur = 16 * d, t.shadowOffsetX = g * 0.35, t.shadowOffsetY = m * 0.35);
+    const w = e.innerArcRadius ?? o, S = e.innerStartAngle ?? s, $ = e.innerEndAngle ?? n;
+    if (t.beginPath(), w <= 0)
+      t.moveTo(v, b), t.arc(v, b, p, s, n, !1), t.closePath();
+    else if ($ <= S + 1e-4) {
+      const x = (S + $) / 2;
+      t.arc(v, b, p, s, n, !1), t.lineTo(
+        v + Math.cos(x) * w,
+        b + Math.sin(x) * w
+      ), t.closePath();
+    } else
+      t.arc(v, b, p, s, n, !1), t.arc(v, b, w, $, S, !0), t.closePath();
+    t.fillStyle = h, t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0;
+    const C = this.styleOptions.border, F = this.styleOptions.sliceGap !== void 0 ? this.styleOptions.sliceGap > 5e-4 : (this.styleOptions.padAngle ?? (o > 0 ? 0.02 : 0)) > 5e-4;
+    d > 0.05 ? (t.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, d)})`, t.lineWidth = 1.5 * Math.min(1, d), t.stroke()) : C && C.width && C.width > 0 ? (t.strokeStyle = C.color || "#151C2C", t.lineWidth = C.width, t.stroke()) : F || (t.strokeStyle = h, t.lineWidth = 0.6, t.lineJoin = "round", t.stroke()), t.restore();
   }
   /**
    * 도넛 차트 중앙 요약 텍스트 렌더링
@@ -3377,7 +3460,7 @@ class Ce {
       (g, m) => g + (typeof m.value == "number" && Number.isFinite(m.value) ? Math.max(0, m.value) : 0),
       0
     ), c = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && a < 100 ? 100 : void 0), h = c && c > 0 ? `${Math.round(a / Math.max(a, c) * 100)}%` : a.toLocaleString(), d = typeof (r == null ? void 0 : r.title) == "function" ? r.title(l, a) : (r == null ? void 0 : r.title) || h, f = typeof (r == null ? void 0 : r.subtitle) == "function" ? r.subtitle(l, a) : (r == null ? void 0 : r.subtitle) || "Total";
-    t.save(), t.textAlign = "center", t.textBaseline = "middle", t.font = (r == null ? void 0 : r.titleFont) || "700 20px Pretendard, -apple-system, sans-serif", t.fillStyle = I((r == null ? void 0 : r.titleColor) || "#FFFFFF"), t.fillText(d, s, n - 8), t.font = (r == null ? void 0 : r.subtitleFont) || "500 11px Pretendard, -apple-system, sans-serif", t.fillStyle = I((r == null ? void 0 : r.subtitleColor) || "#94A3B8"), t.fillText(f, s, n + 14), t.restore();
+    t.save(), t.textAlign = "center", t.textBaseline = "middle", t.font = (r == null ? void 0 : r.titleFont) || "700 20px Pretendard, -apple-system, sans-serif", t.fillStyle = T((r == null ? void 0 : r.titleColor) || "#FFFFFF"), t.fillText(d, s, n - 8), t.font = (r == null ? void 0 : r.subtitleFont) || "500 11px Pretendard, -apple-system, sans-serif", t.fillStyle = T((r == null ? void 0 : r.subtitleColor) || "#94A3B8"), t.fillText(f, s, n + 14), t.restore();
   }
   /**
    * 데이터 라벨 및 리더 라인(Leader Line) 렌더링
@@ -3386,13 +3469,13 @@ class Ce {
     const s = this.labelOptions;
     s.position !== "none" && (t.save(), t.font = s.font || "600 11px Pretendard, -apple-system, sans-serif", e.forEach((n, o) => {
       if (n.isTrack || n.percentage < 0.04) return;
-      const r = i ? i(o) : 0, l = (this.styleOptions.hoverExplode ?? 10) * r, a = Math.cos(n.midAngle) * l, c = Math.sin(n.midAngle) * l, { midAngle: h, innerRadius: d, item: f, percentage: g } = n, m = n.outerRadius + 4 * r, y = n.cx + a, v = n.cy + c, b = s.formatter ? s.formatter(f, g) : `${f.label} ${(g * 100).toFixed(0)}%`;
+      const r = i ? i(o) : 0, l = (this.styleOptions.hoverExplode ?? 10) * r, a = Math.cos(n.midAngle) * l, c = Math.sin(n.midAngle) * l, { midAngle: h, innerRadius: d, item: f, percentage: g } = n, m = n.outerRadius + 4 * r, p = n.cx + a, v = n.cy + c, b = s.formatter ? s.formatter(f, g) : `${f.label} ${(g * 100).toFixed(0)}%`;
       if (s.position === "inside") {
-        const w = (d + m) / 2, S = y + Math.cos(h) * w, $ = v + Math.sin(h) * w;
-        t.fillStyle = I(s.color || "#FFFFFF"), t.textAlign = "center", t.textBaseline = "middle", t.fillText(b, S, $);
+        const w = (d + m) / 2, S = p + Math.cos(h) * w, $ = v + Math.sin(h) * w;
+        t.fillStyle = T(s.color || "#FFFFFF"), t.textAlign = "center", t.textBaseline = "middle", t.fillText(b, S, $);
       } else {
-        const w = m + 4, S = m + 14, $ = y + Math.cos(h) * w, x = v + Math.sin(h) * w, F = y + Math.cos(h) * S, E = v + Math.sin(h) * S, k = Math.cos(h) >= 0, C = F + (k ? 14 : -14), D = E;
-        t.strokeStyle = "rgba(148, 163, 184, 0.4)", t.lineWidth = 1, t.beginPath(), t.moveTo($, x), t.lineTo(F, E), t.lineTo(C, D), t.stroke(), t.fillStyle = I(s.color || "#CBD5E1"), t.textAlign = k ? "left" : "right", t.textBaseline = "middle", t.fillText(b, C + (k ? 4 : -4), D);
+        const w = m + 4, S = m + 14, $ = p + Math.cos(h) * w, C = v + Math.sin(h) * w, F = p + Math.cos(h) * S, x = v + Math.sin(h) * S, E = Math.cos(h) >= 0, k = F + (E ? 14 : -14), B = x;
+        t.strokeStyle = "rgba(148, 163, 184, 0.4)", t.lineWidth = 1, t.beginPath(), t.moveTo($, C), t.lineTo(F, x), t.lineTo(k, B), t.stroke(), t.fillStyle = T(s.color || "#CBD5E1"), t.textAlign = E ? "left" : "right", t.textBaseline = "middle", t.fillText(b, k + (E ? 4 : -4), B);
       }
     }), t.restore());
   }
@@ -3402,25 +3485,27 @@ class Ce {
   toSvgElements(t) {
     var c;
     if (t.length === 0) return "";
-    const e = [], i = [], s = this.styleOptions.border, n = (((c = t[0]) == null ? void 0 : c.innerRadius) ?? 0) > 0.5, o = this.styleOptions.padAngle ?? (n ? 0.02 : 0);
+    const e = [], i = [], s = this.styleOptions.border, n = (((c = t[0]) == null ? void 0 : c.innerRadius) ?? 0) > 0.5, o = this.styleOptions.sliceGap !== void 0 ? this.styleOptions.sliceGap > 5e-4 : (this.styleOptions.padAngle ?? (n ? 0.02 : 0)) > 5e-4;
     let r = "";
     if (s && s.width && s.width > 0) {
-      const h = X(s.color || "#151C2C");
-      r = ` stroke="${L(h.color)}" stroke-width="${p(s.width)}"`;
+      const h = G(s.color || "#151C2C");
+      r = ` stroke="${I(h.color)}" stroke-width="${y(s.width)}"`;
     }
     t.forEach((h) => {
-      const d = pe(
+      const d = Se(
         h.cx,
         h.cy,
-        h.innerRadius,
+        h.innerArcRadius ?? h.innerRadius,
         h.outerRadius,
         h.startAngle,
-        h.endAngle
+        h.endAngle,
+        h.innerStartAngle,
+        h.innerEndAngle
       );
       if (!d) return;
-      const f = X(h.color), g = f.opacity < 0.999 ? ` fill-opacity="${p(f.opacity)}"` : "", m = `${(h.percentage * 100).toFixed(1)}%`, y = r || (o <= 5e-4 && f.opacity >= 0.999 ? ` stroke="${L(f.color)}" stroke-width="0.5" stroke-linejoin="round"` : ""), v = h.isTrack ? `Slice: Track (${m})` : `Slice: ${L(h.item.label)} (${m})`;
+      const f = G(h.color), g = f.opacity < 0.999 ? ` fill-opacity="${y(f.opacity)}"` : "", m = `${(h.percentage * 100).toFixed(1)}%`, p = r || (!o && f.opacity >= 0.999 ? ` stroke="${I(f.color)}" stroke-width="0.5" stroke-linejoin="round"` : ""), v = h.isTrack ? `Slice: Track (${m})` : `Slice: ${I(h.item.label)} (${m})`;
       e.push(
-        `<path id="${v}" d="${d}" fill="${L(f.color)}"${g}${y} />`
+        `<path id="${v}" d="${d}" fill="${I(f.color)}"${g}${p} />`
       );
     });
     const l = [];
@@ -3429,9 +3514,9 @@ class Ce {
     `)}
   </g>`), t[0] && t[0].innerRadius > 15) {
       const { cx: h, cy: d } = t[0], f = t.filter(($) => !$.isTrack).map(($) => $.item), g = f.reduce(
-        ($, x) => $ + (typeof x.value == "number" && Number.isFinite(x.value) ? Math.max(0, x.value) : 0),
+        ($, C) => $ + (typeof C.value == "number" && Number.isFinite(C.value) ? Math.max(0, C.value) : 0),
         0
-      ), m = this.centerOptions, y = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && g < 100 ? 100 : void 0), v = y && y > 0 ? `${Math.round(g / Math.max(g, y) * 100)}%` : g.toLocaleString(), b = typeof (m == null ? void 0 : m.title) == "function" ? m.title(f, g) : (m == null ? void 0 : m.title) !== void 0 ? m.title : v, w = typeof (m == null ? void 0 : m.subtitle) == "function" ? m.subtitle(f, g) : (m == null ? void 0 : m.subtitle) !== void 0 ? m.subtitle : "Total", S = [];
+      ), m = this.centerOptions, p = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && g < 100 ? 100 : void 0), v = p && p > 0 ? `${Math.round(g / Math.max(g, p) * 100)}%` : g.toLocaleString(), b = typeof (m == null ? void 0 : m.title) == "function" ? m.title(f, g) : (m == null ? void 0 : m.title) !== void 0 ? m.title : v, w = typeof (m == null ? void 0 : m.subtitle) == "function" ? m.subtitle(f, g) : (m == null ? void 0 : m.subtitle) !== void 0 ? m.subtitle : "Total", S = [];
       b && S.push(
         j({
           id: "Center Title",
@@ -3464,13 +3549,13 @@ class Ce {
       const h = a.font || "600 11px Pretendard, sans-serif";
       t.forEach((d) => {
         if (d.isTrack || d.percentage < 0.04) return;
-        const { midAngle: f, innerRadius: g, outerRadius: m, cx: y, cy: v, item: b, percentage: w } = d, S = a.formatter ? a.formatter(b, w) : `${b.label} ${(w * 100).toFixed(0)}%`;
+        const { midAngle: f, innerRadius: g, outerRadius: m, cx: p, cy: v, item: b, percentage: w } = d, S = a.formatter ? a.formatter(b, w) : `${b.label} ${(w * 100).toFixed(0)}%`;
         if (a.position === "inside") {
-          const $ = (g + m) / 2, x = y + Math.cos(f) * $, F = v + Math.sin(f) * $;
+          const $ = (g + m) / 2, C = p + Math.cos(f) * $, F = v + Math.sin(f) * $;
           i.push(
             j({
               id: `Label: ${b.label}`,
-              x,
+              x: C,
               y: F,
               text: S,
               font: h,
@@ -3480,17 +3565,17 @@ class Ce {
             })
           );
         } else {
-          const $ = m + 4, x = m + 14, F = y + Math.cos(f) * $, E = v + Math.sin(f) * $, k = y + Math.cos(f) * x, C = v + Math.sin(f) * x, D = Math.cos(f) >= 0, A = k + (D ? 14 : -14), B = C, T = X(a.color || "#676C75"), R = `<path id="Leader: ${L(b.label)}" d="M ${p(F)} ${p(E)} L ${p(k)} ${p(C)} L ${p(A)} ${p(B)}" fill="none" stroke="${L(T.color)}" stroke-opacity="0.4" stroke-width="1" />`, z = j({
+          const $ = m + 4, C = m + 14, F = p + Math.cos(f) * $, x = v + Math.sin(f) * $, E = p + Math.cos(f) * C, k = v + Math.sin(f) * C, B = Math.cos(f) >= 0, D = E + (B ? 14 : -14), A = k, z = G(a.color || "#676C75"), V = `<path id="Leader: ${I(b.label)}" d="M ${y(F)} ${y(x)} L ${y(E)} ${y(k)} L ${y(D)} ${y(A)}" fill="none" stroke="${I(z.color)}" stroke-opacity="0.4" stroke-width="1" />`, N = j({
             id: `Label: ${b.label}`,
-            x: A + (D ? 4 : -4),
-            y: B,
+            x: D + (B ? 4 : -4),
+            y: A,
             text: S,
             font: h,
             fill: a.color || "#CBD5E1",
-            align: D ? "left" : "right",
+            align: B ? "left" : "right",
             baseline: "middle"
           });
-          i.push(`<g id="Slice Label: ${L(b.label)}">${R}${z}</g>`);
+          i.push(`<g id="Slice Label: ${I(b.label)}">${V}${N}</g>`);
         }
       }), i.length > 0 && l.push(`<g id="Pie Labels">
     ${i.join(`
@@ -3519,7 +3604,7 @@ function ee(u, t = 1.6) {
     onResize: e.onResize
   };
 }
-function Z(u, t, e = 1.6) {
+function q(u, t, e = 1.6) {
   const i = ee(t, e), s = u.getBoundingClientRect(), n = u.clientWidth || Math.round(s.width) || 0;
   let o = u.clientHeight || Math.round(s.height) || 0;
   if (n <= 0)
@@ -3541,26 +3626,26 @@ function Z(u, t, e = 1.6) {
     isCompact: a
   };
 }
-function Ie(u) {
+function He(u) {
   const { basePadding: t, userPadding: e, width: i, height: s, yScale: n, yAxis: o, legend: r, responsive: l } = u, a = ee(l);
   if (!a.enabled)
     return { ...t, ...e };
   const c = i < a.compactBreakpoint, h = Math.max(0.68, Math.min(1, (i - 200) / 440 * 0.32 + 0.68)), d = Math.max(0.72, Math.min(1, (s - 160) / 240 * 0.28 + 0.72)), f = Math.min(h, d);
-  let g = (e == null ? void 0 : e.top) !== void 0 ? Math.round(e.top * f) : Math.round(t.top * f), m = (e == null ? void 0 : e.right) !== void 0 ? Math.round(e.right * f) : Math.round(t.right * f), y = (e == null ? void 0 : e.bottom) !== void 0 ? Math.round(e.bottom * f) : Math.round(t.bottom * f), v = (e == null ? void 0 : e.left) !== void 0 ? Math.round(e.left * f) : Math.round(t.left * f);
+  let g = (e == null ? void 0 : e.top) !== void 0 ? Math.round(e.top * f) : Math.round(t.top * f), m = (e == null ? void 0 : e.right) !== void 0 ? Math.round(e.right * f) : Math.round(t.right * f), p = (e == null ? void 0 : e.bottom) !== void 0 ? Math.round(e.bottom * f) : Math.round(t.bottom * f), v = (e == null ? void 0 : e.left) !== void 0 ? Math.round(e.left * f) : Math.round(t.left * f);
   const b = r !== !1 && (typeof r != "object" || r.visible !== !1), w = typeof r == "object" && (r != null && r.position) ? r.position : "top";
-  if (b && (w.startsWith("top") && (e == null ? void 0 : e.top) === void 0 ? g = Math.max(g, c ? 34 : 38) : w.startsWith("bottom") && (e == null ? void 0 : e.bottom) === void 0 && (y = Math.max(y, c ? 38 : 44))), n && (o == null ? void 0 : o.visible) !== !1 && (e == null ? void 0 : e.left) === void 0) {
+  if (b && (w.startsWith("top") && (e == null ? void 0 : e.top) === void 0 ? g = Math.max(g, c ? 34 : 38) : w.startsWith("bottom") && (e == null ? void 0 : e.bottom) === void 0 && (p = Math.max(p, c ? 38 : 44))), n && (o == null ? void 0 : o.visible) !== !1 && (e == null ? void 0 : e.left) === void 0) {
     const S = n.ticks(5);
     let $ = 0;
-    for (const k of S) {
-      const C = o != null && o.formatter ? o.formatter(k) : k.toLocaleString();
-      C.length > $ && ($ = C.length);
+    for (const E of S) {
+      const k = o != null && o.formatter ? o.formatter(E) : E.toLocaleString();
+      k.length > $ && ($ = k.length);
     }
-    const x = c ? 6 : 6.6, F = (o == null ? void 0 : o.labelOffset) ?? 8, E = Math.ceil($ * x + F + 8);
-    v = Math.max(c ? 32 : 40, Math.min(Math.round(i * 0.28), E));
+    const C = c ? 6 : 6.6, F = (o == null ? void 0 : o.labelOffset) ?? 8, x = Math.ceil($ * C + F + 8);
+    v = Math.max(c ? 32 : 40, Math.min(Math.round(i * 0.28), x));
   }
-  return { top: g, right: m, bottom: y, left: v };
+  return { top: g, right: m, bottom: p, left: v };
 }
-class Ze extends ae {
+class tt extends de {
   /**
    * BarChart 인스턴스를 생성하고 초기화합니다.
    * 
@@ -3626,9 +3711,9 @@ class Ze extends ae {
       bottom: 40,
       left: 50,
       ...i.padding
-    }, this.layerManager = new re(this.container), this.tooltip = new le(this.container, i.tooltip);
+    }, this.layerManager = new ce(this.container), this.tooltip = new fe(this.container, i.tooltip);
     const n = i.font ? Y(i.font, i.font.size ?? 11, i.font.weight ?? 600) : void 0;
-    this.barSeries = new $e(
+    this.barSeries = new Be(
       i.bar,
       n ? { font: n, ...i.labels } : i.labels
     );
@@ -3643,25 +3728,25 @@ class Ze extends ae {
       fontWeight: (g = i.font) == null ? void 0 : g.weight,
       ...i.legend
     } : void 0;
-    this.legend = new he(
+    this.legend = new ge(
       this.container,
       r,
       {
-        onToggle: (m, y) => {
-          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: y }), this.render(!0);
+        onToggle: (m, p) => {
+          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: p }), this.render(!0);
         },
         onHover: (m) => {
           this.hoveredLegendKey = (m == null ? void 0 : m.key) ?? null, this.renderHoverState();
         }
       },
       o
-    ), this.xScale = new Ee(), this.yScale = new xe(), this.boundMouseUp = () => {
+    ), this.xScale = new Re(), this.yScale = new Ie(), this.boundMouseUp = () => {
       this.isDragging = !1;
     }, this.syncLegend(), this.initScales(), this.setupInteractions(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((m) => {
-      for (const y of m) {
-        const v = Math.round(y.contentRect.width), b = Math.round(y.contentRect.height);
+      for (const p of m) {
+        const v = Math.round(p.contentRect.width), b = Math.round(p.contentRect.height);
         if (v > 0) {
-          const { height: w } = Z(
+          const { height: w } = q(
             this.container,
             this.options.responsive,
             1.6
@@ -3670,7 +3755,7 @@ class Ze extends ae {
         }
       }
     }), this.resizeObserver.observe(this.container));
-    const l = Z(this.container, this.options.responsive, 1.6);
+    const l = q(this.container, this.options.responsive, 1.6);
     l.width > 0 && l.height > 0 && this.resize(l.width, l.height);
   }
   /**
@@ -3766,7 +3851,7 @@ class Ze extends ae {
     this.legend.setItems(s);
   }
   getEffectivePadding(e, i) {
-    const s = this.legend.getReservedPadding(), n = Ie({
+    const s = this.legend.getReservedPadding(), n = He({
       basePadding: this.padding,
       userPadding: this.options.padding,
       width: e || this.width,
@@ -3794,35 +3879,35 @@ class Ze extends ae {
   initScales() {
     var l;
     if (this.isMultiSeries()) {
-      this.allNormalizedSeries.length === 0 && (this.allNormalizedSeries = this.normalizeMultiSeries()), this.activeSeries = this.allNormalizedSeries.filter((y) => this.legend.isKeyActive(y.key));
+      this.allNormalizedSeries.length === 0 && (this.allNormalizedSeries = this.normalizeMultiSeries()), this.activeSeries = this.allNormalizedSeries.filter((p) => this.legend.isKeyActive(p.key));
       const a = this.activeSeries[0] || this.allNormalizedSeries[0];
       this.activeData = a ? a.items : [];
       const c = this.activeData.length;
       this.xScale.setDomainCount(c);
       const h = this.barSeries.getMode();
       if (h === "percent") {
-        let y = !1;
+        let p = !1;
         for (const v of this.activeSeries)
           if (v.items.some((b) => b.value < 0)) {
-            y = !0;
+            p = !0;
             break;
           }
-        this.yScale.domain([y ? -100 : 0, 100]).nice(5);
+        this.yScale.domain([p ? -100 : 0, 100]).nice(5);
         return;
       }
       let d = 0, f = 0;
       if (h === "stacked")
-        for (let y = 0; y < c; y++) {
+        for (let p = 0; p < c; p++) {
           let v = 0, b = 0;
           for (const w of this.activeSeries) {
-            const S = (l = w.items[y]) == null ? void 0 : l.value, $ = typeof S == "number" && Number.isFinite(S) ? S : 0;
+            const S = (l = w.items[p]) == null ? void 0 : l.value, $ = typeof S == "number" && Number.isFinite(S) ? S : 0;
             $ >= 0 ? v += $ : b += $;
           }
           v > d && (d = v), b < f && (f = b);
         }
       else
-        for (const y of this.activeSeries)
-          for (const v of y.items)
+        for (const p of this.activeSeries)
+          for (const v of p.items)
             typeof v.value != "number" || !Number.isFinite(v.value) || (v.value > d && (d = v.value), v.value < f && (f = v.value));
       d === 0 && f === 0 && (d = 100);
       const g = f < 0 ? f * 1.1 : 0, m = d > 0 ? d * 1.1 : 0;
@@ -3865,7 +3950,7 @@ class Ze extends ae {
     const i = this.getEffectivePadding(), s = this.isMultiSeries(), n = this.layerManager.getContext("background");
     this.layerManager.clear("background");
     const o = this.options.font ? Y(this.options.font, 11, 500) : void 0, r = o ? { font: o, ...this.options.xAxis } : this.options.xAxis, l = o ? { font: o, ...this.options.yAxis } : this.options.yAxis;
-    Be.render(n, this.options.grid, this.yScale, this.width, i, this.xScale, this.height), oe.renderYAxis(n, l, this.yScale, i), oe.renderXAxis(n, r, this.xScale, this.activeData, this.height, i);
+    Te.render(n, this.options.grid, this.yScale, this.width, i, this.xScale, this.height), he.renderYAxis(n, l, this.yScale, i), he.renderXAxis(n, r, this.xScale, this.activeData, this.height, i);
     const a = this.layerManager.getContext("series");
     e && this.options.animation !== !1 ? (this.layerManager.clear("interaction"), this.animator.start(this.options.animation, (c) => {
       this.layerManager.clear("series"), s ? this.barSeries.renderMulti(a, this.activeSeries, this.xScale, this.yScale, c) : this.barSeries.render(a, this.activeData, this.xScale, this.yScale, c), c >= 1 && this.renderHoverState();
@@ -3943,8 +4028,8 @@ class Ze extends ae {
         1
       );
       if (m.length === 0) return;
-      const y = Math.min(...m.map((F) => F.x)), v = Math.max(...m.map((F) => F.x + F.width));
-      if (e < y || e > v) {
+      const p = Math.min(...m.map((F) => F.x)), v = Math.max(...m.map((F) => F.x + F.width));
+      if (e < p || e > v) {
         (this.hoveredIndex !== null || this.hoveredSeriesKey !== null) && (this.hoveredIndex = null, this.hoveredSeriesKey = null, this.legend.setHoveredKey(null), this.layerManager.clear("interaction"), this.tooltip.hide());
         return;
       }
@@ -3960,27 +4045,27 @@ class Ze extends ae {
         seriesKey: S,
         geometry: w ?? m[0]
       }));
-      const $ = Math.min(...m.map((F) => F.y)), x = (y + v) / 2;
+      const $ = Math.min(...m.map((F) => F.y)), C = (p + v) / 2;
       if (((g = this.options.tooltip) == null ? void 0 : g.shared) === !1 && w)
         this.tooltip.show(w.x + w.width / 2, w.y, w.item, a);
       else {
-        const F = m.map((C) => ({
-          seriesKey: C.seriesKey || "",
-          seriesName: C.seriesName || C.item.label,
-          color: C.swatchColor || "#6366F1",
-          value: C.item.value,
-          percentage: C.percentage,
-          item: C.item,
-          highlighted: C.seriesKey === S
-        })), E = m.reduce((C, D) => C + D.item.value, 0), k = this.barSeries.getMode() === "stacked" && m.length > 1;
+        const F = m.map((k) => ({
+          seriesKey: k.seriesKey || "",
+          seriesName: k.seriesName || k.item.label,
+          color: k.swatchColor || "#6366F1",
+          value: k.item.value,
+          percentage: k.percentage,
+          item: k.item,
+          highlighted: k.seriesKey === S
+        })), x = m.reduce((k, B) => k + B.item.value, 0), E = this.barSeries.getMode() === "stacked" && m.length > 1;
         this.tooltip.showMulti(
-          w && !b ? w.x + w.width / 2 : x,
+          w && !b ? w.x + w.width / 2 : C,
           w && !b ? w.y : $,
           c.label,
           F,
           a,
-          k ? "합계 (Total)" : void 0,
-          k ? E.toLocaleString() : void 0
+          E ? "합계 (Total)" : void 0,
+          E ? x.toLocaleString() : void 0
         );
       }
       return;
@@ -4068,15 +4153,15 @@ class Ze extends ae {
     let a = Math.round(n * l);
     if (a = Math.max(Math.min(o, r), Math.min(r, a)), a === n) return;
     const c = this.getEffectivePadding(), h = this.layerManager.getCanvas("interaction").getBoundingClientRect(), d = e.clientX - h.left, f = Math.max(1, this.width - c.left - c.right), g = Math.max(0, Math.min(1, (d - c.left) / f)), m = a - n;
-    let y = Math.round(i - m * g), v = y + a - 1;
-    y < 0 && (y = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, y = Math.max(0, v - a + 1)), this.xScale.setViewport(y, v), this.render();
+    let p = Math.round(i - m * g), v = p + a - 1;
+    p < 0 && (p = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, p = Math.max(0, v - a + 1)), this.xScale.setViewport(p, v), this.render();
   }
   /**
    * 런타임에 차트의 데이터 및 옵션을 동적으로 갱신하고 다시 그립니다.
    */
   update(e) {
     const i = !!(e.data || e.series || e.xLabels), s = !!(e.bar && (e.bar.mode !== void 0 || e.bar.stacked !== void 0));
-    e.data !== void 0 && (this.options.data = e.data), e.series !== void 0 && (this.options.series = e.series), e.xLabels !== void 0 && (this.options.xLabels = e.xLabels), e.animation !== void 0 && (this.options.animation = e.animation), (e.bar || e.labels) && (e.bar && (this.options.bar = { ...this.options.bar, ...e.bar }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), this.barSeries = new $e(this.options.bar, this.options.labels)), e.legend !== void 0 && (this.options.legend = e.legend, this.legend.updateOptions(e.legend, this.isMultiSeries())), (i || e.bar || e.legend !== void 0) && this.syncLegend(), (i || s || e.legend !== void 0) && this.initScales(), e.padding && (this.padding = { ...this.padding, ...e.padding }), e.grid && (this.options.grid = e.grid), e.xAxis && (this.options.xAxis = e.xAxis), e.yAxis && (this.options.yAxis = e.yAxis), this.syncScaleRanges(), this.render(i || s);
+    e.data !== void 0 && (this.options.data = e.data), e.series !== void 0 && (this.options.series = e.series), e.xLabels !== void 0 && (this.options.xLabels = e.xLabels), e.animation !== void 0 && (this.options.animation = e.animation), (e.bar || e.labels) && (e.bar && (this.options.bar = { ...this.options.bar, ...e.bar }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), this.barSeries = new Be(this.options.bar, this.options.labels)), e.legend !== void 0 && (this.options.legend = e.legend, this.legend.updateOptions(e.legend, this.isMultiSeries())), (i || e.bar || e.legend !== void 0) && this.syncLegend(), (i || s || e.legend !== void 0) && this.initScales(), e.padding && (this.padding = { ...this.padding, ...e.padding }), e.grid && (this.options.grid = e.grid), e.xAxis && (this.options.xAxis = e.xAxis), e.yAxis && (this.options.yAxis = e.yAxis), this.syncScaleRanges(), this.render(i || s);
   }
   /**
    * 줌/팬 상태를 초기화하여 전체 데이터를 한 화면에 표시합니다.
@@ -4095,7 +4180,7 @@ class Ze extends ae {
     this.xScale.range([n.left, i - n.right]), this.yScale.range([s - n.bottom, n.top]);
     const o = [], r = [], l = this.options.font ? Y(this.options.font, 11, 500) : void 0, a = l ? { font: l, ...this.options.xAxis } : this.options.xAxis, c = l ? { font: l, ...this.options.yAxis } : this.options.yAxis;
     if ((e == null ? void 0 : e.includeGrid) !== !1) {
-      const f = Ae(
+      const f = ze(
         this.options.grid,
         this.yScale,
         i,
@@ -4105,7 +4190,7 @@ class Ze extends ae {
       );
       f && r.push(f);
     }
-    const h = Le(
+    const h = Oe(
       a,
       c,
       this.xScale,
@@ -4124,7 +4209,7 @@ class Ze extends ae {
       o
     );
     if (d && r.push(d), (e == null ? void 0 : e.includeLegend) !== !1 && this.legend.isVisible()) {
-      const f = ce(
+      const f = ue(
         this.legend.getItems(),
         this.legend.getOptions(),
         i,
@@ -4132,7 +4217,7 @@ class Ze extends ae {
       );
       f && r.push(f);
     }
-    return this.syncScaleRanges(), de({
+    return this.syncScaleRanges(), me({
       width: i,
       height: s,
       defs: o,
@@ -4149,7 +4234,7 @@ class Ze extends ae {
     this.animator.cancel(), typeof window < "u" && window.removeEventListener("mouseup", this.boundMouseUp), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-class qe extends ae {
+class it extends de {
   constructor(e, i) {
     super();
     M(this, "container");
@@ -4181,17 +4266,17 @@ class qe extends ae {
       bottom: 20,
       left: 20,
       ...i.padding
-    }, this.layerManager = new re(this.container), this.tooltip = new le(this.container, i.tooltip);
+    }, this.layerManager = new ce(this.container), this.tooltip = new fe(this.container, i.tooltip);
     const n = i.font ? Y(i.font, i.font.size ?? 11, i.font.weight ?? 600) : void 0, o = i.center && i.font ? {
       titleFont: Y(i.font, (i.font.size ?? 11) + 9, 700),
       subtitleFont: Y(i.font, i.font.size ?? 11, 500),
       ...i.center
     } : i.center;
-    this.pieSeries = new Ce(
+    this.pieSeries = new De(
       i.pie,
       n ? { font: n, ...i.labels } : i.labels,
       o
-    ), this.legend = new he(
+    ), this.legend = new ge(
       this.container,
       this.resolveLegendOptions(i.legend),
       {
@@ -4218,7 +4303,7 @@ class qe extends ae {
       for (const a of l) {
         const c = Math.round(a.contentRect.width), h = Math.round(a.contentRect.height);
         if (c > 0) {
-          const { height: d } = Z(
+          const { height: d } = q(
             this.container,
             this.options.responsive,
             1.35
@@ -4227,7 +4312,7 @@ class qe extends ae {
         }
       }
     }), this.resizeObserver.observe(this.container));
-    const r = Z(this.container, this.options.responsive, 1.35);
+    const r = q(this.container, this.options.responsive, 1.35);
     r.width > 0 && r.height > 0 && this.resize(r.width, r.height);
   }
   resize(e, i) {
@@ -4349,7 +4434,7 @@ class qe extends ae {
     for (let g = 0; g < this.slices.length; g++) {
       const m = this.slices[g];
       if (m.isTrack) continue;
-      const y = this.hoverRatios[g] ?? 0, v = (((d = this.options.pie) == null ? void 0 : d.hoverExplode) ?? 10) * y + 10;
+      const p = this.hoverRatios[g] ?? 0, v = (((d = this.options.pie) == null ? void 0 : d.hoverExplode) ?? 10) * p + 10;
       if (a >= m.innerRadius && a <= m.outerRadius + v) {
         let b = m.startAngle, w = m.endAngle;
         if (b < -Math.PI / 2 && (b += 2 * Math.PI), w < -Math.PI / 2 && (w += 2 * Math.PI), c >= b && c <= w) {
@@ -4361,7 +4446,7 @@ class qe extends ae {
     if (h !== null) {
       const g = this.slices[h];
       this.hoveredIndex !== h && (this.hoveredIndex = h, this.startHoverTransition(), this.legend.setHoveredKey(this.getItemLegendKey(g.item, g.index)), this.emit("hover", { item: g.item, index: h, slice: g }));
-      const m = this.hoverRatios[h] ?? 0, y = (((f = this.options.pie) == null ? void 0 : f.hoverExplode) ?? 10) * m, v = g.outerRadius * 0.82 + y, b = n + Math.cos(g.midAngle) * v, w = o + Math.sin(g.midAngle) * v;
+      const m = this.hoverRatios[h] ?? 0, p = (((f = this.options.pie) == null ? void 0 : f.hoverExplode) ?? 10) * m, v = g.outerRadius * 0.82 + p, b = n + Math.cos(g.midAngle) * v, w = o + Math.sin(g.midAngle) * v;
       this.showSliceTooltip(b, w, g, h);
     } else
       this.hoveredIndex !== null && (this.hoveredIndex = null, this.startHoverTransition(), this.legend.setHoveredKey(null), this.tooltip.hide(), this.emit("hover", null));
@@ -4389,7 +4474,7 @@ class qe extends ae {
   }
   update(e) {
     const i = !!e.data;
-    e.data && (this.options.data = e.data), e.animation !== void 0 && (this.options.animation = e.animation), (e.pie || e.labels || e.center) && (e.pie && (this.options.pie = { ...this.options.pie, ...e.pie }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), e.center && (this.options.center = { ...this.options.center, ...e.center }), this.pieSeries = new Ce(this.options.pie, this.options.labels, this.options.center)), e.legend !== void 0 && (this.options.legend = e.legend, this.legend.updateOptions(this.resolveLegendOptions(e.legend), !0)), (i || e.pie || e.legend !== void 0) && this.syncLegend(), e.padding && (this.padding = { ...this.padding, ...e.padding }), this.render(i);
+    e.data && (this.options.data = e.data), e.animation !== void 0 && (this.options.animation = e.animation), (e.pie || e.labels || e.center) && (e.pie && (this.options.pie = { ...this.options.pie, ...e.pie }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), e.center && (this.options.center = { ...this.options.center, ...e.center }), this.pieSeries = new De(this.options.pie, this.options.labels, this.options.center)), e.legend !== void 0 && (this.options.legend = e.legend, this.legend.updateOptions(this.resolveLegendOptions(e.legend), !0)), (i || e.pie || e.legend !== void 0) && this.syncLegend(), e.padding && (this.padding = { ...this.padding, ...e.padding }), this.render(i);
   }
   /**
    * 현재 파이/도넛 차트를 피그마(`figma.createNodeFromSvg`)에서 레이어별로 편집 가능한 순수 벡터(SVG) 문자열로 추출합니다.
@@ -4408,7 +4493,7 @@ class qe extends ae {
     });
     const r = this.getEffectivePadding(i, s), l = this.pieSeries.calculateSlices(o, i, s, r), a = [], c = this.pieSeries.toSvgElements(l);
     if (c && a.push(c), (e == null ? void 0 : e.includeLegend) !== !1 && this.legend.isVisible()) {
-      const h = ce(
+      const h = ue(
         this.legend.getItems(),
         this.legend.getOptions(),
         i,
@@ -4416,7 +4501,7 @@ class qe extends ae {
       );
       h && a.push(h);
     }
-    return de({
+    return me({
       width: i,
       height: s,
       defs: [],
@@ -4430,7 +4515,7 @@ class qe extends ae {
     this.animator.cancel(), this.stopHoverTransition(), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-function ke(u, t) {
+function Le(u, t) {
   const e = u.length;
   if (t >= e || t < 3)
     return u;
@@ -4448,18 +4533,18 @@ function ke(u, t) {
       c += u[b].x, h += u[b].y;
     c /= Math.max(1, a), h /= Math.max(1, a);
     const d = Math.floor(o * s) + 1, f = Math.floor((o + 1) * s) + 1, g = u[n].x, m = u[n].y;
-    let y = -1, v = d;
+    let p = -1, v = d;
     for (let b = d; b < f; b++) {
       const w = Math.abs(
         (g - c) * (u[b].y - m) - (g - u[b].x) * (h - m)
       );
-      w > y && (y = w, v = b);
+      w > p && (p = w, v = b);
     }
     i.push(u[v]), n = v;
   }
   return i.push(u[e - 1]), i;
 }
-class ge {
+class ve {
   constructor(t, e, i, s, n, o = 600) {
     M(this, "lineOptions");
     M(this, "areaOptions");
@@ -4511,38 +4596,38 @@ class ge {
    * @param baseValues 누적(Stacked) 모드 하단 경계 수치 배열 (선택)
    */
   render(t, e, i, s, n, o, r, l = 1, a, c) {
-    var H;
+    var L;
     const [h, d] = i.getViewport();
     if (e.length === 0 || h > d) return;
-    const f = Math.max(0, h - 1), g = Math.min(e.length - 1, d + 1), m = s.domain(), y = m[0] < 0 && m[1] > 0 ? 0 : m[0], v = s.scale(y), b = l >= 1 ? 1 : Math.min(1, 0.35 + 0.65 * l), w = [], S = [];
-    for (let O = f; O <= g; O++) {
-      const K = e[O];
-      if (!K) continue;
-      const W = a ? a[O] : K.value;
-      if (typeof W != "number" || !Number.isFinite(W)) continue;
-      const N = a ? a[O] : void 0, _ = this.getPointGeometry(K, O, i, s, N);
-      if (b < 1 && (_.y = v + (_.y - v) * b), w.push(_), c) {
-        const G = this.getPointGeometry(K, O, i, s, c[O] ?? 0);
-        b < 1 && (G.y = v + (G.y - v) * b), S.push(G);
+    const f = Math.max(0, h - 1), g = Math.min(e.length - 1, d + 1), m = s.domain(), p = m[0] < 0 && m[1] > 0 ? 0 : m[0], v = s.scale(p), b = l >= 1 ? 1 : Math.min(1, 0.35 + 0.65 * l), w = [], S = [];
+    for (let R = f; R <= g; R++) {
+      const P = e[R];
+      if (!P) continue;
+      const H = a ? a[R] : P.value;
+      if (typeof H != "number" || !Number.isFinite(H)) continue;
+      const _ = a ? a[R] : void 0, K = this.getPointGeometry(P, R, i, s, _);
+      if (b < 1 && (K.y = v + (K.y - v) * b), w.push(K), c) {
+        const X = this.getPointGeometry(P, R, i, s, c[R] ?? 0);
+        b < 1 && (X.y = v + (X.y - v) * b), S.push(X);
       }
     }
     if (w.length === 0) return;
-    const x = !!(this.samplingThreshold && w.length > this.samplingThreshold && !c) ? ke(w, this.samplingThreshold) : w, F = n.left, E = o - n.right, k = n.top, C = r - n.bottom, D = Math.max(1, E - F), A = Math.max(1, C - k), B = Math.max(0, Math.min(1.05, l)), T = l >= 1 ? D : D * B, R = F + T;
-    t.save(), t.beginPath(), t.rect(F, k - 12, T, A + 24), t.clip(), this.areaOptions.visible && x.length >= 2 && this.drawArea(
+    const C = !!(this.samplingThreshold && w.length > this.samplingThreshold && !c) ? Le(w, this.samplingThreshold) : w, F = n.left, x = o - n.right, E = n.top, k = r - n.bottom, B = Math.max(1, x - F), D = Math.max(1, k - E), A = Math.max(0, Math.min(1.05, l)), z = l >= 1 ? B : B * A, V = F + z;
+    t.save(), t.beginPath(), t.rect(F, E - 12, z, D + 24), t.clip(), this.areaOptions.visible && C.length >= 2 && this.drawArea(
       t,
-      x,
+      C,
       s,
       F,
-      k,
+      E,
+      B,
       D,
-      A,
-      S.length === x.length ? S : void 0
-    ), this.drawLine(t, x, F, k, D, A), t.restore();
-    const z = d - h + 1, V = this.pointOptions.visible && z <= 80, P = ((H = this.labelOptions) == null ? void 0 : H.visible) && z <= 45;
-    if (V || P) {
+      S.length === C.length ? S : void 0
+    ), this.drawLine(t, C, F, E, B, D), t.restore();
+    const N = d - h + 1, W = this.pointOptions.visible && N <= 80, O = ((L = this.labelOptions) == null ? void 0 : L.visible) && N <= 45;
+    if (W || O) {
       t.save();
-      for (const O of x)
-        O.index < h || O.index > d || l < 1 && O.x > R + 2 || (V && this.drawPointMarker(t, O, !1), P && this.drawDataLabel(t, O));
+      for (const R of C)
+        R.index < h || R.index > d || l < 1 && R.x > V + 2 || (W && this.drawPointMarker(t, R, !1), O && this.drawDataLabel(t, R));
       t.restore();
     }
   }
@@ -4579,7 +4664,7 @@ class ge {
     } else
       t.lineTo(c.x, f), t.lineTo(a.x, f);
     if (t.closePath(), this.areaOptions.opacity !== void 0 && (t.globalAlpha = this.areaOptions.opacity), this.areaOptions.fill)
-      typeof this.areaOptions.fill == "string" ? t.fillStyle = I(this.areaOptions.fill) : t.fillStyle = se(
+      typeof this.areaOptions.fill == "string" ? t.fillStyle = T(this.areaOptions.fill) : t.fillStyle = ae(
         t,
         s,
         n,
@@ -4588,8 +4673,8 @@ class ge {
         this.areaOptions.fill
       );
     else {
-      const { from: g, to: m } = this.resolveAreaGradientStops(), y = t.createLinearGradient(0, n, 0, n + r);
-      y.addColorStop(0, g), y.addColorStop(1, m), t.fillStyle = y;
+      const { from: g, to: m } = this.resolveAreaGradientStops(), p = t.createLinearGradient(0, n, 0, n + r);
+      p.addColorStop(0, g), p.addColorStop(1, m), t.fillStyle = p;
     }
     t.fill(), t.restore();
   }
@@ -4603,7 +4688,7 @@ class ge {
     }
     this.traceLinePath(t, e);
     const r = this.lineOptions.color;
-    typeof r == "string" ? t.strokeStyle = I(r) : t.strokeStyle = se(t, i, s, n, o, r), t.lineWidth = this.lineOptions.width, t.lineJoin = "round", t.lineCap = "round", this.lineOptions.dash && this.lineOptions.dash.length > 0 ? t.setLineDash(this.lineOptions.dash) : t.setLineDash([]), t.stroke(), t.restore();
+    typeof r == "string" ? t.strokeStyle = T(r) : t.strokeStyle = ae(t, i, s, n, o, r), t.lineWidth = this.lineOptions.width, t.lineJoin = "round", t.lineCap = "round", this.lineOptions.dash && this.lineOptions.dash.length > 0 ? t.setLineDash(this.lineOptions.dash) : t.setLineDash([]), t.stroke(), t.restore();
   }
   /**
    * 단일 데이터 포인트 원형 마커 그리기
@@ -4611,9 +4696,9 @@ class ge {
   drawPointMarker(t, e, i) {
     const s = i ? this.pointOptions.hoverRadius ?? 6 : this.pointOptions.radius ?? 4;
     if (s <= 0) return;
-    const { x: n, y: o, item: r, index: l } = e, a = I(r.color || this.getPrimaryLineColor()), c = I(
+    const { x: n, y: o, item: r, index: l } = e, a = T(r.color || this.getPrimaryLineColor()), c = T(
       typeof this.pointOptions.fill == "function" ? this.pointOptions.fill(r, l) : this.pointOptions.fill || "#0B0F19"
-    ), h = I(
+    ), h = T(
       typeof this.pointOptions.borderColor == "function" ? this.pointOptions.borderColor(r, l) : this.pointOptions.borderColor || a
     );
     t.save(), i && (t.beginPath(), t.arc(n, o, s + 5, 0, Math.PI * 2), t.fillStyle = this.withAlpha(h, 0.25), t.fill()), t.beginPath(), t.arc(n, o, s, 0, Math.PI * 2), t.fillStyle = i ? h : c, t.fill();
@@ -4631,7 +4716,7 @@ class ge {
       i.renderCustom(t, { x: s, y: n, width: 0, height: 0, item: o, index: r });
       return;
     }
-    const l = i.offset ?? 8, a = i.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', c = I(
+    const l = i.offset ?? 8, a = i.font || '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', c = T(
       typeof i.color == "function" ? i.color(o, r) : i.color || "#94A3B8"
     ), h = typeof o.value == "number" && Number.isFinite(o.value) ? o.value.toLocaleString() : "-", d = i.formatter ? i.formatter(o.value, o, r) : h;
     t.save(), t.font = a, t.fillStyle = c, t.textAlign = "center", i.position === "bottom-outside" || i.position === "inside-bottom" ? (t.textBaseline = "top", t.fillText(d, s, n + l)) : (t.textBaseline = "bottom", t.fillText(d, s, n - l)), t.restore();
@@ -4660,29 +4745,29 @@ class ge {
    * 범례(Legend) 아이콘에 표시할 대표 색상 문자열을 반환합니다.
    */
   resolveSwatchColor(t, e) {
-    if (t.color) return I(t.color);
+    if (t.color) return T(t.color);
     const i = this.pointOptions.borderColor;
-    return typeof i == "function" ? I(i(t, e)) : typeof i == "string" ? I(i) : this.getPrimaryLineColor();
+    return typeof i == "function" ? T(i(t, e)) : typeof i == "string" ? T(i) : this.getPrimaryLineColor();
   }
   /**
    * 라인의 대표 색상 문자열을 추출합니다.
    */
   getPrimaryLineColor() {
     const t = this.lineOptions.color;
-    return I(typeof t == "string" ? t : t.from);
+    return T(typeof t == "string" ? t : t.from);
   }
   /**
    * Area 영역의 채도(Saturation), 명도(Lightness), 상/하단 불투명도 옵션을 반영하여
    * 그라데이션 `{ from, to }` 색상 문자열을 계산합니다.
    */
   resolveAreaGradientStops() {
-    const t = this.getPrimaryLineColor(), e = this.areaOptions.topOpacity ?? 0.42, i = this.areaOptions.bottomOpacity ?? 0.02, s = Fe(t, {
+    const t = this.getPrimaryLineColor(), e = this.areaOptions.topOpacity ?? 0.42, i = this.areaOptions.bottomOpacity ?? 0.02, s = Ee(t, {
       saturation: this.areaOptions.topSaturation,
       saturationDelta: this.areaOptions.saturationDelta,
       lightness: this.areaOptions.topLightness,
       lightnessDelta: this.areaOptions.lightnessDelta,
       alpha: e
-    }), n = Fe(t, {
+    }), n = Ee(t, {
       saturation: this.areaOptions.bottomSaturation ?? this.areaOptions.topSaturation,
       saturationDelta: this.areaOptions.saturationDelta,
       lightness: this.areaOptions.bottomLightness ?? this.areaOptions.topLightness,
@@ -4709,7 +4794,7 @@ class ge {
    * 피그마(`figma.createNodeFromSvg`) 호환 라인/영역/포인트/라벨 SVG 벡터 그룹을 생성합니다.
    */
   toSvgElements(t) {
-    var V;
+    var W;
     const {
       seriesName: e = "Series",
       seriesIdSuffix: i = "0",
@@ -4724,103 +4809,103 @@ class ge {
       baseValues: d
     } = t, [f, g] = n.getViewport();
     if (s.length === 0 || f > g) return "";
-    const m = Math.max(0, f), y = Math.min(s.length - 1, g), v = [], b = [];
-    for (let P = m; P <= y; P++) {
-      const H = s[P];
-      if (!H) continue;
-      const O = h ? h[P] : void 0;
-      v.push(this.getPointGeometry(H, P, n, o, O)), d && b.push(this.getPointGeometry(H, P, n, o, d[P] ?? 0));
+    const m = Math.max(0, f), p = Math.min(s.length - 1, g), v = [], b = [];
+    for (let O = m; O <= p; O++) {
+      const L = s[O];
+      if (!L) continue;
+      const R = h ? h[O] : void 0;
+      v.push(this.getPointGeometry(L, O, n, o, R)), d && b.push(this.getPointGeometry(L, O, n, o, d[O] ?? 0));
     }
     if (v.length === 0) return "";
-    const S = !!(this.samplingThreshold && v.length > this.samplingThreshold && !d) ? ke(v, this.samplingThreshold) : v, $ = r.left, x = l - r.right, F = r.top, E = a - r.bottom, k = Math.max(1, x - $), C = Math.max(1, E - F), D = this.lineOptions.curve || "smooth", A = this.lineOptions.tension ?? 0.35, B = [];
+    const S = !!(this.samplingThreshold && v.length > this.samplingThreshold && !d) ? Le(v, this.samplingThreshold) : v, $ = r.left, C = l - r.right, F = r.top, x = a - r.bottom, E = Math.max(1, C - $), k = Math.max(1, x - F), B = this.lineOptions.curve || "smooth", D = this.lineOptions.tension ?? 0.35, A = [];
     if (this.areaOptions.visible && S.length >= 2) {
-      const P = fe(S, D, A, !1);
-      let H = "";
+      const O = pe(S, B, D, !1);
+      let L = "";
       if (b.length === S.length && b.length > 0) {
-        const N = [...b].reverse(), _ = fe(N, D, A, !0);
-        H = `${P} ${_} Z`;
+        const _ = [...b].reverse(), K = pe(_, B, D, !0);
+        L = `${O} ${K} Z`;
       } else {
-        const N = o.domain(), _ = N[0] < 0 && N[1] > 0 ? 0 : N[0], G = o.scale(_), q = S[0], Re = S[S.length - 1];
-        H = `${P} L ${p(Re.x)} ${p(G)} L ${p(q.x)} ${p(G)} Z`;
+        const _ = o.domain(), K = _[0] < 0 && _[1] > 0 ? 0 : _[0], X = o.scale(K), Z = S[0], ye = S[S.length - 1];
+        L = `${O} L ${y(ye.x)} ${y(X)} L ${y(Z.x)} ${y(X)} Z`;
       }
-      const O = this.resolveAreaGradientStops(), K = this.areaOptions.fill || {
+      const R = this.resolveAreaGradientStops(), P = this.areaOptions.fill || {
         type: "linear",
-        from: O.from,
-        to: O.to,
+        from: R.from,
+        to: R.to,
         direction: "vertical"
-      }, W = ye(
+      }, H = Fe(
         "fill",
-        K,
+        P,
         c,
         `area-grad-${i}`,
         $,
         F,
+        E,
         k,
-        C,
         this.areaOptions.opacity ?? 1
       );
-      B.push(`<path id="Area: ${L(e)}" d="${H}" ${W} />`);
+      A.push(`<path id="Area: ${I(e)}" d="${L}" ${H} />`);
     }
     if (S.length >= 2) {
-      const P = fe(S, D, A, !1), H = ye(
+      const O = pe(S, B, D, !1), L = Fe(
         "stroke",
         this.lineOptions.color,
         c,
         `line-grad-${i}`,
         $,
         F,
-        k,
-        C
-      ), O = this.lineOptions.dash && this.lineOptions.dash.length > 0 ? ` stroke-dasharray="${this.lineOptions.dash.join(" ")}"` : "";
-      B.push(
-        `<path id="Line: ${L(e)}" d="${P}" fill="none" ${H} stroke-width="${p(this.lineOptions.width)}" stroke-linecap="round" stroke-linejoin="round"${O} />`
+        E,
+        k
+      ), R = this.lineOptions.dash && this.lineOptions.dash.length > 0 ? ` stroke-dasharray="${this.lineOptions.dash.join(" ")}"` : "";
+      A.push(
+        `<path id="Line: ${I(e)}" d="${O}" fill="none" ${L} stroke-width="${y(this.lineOptions.width)}" stroke-linecap="round" stroke-linejoin="round"${R} />`
       );
     }
-    const T = g - f + 1, R = this.pointOptions.visible && T <= 80, z = ((V = this.labelOptions) == null ? void 0 : V.visible) && T <= 45;
-    if (R) {
-      const P = [], H = this.pointOptions.radius ?? 4, O = this.pointOptions.borderWidth ?? 2;
-      for (const K of S) {
-        if (K.index < f || K.index > g) continue;
-        const W = K.item.color || this.getPrimaryLineColor(), N = typeof this.pointOptions.fill == "function" ? this.pointOptions.fill(K.item, K.index) : this.pointOptions.fill || "#0B0F19", _ = typeof this.pointOptions.borderColor == "function" ? this.pointOptions.borderColor(K.item, K.index) : this.pointOptions.borderColor || W, G = X(N), q = X(_);
-        P.push(
-          `<circle id="Point: ${L(K.item.label)} (${K.item.value})" cx="${p(K.x)}" cy="${p(K.y)}" r="${p(H)}" fill="${L(G.color)}" stroke="${L(q.color)}" stroke-width="${p(O)}" />`
+    const z = g - f + 1, V = this.pointOptions.visible && z <= 80, N = ((W = this.labelOptions) == null ? void 0 : W.visible) && z <= 45;
+    if (V) {
+      const O = [], L = this.pointOptions.radius ?? 4, R = this.pointOptions.borderWidth ?? 2;
+      for (const P of S) {
+        if (P.index < f || P.index > g) continue;
+        const H = P.item.color || this.getPrimaryLineColor(), _ = typeof this.pointOptions.fill == "function" ? this.pointOptions.fill(P.item, P.index) : this.pointOptions.fill || "#0B0F19", K = typeof this.pointOptions.borderColor == "function" ? this.pointOptions.borderColor(P.item, P.index) : this.pointOptions.borderColor || H, X = G(_), Z = G(K);
+        O.push(
+          `<circle id="Point: ${I(P.item.label)} (${P.item.value})" cx="${y(P.x)}" cy="${y(P.y)}" r="${y(L)}" fill="${I(X.color)}" stroke="${I(Z.color)}" stroke-width="${y(R)}" />`
         );
       }
-      P.length > 0 && B.push(`<g id="Points: ${L(e)}">
-      ${P.join(`
+      O.length > 0 && A.push(`<g id="Points: ${I(e)}">
+      ${O.join(`
       `)}
     </g>`);
     }
-    if (z && this.labelOptions && this.labelOptions.position !== "none") {
-      const P = [], H = this.labelOptions.offset ?? 8, O = this.labelOptions.font || "600 11px Pretendard, sans-serif", K = this.labelOptions.position === "bottom-outside" || this.labelOptions.position === "inside-bottom";
-      for (const W of S) {
-        if (W.index < f || W.index > g) continue;
-        const N = typeof this.labelOptions.color == "function" ? this.labelOptions.color(W.item, W.index) : this.labelOptions.color || "#94A3B8", _ = this.labelOptions.formatter ? this.labelOptions.formatter(W.item.value, W.item, W.index) : W.item.value.toLocaleString();
-        P.push(
+    if (N && this.labelOptions && this.labelOptions.position !== "none") {
+      const O = [], L = this.labelOptions.offset ?? 8, R = this.labelOptions.font || "600 11px Pretendard, sans-serif", P = this.labelOptions.position === "bottom-outside" || this.labelOptions.position === "inside-bottom";
+      for (const H of S) {
+        if (H.index < f || H.index > g) continue;
+        const _ = typeof this.labelOptions.color == "function" ? this.labelOptions.color(H.item, H.index) : this.labelOptions.color || "#94A3B8", K = this.labelOptions.formatter ? this.labelOptions.formatter(H.item.value, H.item, H.index) : H.item.value.toLocaleString();
+        O.push(
           j({
-            id: `Label: ${W.item.label} (${_})`,
-            x: W.x,
-            y: K ? W.y + H : W.y - H,
-            text: _,
-            font: O,
-            fill: N,
+            id: `Label: ${H.item.label} (${K})`,
+            x: H.x,
+            y: P ? H.y + L : H.y - L,
+            text: K,
+            font: R,
+            fill: _,
             align: "center",
-            baseline: K ? "top" : "bottom"
+            baseline: P ? "top" : "bottom"
           })
         );
       }
-      P.length > 0 && B.push(`<g id="Labels: ${L(e)}">
-      ${P.join(`
+      O.length > 0 && A.push(`<g id="Labels: ${I(e)}">
+      ${O.join(`
       `)}
     </g>`);
     }
-    return `<g id="Series: ${L(e)}">
-    ${B.join(`
+    return `<g id="Series: ${I(e)}">
+    ${A.join(`
     `)}
   </g>`;
   }
 }
-class Qe extends ae {
+class st extends de {
   /**
    * LineChart 인스턴스를 생성하고 초기화합니다.
    * 
@@ -4886,9 +4971,9 @@ class Qe extends ae {
       bottom: 40,
       left: 50,
       ...i.padding
-    }, this.layerManager = new re(this.container), this.tooltip = new le(this.container, i.tooltip);
+    }, this.layerManager = new ce(this.container), this.tooltip = new fe(this.container, i.tooltip);
     const n = i.font ? Y(i.font, i.font.size ?? 11, i.font.weight ?? 600) : void 0;
-    this.lineSeries = new ge(
+    this.lineSeries = new ve(
       i.line,
       i.area,
       i.points,
@@ -4907,25 +4992,25 @@ class Qe extends ae {
       fontWeight: (g = i.font) == null ? void 0 : g.weight,
       ...i.legend
     } : void 0;
-    this.legend = new he(
+    this.legend = new ge(
       this.container,
       r,
       {
-        onToggle: (m, y) => {
-          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: y }), this.render(!0);
+        onToggle: (m, p) => {
+          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: p }), this.render(!0);
         },
         onHover: (m) => {
           this.hoveredLegendKey = (m == null ? void 0 : m.key) ?? null, this.renderHoverState();
         }
       },
       o
-    ), this.xScale = new Ee(), this.yScale = new xe(), this.boundMouseUp = () => {
+    ), this.xScale = new Re(), this.yScale = new Ie(), this.boundMouseUp = () => {
       this.isDragging = !1;
     }, this.syncLegend(), this.initScales(), this.setupInteractions(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((m) => {
-      for (const y of m) {
-        const v = Math.round(y.contentRect.width), b = Math.round(y.contentRect.height);
+      for (const p of m) {
+        const v = Math.round(p.contentRect.width), b = Math.round(p.contentRect.height);
         if (v > 0) {
-          const { height: w } = Z(
+          const { height: w } = q(
             this.container,
             this.options.responsive,
             1.6
@@ -4934,7 +5019,7 @@ class Qe extends ae {
         }
       }
     }), this.resizeObserver.observe(this.container));
-    const l = Z(this.container, this.options.responsive, 1.6);
+    const l = q(this.container, this.options.responsive, 1.6);
     l.width > 0 && l.height > 0 && this.resize(l.width, l.height);
   }
   /**
@@ -4951,7 +5036,7 @@ class Qe extends ae {
     if (e.length === 0) return [];
     const i = Math.max(0, ...e.map((n) => n.data.length)), s = this.options.xLabels;
     return e.map((n, o) => {
-      var v, b, w, S, $, x, F;
+      var v, b, w, S, $, C, F;
       const r = n.id || n.name || `series-${o}`, l = U[o % U.length], a = n.color ?? l, c = typeof a == "string" ? a : a.from, h = {
         ...this.options.line,
         color: a,
@@ -4972,34 +5057,34 @@ class Qe extends ae {
       } : d = {
         ...this.options.area,
         visible: (($ = this.options.area) == null ? void 0 : $.visible) ?? !0,
-        opacity: ((x = this.options.area) == null ? void 0 : x.opacity) ?? (this.options.stacked ? 0.55 : 0.22)
+        opacity: ((C = this.options.area) == null ? void 0 : C.opacity) ?? (this.options.stacked ? 0.55 : 0.22)
       };
       const f = {
         ...this.options.points,
         ...n.points,
         borderColor: ((F = n.points) == null ? void 0 : F.borderColor) ?? c
-      }, g = this.options.font ? Y(this.options.font, this.options.font.size ?? 11, this.options.font.weight ?? 600) : void 0, m = new ge(
+      }, g = this.options.font ? Y(this.options.font, this.options.font.size ?? 11, this.options.font.weight ?? 600) : void 0, m = new ve(
         h,
         d,
         f,
         g ? { font: g, ...this.options.labels } : this.options.labels,
         this.options.crosshair,
         this.options.samplingThreshold ?? 600
-      ), y = [];
-      for (let E = 0; E < i; E++) {
-        const k = n.data[E], C = (s == null ? void 0 : s[E]) ?? (typeof k == "object" && (k != null && k.label) ? k.label : `#${E + 1}`);
-        typeof k == "number" ? y.push({
-          id: `${r}-${E}`,
-          label: C,
-          value: k,
+      ), p = [];
+      for (let x = 0; x < i; x++) {
+        const E = n.data[x], k = (s == null ? void 0 : s[x]) ?? (typeof E == "object" && (E != null && E.label) ? E.label : `#${x + 1}`);
+        typeof E == "number" ? p.push({
+          id: `${r}-${x}`,
+          label: k,
+          value: E,
           category: n.name
-        }) : k ? y.push({
-          ...k,
-          label: (s == null ? void 0 : s[E]) ?? k.label ?? C,
-          category: k.category ?? n.name
-        }) : y.push({
-          id: `${r}-${E}`,
-          label: C,
+        }) : E ? p.push({
+          ...E,
+          label: (s == null ? void 0 : s[x]) ?? E.label ?? k,
+          category: E.category ?? n.name
+        }) : p.push({
+          id: `${r}-${x}`,
+          label: k,
           value: 0,
           category: n.name
         });
@@ -5007,7 +5092,7 @@ class Qe extends ae {
       return {
         key: r,
         name: n.name,
-        items: y,
+        items: p,
         renderer: m,
         swatchColor: c
       };
@@ -5062,7 +5147,7 @@ class Qe extends ae {
     this.legend.setItems(s);
   }
   getEffectivePadding(e, i) {
-    const s = this.legend.getReservedPadding(), n = Ie({
+    const s = this.legend.getReservedPadding(), n = He({
       basePadding: this.padding,
       userPadding: this.options.padding,
       width: e || this.width,
@@ -5098,18 +5183,18 @@ class Qe extends ae {
       let h = 0, d = 0;
       if (this.options.stacked) {
         const m = new Array(c).fill(0);
-        for (const y of this.activeSeries) {
-          y.baseValues = [...m], y.stackedValues = new Array(c);
+        for (const p of this.activeSeries) {
+          p.baseValues = [...m], p.stackedValues = new Array(c);
           for (let v = 0; v < c; v++) {
-            const b = (l = y.items[v]) == null ? void 0 : l.value, w = typeof b == "number" && Number.isFinite(b) ? b : 0;
-            m[v] += w, y.stackedValues[v] = m[v], m[v] > h && (h = m[v]), m[v] < d && (d = m[v]);
+            const b = (l = p.items[v]) == null ? void 0 : l.value, w = typeof b == "number" && Number.isFinite(b) ? b : 0;
+            m[v] += w, p.stackedValues[v] = m[v], m[v] > h && (h = m[v]), m[v] < d && (d = m[v]);
           }
         }
       } else
         for (const m of this.activeSeries) {
           m.baseValues = void 0, m.stackedValues = void 0;
-          for (const y of m.items)
-            typeof y.value != "number" || !Number.isFinite(y.value) || (y.value > h && (h = y.value), y.value < d && (d = y.value));
+          for (const p of m.items)
+            typeof p.value != "number" || !Number.isFinite(p.value) || (p.value > h && (h = p.value), p.value < d && (d = p.value));
         }
       h === 0 && d === 0 && (h = 100);
       const f = d < 0 ? d * 1.1 : 0, g = h > 0 ? h * 1.1 : 0;
@@ -5152,7 +5237,7 @@ class Qe extends ae {
     const i = this.getEffectivePadding(), s = this.isMultiSeries(), n = this.layerManager.getContext("background");
     this.layerManager.clear("background");
     const o = this.options.font ? Y(this.options.font, 11, 500) : void 0, r = o ? { font: o, ...this.options.xAxis } : this.options.xAxis, l = o ? { font: o, ...this.options.yAxis } : this.options.yAxis;
-    Be.render(n, this.options.grid, this.yScale, this.width, i, this.xScale, this.height), oe.renderYAxis(n, l, this.yScale, i), oe.renderXAxis(n, r, this.xScale, this.activeData, this.height, i);
+    Te.render(n, this.options.grid, this.yScale, this.width, i, this.xScale, this.height), he.renderYAxis(n, l, this.yScale, i), he.renderXAxis(n, r, this.xScale, this.activeData, this.height, i);
     const a = this.layerManager.getContext("series"), c = (h) => {
       if (s)
         for (const d of this.activeSeries)
@@ -5258,10 +5343,10 @@ class Qe extends ae {
       for (const S of this.activeSeries) {
         const $ = S.items[a];
         if (!$) continue;
-        const x = S.stackedValues ? S.stackedValues[a] : void 0, F = S.renderer.getPointGeometry($, a, this.xScale, this.yScale, x);
+        const C = S.stackedValues ? S.stackedValues[a] : void 0, F = S.renderer.getPointGeometry($, a, this.xScale, this.yScale, C);
         d.push({ series: S, pt: F });
-        const E = Math.abs(F.y - i);
-        E < g && (g = E, f = S.key, m = F);
+        const x = Math.abs(F.y - i);
+        x < g && (g = x, f = S.key, m = F);
       }
       if (d.length === 0 || !m) return;
       (this.hoveredIndex !== a || this.hoveredSeriesKey !== f) && (this.hoveredIndex = a, this.hoveredSeriesKey = f, this.legend.setHoveredKey(f), this.renderHoverState(m), this.emit("hover", {
@@ -5270,7 +5355,7 @@ class Qe extends ae {
         seriesKey: f,
         point: m
       }));
-      const y = d.map(({ series: S, pt: $ }) => ({
+      const p = d.map(({ series: S, pt: $ }) => ({
         seriesKey: S.key,
         seriesName: S.name,
         color: S.swatchColor,
@@ -5282,7 +5367,7 @@ class Qe extends ae {
         m.x,
         v,
         c.label,
-        y,
+        p,
         a,
         w ? "합계 (Total)" : void 0,
         w ? b.toLocaleString() : void 0
@@ -5366,8 +5451,8 @@ class Qe extends ae {
       0,
       Math.min(1, (d - c.left) / f)
     ), m = a - n;
-    let y = Math.round(i - m * g), v = y + a - 1;
-    y < 0 && (y = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, y = Math.max(0, v - a + 1)), this.xScale.setViewport(y, v), this.render();
+    let p = Math.round(i - m * g), v = p + a - 1;
+    p < 0 && (p = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, p = Math.max(0, v - a + 1)), this.xScale.setViewport(p, v), this.render();
   }
   /**
    * 런타임에 차트의 데이터 및 옵션을 동적으로 갱신하고 다시 그립니다.
@@ -5376,7 +5461,7 @@ class Qe extends ae {
     const i = !!(e.data || e.series || e.xLabels), s = e.stacked !== void 0 && e.stacked !== this.options.stacked;
     e.data !== void 0 && (this.options.data = e.data), e.series !== void 0 && (this.options.series = e.series), e.xLabels !== void 0 && (this.options.xLabels = e.xLabels), e.stacked !== void 0 && (this.options.stacked = e.stacked), e.animation !== void 0 && (this.options.animation = e.animation);
     const n = !!(e.line || e.area || e.points || e.labels || e.crosshair || e.samplingThreshold !== void 0);
-    n && (e.line && (this.options.line = { ...this.options.line, ...e.line }), e.area && (this.options.area = { ...this.options.area, ...e.area }), e.points && (this.options.points = { ...this.options.points, ...e.points }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), e.crosshair && (this.options.crosshair = { ...this.options.crosshair, ...e.crosshair }), e.samplingThreshold !== void 0 && (this.options.samplingThreshold = e.samplingThreshold), this.lineSeries = new ge(
+    n && (e.line && (this.options.line = { ...this.options.line, ...e.line }), e.area && (this.options.area = { ...this.options.area, ...e.area }), e.points && (this.options.points = { ...this.options.points, ...e.points }), e.labels && (this.options.labels = { ...this.options.labels, ...e.labels }), e.crosshair && (this.options.crosshair = { ...this.options.crosshair, ...e.crosshair }), e.samplingThreshold !== void 0 && (this.options.samplingThreshold = e.samplingThreshold), this.lineSeries = new ve(
       this.options.line,
       this.options.area,
       this.options.points,
@@ -5402,7 +5487,7 @@ class Qe extends ae {
     this.xScale.range([n.left, i - n.right]), this.yScale.range([s - n.bottom, n.top]);
     const o = [], r = [], l = this.options.font ? Y(this.options.font, 11, 500) : void 0, a = l ? { font: l, ...this.options.xAxis } : this.options.xAxis, c = l ? { font: l, ...this.options.yAxis } : this.options.yAxis;
     if ((e == null ? void 0 : e.includeGrid) !== !1) {
-      const d = Ae(
+      const d = ze(
         this.options.grid,
         this.yScale,
         i,
@@ -5412,7 +5497,7 @@ class Qe extends ae {
       );
       d && r.push(d);
     }
-    const h = Le(
+    const h = Oe(
       a,
       c,
       this.xScale,
@@ -5453,7 +5538,7 @@ class Qe extends ae {
       d && r.push(d);
     }
     if ((e == null ? void 0 : e.includeLegend) !== !1 && this.legend.isVisible()) {
-      const d = ce(
+      const d = ue(
         this.legend.getItems(),
         this.legend.getOptions(),
         i,
@@ -5461,7 +5546,7 @@ class Qe extends ae {
       );
       d && r.push(d);
     }
-    return this.syncScaleRanges(), de({
+    return this.syncScaleRanges(), me({
       width: i,
       height: s,
       defs: o,
@@ -5478,7 +5563,7 @@ class Qe extends ae {
     this.animator.cancel(), typeof window < "u" && window.removeEventListener("mouseup", this.boundMouseUp), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-class Xe {
+class Ze {
   constructor(t, e) {
     M(this, "styleOptions");
     M(this, "labelOptions");
@@ -5505,69 +5590,69 @@ class Xe {
    * 각 퍼널 단계의 채우기 색상을 결정합니다.
    */
   resolveStageColor(t, e) {
-    return t.color ? I(t.color) : typeof this.styleOptions.colors == "function" ? I(this.styleOptions.colors(t, e)) : Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0 ? I(this.styleOptions.colors[e % this.styleOptions.colors.length]) : U[e % U.length];
+    return t.color ? T(t.color) : typeof this.styleOptions.colors == "function" ? T(this.styleOptions.colors(t, e)) : Array.isArray(this.styleOptions.colors) && this.styleOptions.colors.length > 0 ? T(this.styleOptions.colors[e % this.styleOptions.colors.length]) : U[e % U.length];
   }
   /**
    * 데이터와 컨테이너 크기로부터 각 퍼널 단계의 사다리꼴/바 좌표를 계산합니다.
    */
   calculateStages(t, e, i, s, n = 1) {
-    var C;
+    var k;
     const o = t.length;
     if (o === 0) return [];
-    const r = (D) => typeof D == "number" && Number.isFinite(D) ? Math.max(0, D) : 0, l = Math.max(1, ...t.map((D) => r(D.value))), a = Math.max(1, r((C = t[0]) == null ? void 0 : C.value) || l), c = this.styleOptions.direction || "vertical", h = this.styleOptions.shape || "trapezoid", d = Math.max(0, this.styleOptions.gap ?? 4), f = Math.max(0.08, Math.min(0.5, this.styleOptions.minSizeRatio ?? 0.16)), g = Math.max(0, Math.min(1, n)), m = this.labelOptions.visible !== !1 && this.labelOptions.position === "outside", y = s.left + (c === "vertical" && m ? 10 : 0), v = e - s.right - (c === "vertical" && m ? 90 : 0), b = s.top, w = i - s.bottom - (c === "horizontal" && m ? 26 : 0), S = Math.max(40, v - y), $ = Math.max(40, w - b), x = y + S / 2, F = b + $ / 2, E = t.map((D) => {
-      const A = r(D.value) / l;
-      return f + (1 - f) * A;
-    }), k = [];
+    const r = (B) => typeof B == "number" && Number.isFinite(B) ? Math.max(0, B) : 0, l = Math.max(1, ...t.map((B) => r(B.value))), a = Math.max(1, r((k = t[0]) == null ? void 0 : k.value) || l), c = this.styleOptions.direction || "vertical", h = this.styleOptions.shape || "trapezoid", d = Math.max(0, this.styleOptions.gap ?? 4), f = Math.max(0.08, Math.min(0.5, this.styleOptions.minSizeRatio ?? 0.16)), g = Math.max(0, Math.min(1, n)), m = this.labelOptions.visible !== !1 && this.labelOptions.position === "outside", p = s.left + (c === "vertical" && m ? 10 : 0), v = e - s.right - (c === "vertical" && m ? 90 : 0), b = s.top, w = i - s.bottom - (c === "horizontal" && m ? 26 : 0), S = Math.max(40, v - p), $ = Math.max(40, w - b), C = p + S / 2, F = b + $ / 2, x = t.map((B) => {
+      const D = r(B.value) / l;
+      return f + (1 - f) * D;
+    }), E = [];
     if (c === "horizontal") {
-      const D = d * Math.max(0, o - 1), A = (S - D) / o;
-      for (let B = 0; B < o; B++) {
-        const T = t[B], R = r(T.value), z = B > 0 ? Math.max(1, r(t[B - 1].value)) : Math.max(1, R), V = R / a, P = B === 0 ? 1 : R / z, H = E[B] * g, O = h === "bar" ? H : B < o - 1 ? E[B + 1] * g : this.styleOptions.neckStyle === "pinch" ? H * 0.55 : H, K = $ * H, W = $ * O, N = y + B * (A + d), _ = N + A, G = Math.max(K, W), q = [
-          { x: N, y: F - K / 2 },
-          { x: _, y: F - W / 2 },
-          { x: _, y: F + W / 2 },
-          { x: N, y: F + K / 2 }
+      const B = d * Math.max(0, o - 1), D = (S - B) / o;
+      for (let A = 0; A < o; A++) {
+        const z = t[A], V = r(z.value), N = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, V), W = V / a, O = A === 0 ? 1 : V / N, L = x[A] * g, R = h === "bar" ? L : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? L * 0.55 : L, P = $ * L, H = $ * R, _ = p + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
+          { x: _, y: F - P / 2 },
+          { x: K, y: F - H / 2 },
+          { x: K, y: F + H / 2 },
+          { x: _, y: F + P / 2 }
         ];
-        k.push({
-          index: B,
-          item: T,
-          color: this.resolveStageColor(T, B),
-          points: q,
-          x: N,
-          y: F - G / 2,
-          width: A,
-          height: G,
-          cx: (N + _) / 2,
+        E.push({
+          index: A,
+          item: z,
+          color: this.resolveStageColor(z, A),
+          points: Z,
+          x: _,
+          y: F - X / 2,
+          width: D,
+          height: X,
+          cx: (_ + K) / 2,
           cy: F,
-          overallRatio: V,
-          stepConversionRate: P
+          overallRatio: W,
+          stepConversionRate: O
         });
       }
     } else {
-      const D = d * Math.max(0, o - 1), A = ($ - D) / o;
-      for (let B = 0; B < o; B++) {
-        const T = t[B], R = r(T.value), z = B > 0 ? Math.max(1, r(t[B - 1].value)) : Math.max(1, R), V = R / a, P = B === 0 ? 1 : R / z, H = E[B] * g, O = h === "bar" ? H : B < o - 1 ? E[B + 1] * g : this.styleOptions.neckStyle === "pinch" ? H * 0.55 : H, K = S * H, W = S * O, N = b + B * (A + d), _ = N + A, G = Math.max(K, W), q = [
-          { x: x - K / 2, y: N },
-          { x: x + K / 2, y: N },
-          { x: x + W / 2, y: _ },
-          { x: x - W / 2, y: _ }
+      const B = d * Math.max(0, o - 1), D = ($ - B) / o;
+      for (let A = 0; A < o; A++) {
+        const z = t[A], V = r(z.value), N = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, V), W = V / a, O = A === 0 ? 1 : V / N, L = x[A] * g, R = h === "bar" ? L : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? L * 0.55 : L, P = S * L, H = S * R, _ = b + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
+          { x: C - P / 2, y: _ },
+          { x: C + P / 2, y: _ },
+          { x: C + H / 2, y: K },
+          { x: C - H / 2, y: K }
         ];
-        k.push({
-          index: B,
-          item: T,
-          color: this.resolveStageColor(T, B),
-          points: q,
-          x: x - G / 2,
-          y: N,
-          width: G,
-          height: A,
-          cx: x,
-          cy: (N + _) / 2,
-          overallRatio: V,
-          stepConversionRate: P
+        E.push({
+          index: A,
+          item: z,
+          color: this.resolveStageColor(z, A),
+          points: Z,
+          x: C - X / 2,
+          y: _,
+          width: X,
+          height: D,
+          cx: C,
+          cy: (_ + K) / 2,
+          overallRatio: W,
+          stepConversionRate: O
         });
       }
     }
-    return k;
+    return E;
   }
   /**
    * 마우스 좌표 `(mx, my)`가 특정 퍼널 단계 다각형 내부에 위치하는지 판정합니다 (Ray-casting).
@@ -5597,7 +5682,7 @@ class Xe {
   drawStageShape(t, e, i) {
     const s = this.styleOptions.shape || "trapezoid", n = this.styleOptions.border;
     if (t.save(), i && (t.shadowColor = e.color, t.shadowBlur = 14), s === "bar")
-      ie(
+      re(
         t,
         e.x,
         e.y,
@@ -5612,7 +5697,7 @@ class Xe {
         t.lineTo(o[r].x, o[r].y);
       t.closePath();
     }
-    t.fillStyle = e.color, t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0, i ? (t.strokeStyle = "rgba(255, 255, 255, 0.85)", t.lineWidth = 2, t.stroke()) : n && n.width && n.width > 0 && (t.strokeStyle = I(n.color || "#FFFFFF"), t.lineWidth = n.width, t.stroke()), t.restore();
+    t.fillStyle = e.color, t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0, i ? (t.strokeStyle = "rgba(255, 255, 255, 0.85)", t.lineWidth = 2, t.stroke()) : n && n.width && n.width > 0 && (t.strokeStyle = T(n.color || "#FFFFFF"), t.lineWidth = n.width, t.stroke()), t.restore();
   }
   drawLabelsAndConversions(t, e) {
     const i = this.labelOptions, s = this.styleOptions.direction || "vertical", n = this.styleOptions.showConversion !== !1, o = this.styleOptions.conversionBase || "previous", r = i.font || "600 11px Pretendard, Inter, sans-serif";
@@ -5621,14 +5706,14 @@ class Xe {
       for (const l of e) {
         const a = o === "first" ? l.overallRatio : l.stepConversionRate, c = `${Math.round(a * 100)}%`, h = typeof l.item.value == "number" && Number.isFinite(l.item.value) ? l.item.value.toLocaleString() : "-", d = i.formatter ? i.formatter(l.item, l) : n && l.index > 0 ? `${l.item.label} · ${h} (${c})` : `${l.item.label} · ${h}`;
         if (i.position === "outside")
-          if (t.fillStyle = I(i.color || "#64748B"), s === "horizontal")
+          if (t.fillStyle = T(i.color || "#64748B"), s === "horizontal")
             t.textAlign = "center", t.textBaseline = "top", t.fillText(d, l.cx, l.y + l.height + 8);
           else {
             const f = Math.max(l.points[1].x, l.points[2].x);
             t.textAlign = "left", t.textBaseline = "middle", t.fillText(d, f + 10, l.cy);
           }
         else
-          t.fillStyle = I(i.color || "#FFFFFF"), t.textAlign = "center", t.textBaseline = "middle", t.fillText(d, l.cx, l.cy);
+          t.fillStyle = T(i.color || "#FFFFFF"), t.textAlign = "center", t.textBaseline = "middle", t.fillText(d, l.cx, l.cy);
       }
       t.restore();
     }
@@ -5641,15 +5726,15 @@ class Xe {
     const e = this.styleOptions.shape || "trapezoid", i = this.styleOptions.direction || "vertical", s = this.styleOptions.showConversion !== !1, n = this.styleOptions.conversionBase || "previous", o = this.styleOptions.border;
     let r = "";
     if (o && o.width && o.width > 0) {
-      const f = X(o.color || "#FFFFFF");
-      r = ` stroke="${L(f.color)}" stroke-width="${p(o.width)}"`;
+      const f = G(o.color || "#FFFFFF");
+      r = ` stroke="${I(f.color)}" stroke-width="${y(o.width)}"`;
     }
     const l = [], a = [], c = this.labelOptions, h = c.font || "600 11px Pretendard, sans-serif";
     for (const f of t) {
-      const g = X(f.color), m = `fill="${L(g.color)}"${g.opacity < 0.999 ? ` fill-opacity="${p(g.opacity)}"` : ""}`, y = `Funnel Stage ${f.index + 1}: ${f.item.label} (${f.item.value})`;
+      const g = G(f.color), m = `fill="${I(g.color)}"${g.opacity < 0.999 ? ` fill-opacity="${y(g.opacity)}"` : ""}`, p = `Funnel Stage ${f.index + 1}: ${f.item.label} (${f.item.value})`;
       if (e === "bar") {
-        const v = De({
-          id: y,
+        const v = Pe({
+          id: p,
           x: f.x,
           y: f.y,
           width: f.width,
@@ -5660,8 +5745,8 @@ class Xe {
         });
         v && l.push(v);
       } else {
-        const v = f.points.map((b, w) => `${w === 0 ? "M" : "L"} ${p(b.x)} ${p(b.y)}`).join(" ") + " Z";
-        l.push(`<path id="${L(y)}" d="${v}" ${m}${r} />`);
+        const v = f.points.map((b, w) => `${w === 0 ? "M" : "L"} ${y(b.x)} ${y(b.y)}`).join(" ") + " Z";
+        l.push(`<path id="${I(p)}" d="${v}" ${m}${r} />`);
       }
       if (c.visible !== !1 && c.position !== "none") {
         const v = n === "first" ? f.overallRatio : f.stepConversionRate, b = `${Math.round(v * 100)}%`, w = typeof f.item.value == "number" && Number.isFinite(f.item.value) ? f.item.value.toLocaleString() : "-", S = c.formatter ? c.formatter(f.item, f) : s && f.index > 0 ? `${f.item.label} · ${w} (${b})` : `${f.item.label} · ${w}`;
@@ -5681,11 +5766,11 @@ class Xe {
               })
             );
           else {
-            const x = Math.max(f.points[1].x, f.points[2].x);
+            const C = Math.max(f.points[1].x, f.points[2].x);
             a.push(
               j({
                 id: `Label: ${f.item.label}`,
-                x: x + 10,
+                x: C + 10,
                 y: f.cy,
                 text: S,
                 font: h,
@@ -5721,7 +5806,7 @@ class Xe {
   `);
   }
 }
-class Je extends ae {
+class nt extends de {
   constructor(e, i) {
     super();
     M(this, "container");
@@ -5749,12 +5834,12 @@ class Je extends ae {
       bottom: 24,
       left: 24,
       ...i.padding
-    }, this.layerManager = new re(this.container), this.tooltip = new le(this.container, i.tooltip);
+    }, this.layerManager = new ce(this.container), this.tooltip = new fe(this.container, i.tooltip);
     const n = i.font ? Y(i.font, i.font.size ?? 11, i.font.weight ?? 600) : void 0;
-    this.funnelSeries = new Xe(
+    this.funnelSeries = new Ze(
       i.funnel,
       n ? { font: n, ...i.labels } : i.labels
-    ), this.legend = new he(
+    ), this.legend = new ge(
       this.container,
       this.resolveLegendOptions(i.legend),
       {
@@ -5781,7 +5866,7 @@ class Je extends ae {
       for (const l of r) {
         const a = Math.round(l.contentRect.width), c = Math.round(l.contentRect.height);
         if (a > 0) {
-          const { height: h } = Z(
+          const { height: h } = q(
             this.container,
             this.options.responsive,
             1.5
@@ -5790,7 +5875,7 @@ class Je extends ae {
         }
       }
     }), this.resizeObserver.observe(this.container));
-    const o = Z(this.container, this.options.responsive, 1.5);
+    const o = q(this.container, this.options.responsive, 1.5);
     o.width > 0 && o.height > 0 && this.resize(o.width, o.height);
   }
   resolveLegendOptions(e) {
@@ -5946,7 +6031,7 @@ class Je extends ae {
       1
     ), a = [], c = [], h = this.funnelSeries.toSvgElements(l);
     if (h && c.push(h), (e == null ? void 0 : e.includeLegend) !== !1 && this.legend.isVisible()) {
-      const d = ce(
+      const d = ue(
         this.legend.getItems(),
         this.legend.getOptions(),
         i,
@@ -5954,7 +6039,7 @@ class Je extends ae {
       );
       d && c.push(d);
     }
-    return de({
+    return me({
       width: i,
       height: s,
       defs: a,
@@ -5970,58 +6055,58 @@ class Je extends ae {
 }
 
 const Animator = J;
-const Axis = oe;
-const BandScale = Ee;
-const BarChart = Ze;
-const BarSeries = $e;
+const Axis = he;
+const BandScale = Re;
+const BarChart = tt;
+const BarSeries = Be;
 const DEFAULT_PALETTE = U;
-const DESIGN_TOKENS = te;
-const EASINGS = ve;
-const EventEmitter = ae;
-const FunnelChart = Je;
-const FunnelSeries = Xe;
-const Grid = Be;
-const LayerManager = re;
-const Legend = he;
-const LineChart = Qe;
-const LineSeries = ge;
-const LinearScale = xe;
-const PieChart = qe;
-const PieSeries = Ce;
-const RADIUS_TOKENS = je;
-const SPACING_GAP_TOKENS = He;
-const SPACING_PADDING_TOKENS = ze;
-const SPACING_TOKENS = Ye;
-const Tooltip = le;
-const adjustColorHsl = Fe;
+const DESIGN_TOKENS = oe;
+const EASINGS = $e;
+const EventEmitter = de;
+const FunnelChart = nt;
+const FunnelSeries = Ze;
+const Grid = Te;
+const LayerManager = ce;
+const Legend = ge;
+const LineChart = st;
+const LineSeries = ve;
+const LinearScale = Ie;
+const PieChart = it;
+const PieSeries = De;
+const RADIUS_TOKENS = Qe;
+const SPACING_GAP_TOKENS = We;
+const SPACING_PADDING_TOKENS = Ne;
+const SPACING_TOKENS = Je;
+const Tooltip = fe;
+const adjustColorHsl = Ee;
 const buildCssFontString = Y;
-const buildSvgAxesGroups = Le;
-const buildSvgGridGroup = Ae;
-const buildSvgLegendGroup = ce;
-const buildSvgLinePathData = fe;
-const buildSvgPieSlicePathData = pe;
-const computeResponsivePadding = Ie;
-const createGradient = se;
-const createSvgGradientDef = Ne;
-const downsampleLTTB = ke;
-const drawRoundedRect = ie;
-const escapeXml = L;
-const fmt = p;
-const normalizeBorderRadius = We;
+const buildSvgAxesGroups = Oe;
+const buildSvgGridGroup = ze;
+const buildSvgLegendGroup = ue;
+const buildSvgLinePathData = pe;
+const buildSvgPieSlicePathData = Se;
+const computeResponsivePadding = He;
+const createGradient = ae;
+const createSvgGradientDef = Ye;
+const downsampleLTTB = Le;
+const drawRoundedRect = re;
+const escapeXml = I;
+const fmt = y;
+const normalizeBorderRadius = je;
 const normalizeResponsiveOptions = ee;
-const normalizeTokenKey = ue;
-const parseColorToRgba = Ve;
-const parseCssFont = _e;
-const parseLegendAnchor = me;
-const parseSvgColor = X;
-const resolveColor = I;
-const resolveContainerDimensions = Z;
-const resolveGridLineDash = ne;
-const resolveSvgPaintAttrs = ye;
-const svgRoundedRectElement = De;
+const normalizeTokenKey = be;
+const parseColorToRgba = Xe;
+const parseCssFont = Ue;
+const parseLegendAnchor = we;
+const parseSvgColor = G;
+const resolveColor = T;
+const resolveContainerDimensions = q;
+const resolveGridLineDash = le;
+const resolveSvgPaintAttrs = Fe;
+const svgRoundedRectElement = Pe;
 const svgTextElement = j;
-const toFigmaVariableName = Ue;
-const wrapSvgDocument = de;
+const toFigmaVariableName = et;
+const wrapSvgDocument = me;
 
 
     const TOKEN_PALETTES = {
@@ -6079,6 +6164,8 @@ const wrapSvgDocument = de;
       areaSatDelta: 0,
       areaLightDelta: 0,
       holeRatio: 0.6,
+      pieGapMode: 'px',
+      pieSliceGap: 3,
       piePadDeg: 1.5,
       pieMaxValue: 0,
       pieTrackToken: 'auto',
@@ -6472,6 +6559,11 @@ const wrapSvgDocument = de;
       document.getElementById('pie-controls').style.display = isPie ? 'flex' : 'none';
       document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
       document.getElementById('grid-controls').style.display = isBar || isLine ? '' : 'none';
+      const showElementGap = isBar || isLine;
+      const gapFieldEl = document.getElementById('gap-field');
+      const spacingRowEl = document.getElementById('spacing-row');
+      if (gapFieldEl) gapFieldEl.style.display = showElementGap ? '' : 'none';
+      if (spacingRowEl) spacingRowEl.style.gridTemplateColumns = showElementGap ? '' : '1fr';
       document.getElementById('custom-font-field').style.display =
         state.fontFamilyPreset === 'custom' ? '' : 'none';
 
@@ -6697,7 +6789,10 @@ const wrapSvgDocument = de;
           legend: legendOpt,
         });
       } else {
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
         const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
         const padRad = ((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
@@ -6715,7 +6810,7 @@ const wrapSvgDocument = de;
           responsive: { enabled: true },
           pie: {
             innerRadiusRatio: state.holeRatio,
-            padAngle: padRad,
+            ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
             maxValue: maxVal,
             trackColor: trackHex,
             colors: palette,
@@ -6985,31 +7080,62 @@ const wrapSvgDocument = de;
       renderPreview();
     });
 
+    function syncPieGapControlUI() {
+      const mode = state.pieGapMode || 'px';
+      const modeSelect = document.getElementById('pie-gap-mode-select');
+      const padSlider = document.getElementById('pie-pad-slider');
+      const padTxt = document.getElementById('pie-pad-txt');
+      if (modeSelect) modeSelect.value = mode;
+      if (mode === 'px') {
+        const pxVal = state.pieSliceGap ?? (state.holeRatio > 0 ? 3 : 0);
+        padSlider.min = '0';
+        padSlider.max = '16';
+        padSlider.step = '1';
+        padSlider.value = String(pxVal);
+        padTxt.innerText = `${pxVal}px`;
+      } else {
+        const degVal = state.piePadDeg ?? (state.holeRatio > 0 ? 1.5 : 0);
+        padSlider.min = '0';
+        padSlider.max = '5';
+        padSlider.step = '0.5';
+        padSlider.value = String(degVal);
+        padTxt.innerText = `${degVal}°`;
+      }
+    }
+
     document.getElementById('hole-slider').addEventListener('input', (e) => {
       const pct = parseInt(e.target.value, 10);
       const prevHole = state.holeRatio;
       state.holeRatio = pct / 100;
       document.getElementById('hole-txt').innerText = `${pct}%`;
 
-      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격(padAngle)을 0°로 자동 전환
-      const padSlider = document.getElementById('pie-pad-slider');
-      const padTxt = document.getElementById('pie-pad-txt');
+      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격을 0으로 자동 전환
       if (pct === 0) {
+        state.pieSliceGap = 0;
         state.piePadDeg = 0;
-        padSlider.value = 0;
-        padTxt.innerText = '0°';
-      } else if (prevHole === 0 && state.piePadDeg === 0) {
-        state.piePadDeg = 1.5;
-        padSlider.value = 1.5;
-        padTxt.innerText = '1.5°';
+      } else if (prevHole === 0) {
+        if ((state.pieSliceGap ?? 0) === 0) state.pieSliceGap = 3;
+        if ((state.piePadDeg ?? 0) === 0) state.piePadDeg = 1.5;
       }
+      syncPieGapControlUI();
+      renderPreview();
+    });
+
+    document.getElementById('pie-gap-mode-select').addEventListener('change', (e) => {
+      state.pieGapMode = e.target.value === 'angle' ? 'angle' : 'px';
+      syncPieGapControlUI();
       renderPreview();
     });
 
     document.getElementById('pie-pad-slider').addEventListener('input', (e) => {
-      const deg = parseFloat(e.target.value);
-      state.piePadDeg = deg;
-      document.getElementById('pie-pad-txt').innerText = `${deg}°`;
+      const val = parseFloat(e.target.value);
+      if ((state.pieGapMode || 'px') === 'px') {
+        state.pieSliceGap = val;
+        document.getElementById('pie-pad-txt').innerText = `${val}px`;
+      } else {
+        state.piePadDeg = val;
+        document.getElementById('pie-pad-txt').innerText = `${val}°`;
+      }
       renderPreview();
     });
 
@@ -7318,8 +7444,14 @@ const wrapSvgDocument = de;
         optionsLines.push(legendCode);
       } else {
         className = 'PieChart';
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
         const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
         const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const gapCodeLine = isPxGap
+          ? `    sliceGap: ${sliceGapVal},`
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -7331,8 +7463,8 @@ const wrapSvgDocument = de;
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(
           maxVal
-            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
         );
         if (state.holeRatio >= 0.35) {
           optionsLines.push(
@@ -7609,9 +7741,15 @@ const wrapSvgDocument = de;
           document.getElementById('area-light-txt').innerText = `${state.areaLightDelta ?? 0}%`;
           document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
           document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
-          const restoredPadDeg = state.holeRatio <= 0 ? 0 : (state.piePadDeg ?? 1.5);
-          document.getElementById('pie-pad-slider').value = restoredPadDeg;
-          document.getElementById('pie-pad-txt').innerText = `${restoredPadDeg}°`;
+          state.pieGapMode = state.pieGapMode || 'px';
+          if (state.holeRatio <= 0) {
+            state.pieSliceGap = 0;
+            state.piePadDeg = 0;
+          } else {
+            state.pieSliceGap = state.pieSliceGap ?? 3;
+            state.piePadDeg = state.piePadDeg ?? 1.5;
+          }
+          syncPieGapControlUI();
           document.getElementById('pie-max-input').value =
             state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : '';
           document.getElementById('pie-max-txt').innerText =

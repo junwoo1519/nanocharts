@@ -603,6 +603,12 @@ export interface PieSliceGeometry {
   index: number;
   /** 잔여 비율을 채우는 배경 트랙 조각 여부 (`true`인 경우 호버/툴팁/라벨 제외) */
   isTrack?: boolean;
+  /** 평행 간격(`sliceGap`) 적용 시 내부 아크 시작 각도 (라디안, 미지정 시 `startAngle` 사용) */
+  innerStartAngle?: number;
+  /** 평행 간격(`sliceGap`) 적용 시 내부 아크 종료 각도 (라디안, 미지정 시 `endAngle` 사용) */
+  innerEndAngle?: number;
+  /** 평행 간격(`sliceGap`) 적용 시 좁은 조각의 내부 교점 보정 반지름 (px, 미지정 시 `innerRadius` 사용) */
+  innerArcRadius?: number;
 }
 
 /**
@@ -637,8 +643,15 @@ export interface PieStyleOptions {
    * - 기본값: `'var(--surface-low)'` (`'transparent'` 또는 `'none'` 지정 시 빈 영역 미표시)
    */
   trackColor?: string;
-  /** 조각들 사이의 빈 여백 각도 (라디안, 기본값: 0.02) */
+  /** 조각들 사이의 빈 여백 각도 (라디안, 기본값: 도넛 0.02 / 파이 0) */
   padAngle?: number;
+  /**
+   * 조각들 사이의 일정한 평행 픽셀 간격 (px, 선택)
+   * - 지정 시 안쪽(innerRadius)과 바깥쪽(outerRadius)이 동일한 직선 폭(px)으로 평행하게 분리됩니다.
+   * - `sliceGap`이 지정되면(`undefined`가 아닌 경우) 각도 기반 `padAngle`보다 우선 적용됩니다.
+   * - 미지정 시 기존 `padAngle` 동작을 유지합니다.
+   */
+  sliceGap?: number;
   /** 파이 조각 외곽 모서리 둥글기 (px, 기본값: 0) */
   cornerRadius?: number;
   /** 조각별 기본 컬러 팔레트 (기본 모던 색상 8종 내장) */
