@@ -1,26 +1,33 @@
-# NanoCharts 📊
+# `@ju9nu7/nanocharts`
 
-> **Ultra-lightweight, High-performance, and Designer-friendly Canvas Chart Library.**
+> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.16`)의 핵심 특징, 설치 방법, 즉시 실행 가능한 차트별 예제, API 요약 및 Figma 플러그인 연동 방법을 안내합니다.
 
-`nanocharts`는 수만 개의 대용량 데이터에서도 60fps의 부드러운 반응성을 유지하며, 디자이너가 의도한 정교한 UI(그라데이션, 모서리 라운딩, 자유로운 라벨 위치 등)를 100% 코드로 구현할 수 있는 초경량 Canvas 차트 엔진입니다.
-
----
-
-## ✨ Features
-
-- ⚡ **극강의 렌더링 성능**: 3단 멀티 레이어 Canvas 아키텍처로 수천~수만 개의 데이터 포인트에서도 부드러운 줌 & 팬 지원.
-- 🎯 **$O(1)$ 히트 테스팅**: 마우스 호버 시 전체 데이터를 순회하지 않고 즉각 타겟 인덱스를 역산해 렉 없는 상호작용 보장.
-- 🎨 **디자이너 친화적 커스텀 자유도**:
-  - **둥근 모서리(`borderRadius`)**: 상단만 둥글게, 캡슐형 등 자유 조절
-  - **선형 그라데이션**: 수평/수직 그라데이션 및 데이터 기반 **조건부 색상 콜백** 지원
-  - **라벨 위치 완전 자유화**: `top-outside`, `inside-top`, `inside-center`, `inside-bottom` 등
-  - **테두리(Border)**: 색상, 굵기, 대시선 스타일 커스텀
-- 📦 **Zero Dependency & 초경량**: 외부 무거운 프레임워크 의존성 없이 번들 크기 최소화.
-- 💻 **TypeScript First**: 모든 옵션과 콜백에 대한 완벽한 타입 지원.
+`@ju9nu7/nanocharts`는 런타임 외부 의존성이 없는(Zero Dependency) 순수 TypeScript + Canvas 2D 기반 초경량 차트 라이브러리입니다. 3단 멀티 레이어 Canvas 아키텍처와 $O(1)$ 히트 테스팅으로 대용량 데이터에서도 60fps 인터랙션을 유지하며, 디자인 토큰(`var(--*)`) 해석과 Figma 호환 순수 벡터(`toSVG()`) 추출을 기본 지원합니다.
 
 ---
 
-## 🚀 Installation
+## 핵심 특징
+
+- **Zero Runtime Dependency**: `package.json` 기준 런타임 `dependencies`·`peerDependencies`가 전혀 없는 순수 바닐라 TypeScript/Canvas 2D 엔진입니다. (ES Module `./dist/index.js` 및 CommonJS `./dist/index.cjs` 듀얼 번들, `sideEffects: false`)
+- **3단 멀티 레이어 Canvas (`LayerManager`)**: `background`(그리드·축), `series`(데이터 도형), `interaction`(호버 하이라이트·크로스헤어) 3개 Canvas를 분리해 마우스 이동 시 전체 데이터를 다시 그리지 않습니다.
+- **고성능 데이터 처리**: `BandScale.invert()` 기반 $O(1)$ 인덱스 역산, 뷰포트 컬링(Viewport Culling), `LineSeries` LTTB(Largest-Triangle-Three-Buckets) 다운샘플링(기본 임계치 `600`)을 내장합니다.
+- **디자인 시스템 & Figma 연동**: `DESIGN_TOKENS`, `RADIUS_TOKENS`, `SPACING_TOKENS`를 내장하여 `var(--primary)` 등 CSS 변수를 웹 Canvas와 Figma Local Variables 양쪽에서 일관되게 해석하며, 모든 차트에서 `toSVG()` 벡터 추출을 지원합니다.
+- **반응형 & 터치 대응**: `ResizeObserver` 기반 자동 리사이즈, `aspectRatio` 기반 높이 자동 계산, 브레이크포인트(`compactBreakpoint: 480`) 여백 보정, 모바일 `touchstart`/`touchmove` 인터랙션을 제공합니다.
+
+---
+
+## 현재 지원 차트 목록
+
+| 차트 클래스 | 파일 위치 | 주요 지원 기능 |
+| :--- | :--- | :--- |
+| `BarChart` | `src/core/Chart.ts` | 단일/다중 시리즈(`grouped`, `stacked`, `percent`), 그라데이션, 조건부 컬러링, 개별 모서리 둥글기, 테두리, 수치 라벨, 휠 줌 & 드래그 팬, `toSVG()` |
+| `LineChart` | `src/core/LineChart.ts` | 단일/다중 라인 & 누적 영역(`stacked`), `smooth`/`linear`/`step` 보간, Area HSL 채도·명도·투명도 그라데이션, LTTB 다운샘플링, 크로스헤어, 휠 줌 & 드래그 팬, `toSVG()` |
+| `PieChart` | `src/core/PieChart.ts` | 파이/도넛 전환(`innerRadiusRatio`), 목표 최대값 배경 트랙(`maxValue`/`trackColor`), 극좌표 히트 테스팅, Lerp 호버 팝아웃(`hoverExplode`), 리더라인 라벨, 도넛 중앙 요약 텍스트, `toSVG()` |
+| `FunnelChart` | `src/core/FunnelChart.ts` | 상하(`vertical`)/좌우(`horizontal`) 방향, 사다리꼴(`trapezoid`)/바(`bar`) 형태, 단계 간격(`gap`), 직전/최초 단계 대비 전환율(`%`) 자동 표시, Ray-casting 히트 테스팅, `toSVG()` |
+
+---
+
+## 설치 방법
 
 ```bash
 npm install @ju9nu7/nanocharts
@@ -32,13 +39,14 @@ pnpm add @ju9nu7/nanocharts
 
 ---
 
-## 📖 Quick Start
+## 빠른 시작 (Quick Start)
 
-### 1. Bar Chart (바 차트)
+### 1. BarChart (단일 / 다중 시리즈)
+
 ```typescript
 import { BarChart } from '@ju9nu7/nanocharts';
 
-const chart = new BarChart('#chart', {
+const bar = new BarChart('#bar-chart', {
   data: [
     { label: 'Q1', value: 120 },
     { label: 'Q2', value: 240 },
@@ -47,11 +55,7 @@ const chart = new BarChart('#chart', {
   ],
   bar: {
     borderRadius: [6, 6, 0, 0],
-    fill: {
-      type: 'linear',
-      from: '#6366F1',
-      to: '#9333EA',
-    },
+    fill: { type: 'linear', from: '#6366F1', to: '#9333EA', direction: 'vertical' },
     widthRatio: 0.6,
   },
   labels: { visible: true, position: 'top-outside' },
@@ -60,7 +64,21 @@ const chart = new BarChart('#chart', {
 });
 ```
 
-### 2. Line & Area Chart (라인 & 영역 차트)
+```typescript
+// 다중 시리즈 (grouped | stacked | percent)
+const multiBar = new BarChart('#multi-bar', {
+  xLabels: ['1분기', '2분기', '3분기', '4분기'],
+  series: [
+    { name: 'Frontend', data: [120, 150, 180, 210], color: '#6366F1' },
+    { name: 'Backend', data: [90, 110, 140, 160], color: '#10B981' },
+  ],
+  bar: { mode: 'stacked', borderRadius: [6, 6, 0, 0] },
+  legend: { visible: true, position: 'top-right' },
+});
+```
+
+### 2. LineChart (라인 & 영역 / 누적 영역)
+
 ```typescript
 import { LineChart } from '@ju9nu7/nanocharts';
 
@@ -72,27 +90,27 @@ const line = new LineChart('#line-chart', {
     { label: 'Thu', value: 290 },
     { label: 'Fri', value: 340 },
   ],
-  line: {
-    color: '#6366F1',
-    width: 2.5,
-    curve: 'smooth', // 'smooth' | 'linear' | 'step'
-  },
+  font: { family: 'Pretendard, sans-serif', size: 11, weight: 500 },
+  line: { color: 'var(--primary)', width: 2.5, curve: 'smooth' },
   area: {
     visible: true,
-    fill: {
-      type: 'linear',
-      from: 'rgba(99, 102, 241, 0.45)',
-      to: 'rgba(99, 102, 241, 0.0)',
-      direction: 'vertical',
-    },
+    topOpacity: 0.45,
+    bottomOpacity: 0.02,
+    saturationDelta: 15,
+    lightnessDelta: 10,
+  },
+  grid: {
+    y: { visible: true, style: 'dashed', lineWidth: 1, color: 'var(--outline)' },
+    x: { visible: true, style: 'dotted', lineWidth: 1, color: 'var(--outline-low)' },
+    border: { visible: true, color: 'var(--outline)', radius: 4 },
+    alternateBand: { visible: true, color: 'rgba(233, 236, 239, 0.35)' },
   },
   crosshair: { enabled: true, vertical: true, horizontal: true },
-  zoom: { enabled: true },
-  pan: { enabled: true },
 });
 ```
 
-### 3. Pie & Donut Chart (파이 & 도넛 차트)
+### 3. PieChart (파이 & 도넛)
+
 ```typescript
 import { PieChart } from '@ju9nu7/nanocharts';
 
@@ -104,50 +122,17 @@ const pie = new PieChart('#pie-chart', {
     { label: 'Design', value: 10 },
   ],
   pie: {
-    innerRadiusRatio: 0.6, // 0이면 파이 차트, 0.6이면 세련된 도넛 차트!
-    padAngle: 0.03,        // 조각 사이의 여백
-    hoverExplode: 8,       // 마우스 호버 시 밖으로 팝아웃되는 거리
+    innerRadiusRatio: 0.6,
+    padAngle: 0.03,
+    hoverExplode: 8,
   },
-  center: {
-    title: '100%',
-    subtitle: '전체 점유율',
-  },
+  center: { title: '100%', subtitle: '전체 점유율' },
   labels: { position: 'outside' },
 });
 ```
 
-### 4. Multi-Series & Stacked Chart (다중 시리즈 & 누적 차트)
-```typescript
-import { BarChart, LineChart } from '@ju9nu7/nanocharts';
+### 4. FunnelChart (상하/좌우 퍼널 & 전환율)
 
-// 1) 그룹형(Grouped) / 누적형(Stacked) / 100% 비율(Percent) 바 차트
-const multiBar = new BarChart('#multi-bar', {
-  xLabels: ['1분기', '2분기', '3분기', '4분기'],
-  series: [
-    { name: 'Frontend', data: [120, 150, 180, 210], color: '#6366F1' },
-    { name: 'Backend', data: [90, 110, 140, 160], color: '#10B981' },
-    { name: 'AI / Cloud', data: [60, 85, 110, 145], color: '#F59E0B' },
-  ],
-  bar: {
-    mode: 'stacked', // 'grouped' | 'stacked' | 'percent'
-    borderRadius: [6, 6, 0, 0],
-  },
-  legend: { visible: true, position: 'top' },
-  animation: { enabled: true, duration: 680, easing: 'easeOutQuart' },
-});
-
-// 2) 다중 라인(Multi-Line) & 누적 영역(Stacked Area) 차트
-const multiLine = new LineChart('#multi-line', {
-  xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-  stacked: true, // true 설정 시 누적 영역(Stacked Area) 차트로 동작
-  series: [
-    { name: '모바일 트래픽', data: [140, 230, 195, 290, 340], color: '#6366F1' },
-    { name: '데스크톱 트래픽', data: [95, 130, 160, 185, 210], color: '#22D3EE', dash: [6, 4] },
-  ],
-});
-```
-
-### 5. Funnel Chart (퍼널 차트 — 상하/좌우 방향 & 전환율)
 ```typescript
 import { FunnelChart } from '@ju9nu7/nanocharts';
 
@@ -158,111 +143,21 @@ const funnel = new FunnelChart('#funnel-chart', {
     { label: '장바구니', value: 540 },
     { label: '구매완료', value: 310 },
   ],
-  font: {
-    family: 'Pretendard, Inter, sans-serif',
-    size: 12,
-    weight: 600,
-  },
   funnel: {
-    direction: 'vertical', // 'vertical' (상->하 기본) | 'horizontal' (좌->우)
-    shape: 'trapezoid',    // 'trapezoid' (사다리꼴) | 'bar' (단계별 바)
+    direction: 'vertical', // 'vertical' | 'horizontal'
+    shape: 'trapezoid',    // 'trapezoid' | 'bar'
     gap: 4,
-    showConversion: true,  // 단계별 전환율(%) 자동 표시
+    showConversion: true,
+    conversionBase: 'previous',
   },
-  legend: {
-    visible: true,
-    position: 'top-right', // 상좌/상중/상우, 하좌/하중/하우, 좌상/좌중/좌하, 우상/우중/우하 12방향 지원
-  },
+  legend: { visible: true, position: 'top-center' },
 });
 ```
 
-### 6. Area 그라데이션 채도·명도 조절 & 그리드 선 커스텀
-```typescript
-const customLine = new LineChart('#custom-line', {
-  data,
-  font: { family: 'Pretendard, sans-serif', size: 11, weight: 500 },
-  line: { color: 'var(--primary)', width: 2.5, curve: 'smooth' },
-  area: {
-    visible: true,
-    topOpacity: 0.45,
-    bottomOpacity: 0.02,
-    saturationDelta: 15, // 원본 선 색상 대비 채도 +15%
-    lightnessDelta: 10,  // 원본 선 색상 대비 명도 +10%
-  },
-  grid: {
-    y: { visible: true, style: 'dashed', lineWidth: 1, color: 'var(--outline)' },
-    x: { visible: true, style: 'dotted', lineWidth: 1, color: 'var(--outline-low)' },
-    border: { visible: true, color: 'var(--outline)', radius: 4 },
-    alternateBand: { visible: true, color: 'rgba(233, 236, 239, 0.35)' },
-  },
-  legend: { visible: true, position: 'bottom-center' },
-});
-```
-
----
-
-## 🎨 Designer Customization Examples
-
-### 1. 조건부 컬러링 (값에 따른 동적 색상 변경)
+### 5. Figma 호환 SVG 벡터 추출 (`toSVG`)
 
 ```typescript
-bar: {
-  fill: (item) => {
-    if (item.value >= 80) return '#10B981'; // 목표 달성: 에메랄드 그린
-    if (item.value < 40) return '#EF4444';  // 경고: 레드
-    return '#6366F1';                       // 기본: 인디고
-  }
-}
-```
-
-### 2. 네온 테두리 & 사이버펑크 스타일
-
-```typescript
-bar: {
-  fill: '#0891B2',
-  border: {
-    color: '#22D3EE',
-    width: 2,
-    dash: [4, 2], // 대시 테두리 지원
-  },
-  borderRadius: 8,
-}
-```
-
-### 3. 바 내부 중앙 뱃지형 라벨
-
-```typescript
-labels: {
-  visible: true,
-  position: 'inside-center',
-  font: '700 12px Pretendard, sans-serif',
-  color: '#FFFFFF',
-}
-```
-
-### 4. 인터랙티브 범례(Legend) & 애니메이션(Animation)
-
-```typescript
-legend: {
-  visible: true,
-  position: 'top',       // 'top' | 'bottom' | 'left' | 'right'
-  align: 'center',       // 'start' | 'center' | 'end'
-  markerShape: 'rounded',// 'circle' | 'rounded' | 'square' | 'line'
-  interactive: true,     // 클릭 시 시리즈/카테고리 데이터 토글 & 양방향 호버 하이라이트
-},
-animation: {
-  enabled: true,
-  duration: 680,
-  easing: 'easeOutQuart', // 'linear' | 'easeOutCubic' | 'easeOutQuart' | 'easeOutExpo' | 'easeOutBack'
-}
-```
-
-### 5. 피그마(Figma) 호환 순수 벡터(SVG) 추출 (`toSVG`)
-
-모든 차트 인스턴스(`BarChart`, `LineChart`, `PieChart`, `FunnelChart`)는 현재 렌더링 상태를 피그마(`figma.createNodeFromSvg`)에서 Frame, Vector, Rectangle, Text 레이어로 분해하여 개별 편집할 수 있는 표준 SVG 문자열로 추출하는 `toSVG()` 메서드를 제공합니다.
-
-```typescript
-const svgString = chart.toSVG({
+const svgString = bar.toSVG({
   width: 640,
   height: 400,
   backgroundColor: '#151C2C',
@@ -270,113 +165,57 @@ const svgString = chart.toSVG({
   includeLegend: true,
   includeGrid: true,
 });
-
-// Figma 플러그인(code.ts) 내부에서 즉시 벡터 레이어로 삽입:
-const node = figma.createNodeFromSvg(svgString);
 ```
 
 ---
 
-## 🛠 API Options & Methods
+## Figma Plugin 연동
 
-### 공통 및 차트별 주요 옵션
+`figma-plugin/` 디렉토리에 `@ju9nu7/nanocharts` 엔진이 내장된 Figma 벡터 차트 플러그인이 포함되어 있습니다.
 
-| 옵션명 | 타입 | 설명 |
-| :--- | :--- | :--- |
-| `data` | `DataItem[]` | 단일 시리즈 데이터 배열 (`{ label, value, ... }`) |
-| `series` | `BarSeriesDataset[] \| LineSeriesDataset[]` | 다중 시리즈 데이터셋 배열 (`{ name, data, color, ... }`) |
-| `xLabels` | `string[]` | 다중 시리즈에서 `number[]` 데이터를 사용할 때 지정할 X축 라벨 배열 |
-| `font` | `ChartFontOptions` | 차트 전역 폰트 (`{ family, size, weight }`) |
-| `responsive` | `boolean \| ResponsiveOptions` | `ResizeObserver` 기반 반응형 크기·비율(`aspectRatio`)·브레이크포인트 자동 보정 |
-| `grid` | `GridOptions` | X/Y 격자선(`solid` \| `dashed` \| `dotted`), 외곽 박스(`border`), 줄무늬 배경(`alternateBand`) |
-| `xAxis` / `yAxis` | `AxisOptions` | 축선, 눈금 라벨 폰트/색상, `formatter` (긴 라벨 자동 말줄임 지원) |
-| `tooltip` | `TooltipOptions` | 부동형 툴팁 (`enabled`, `shared`, `formatter`, `multiFormatter`, 경계 자동 반전/클램핑) |
-| `legend` | `boolean \| LegendOptions` | 12방향 범례 배치, 마커 모양, 클릭 데이터 토글 및 양방향 호버 연동 |
-| `animation` | `boolean \| AnimationOptions` | 렌더링 애니메이션 시간(`duration`) 및 이징(`easing`) 옵션 |
-| `bar` | `BarStyleOptions` | `mode`(`'grouped' \| 'stacked' \| 'percent'`), `fill`, `borderRadius`, `border`, `widthRatio` |
-| `line` / `area` / `stacked` | `LineStyleOptions` / `AreaStyleOptions` / `boolean` | 라인 곡률(`smooth` \| `linear` \| `step`), Area HSL 그라데이션 채도·명도, 누적 영역 |
-| `pie` / `center` | `PieStyleOptions` / `PieCenterContentOptions` | 도넛 비율(`innerRadiusRatio`), `maxValue`/`trackColor`, `hoverExplode`, 중앙 텍스트 |
-| `funnel` | `FunnelStyleOptions` | `direction`(`'vertical' \| 'horizontal'`), `shape`(`'trapezoid' \| 'bar'`), `showConversion` |
-| `labels` | `DataLabelOptions \| PieLabelOptions \| FunnelLabelOptions` | 라벨 위치, `formatter`, 캔버스 직접 렌더러(`renderCustom`) |
-| `zoom` / `pan` | `{ enabled?: boolean; minPoints?: number }` | 마우스 휠 커서 중심 줌 & 드래그 좌우 팬 탐색 (`BarChart`, `LineChart`) |
-
-### 인스턴스 메서드 및 이벤트
-
-| 메서드 / 이벤트 | 설명 |
-| :--- | :--- |
-| `chart.update(partialOptions)` | 런타임 데이터 및 스타일 옵션 동적 갱신 |
-| `chart.resize(width, height)` | 차트 크기 수동 재설정 및 리렌더링 |
-| `chart.resetZoom()` | 줌/팬 뷰포트 초기화 (`BarChart`, `LineChart`) |
-| `chart.replayAnimation()` | 등장 애니메이션 처음부터 다시 재생 |
-| `chart.toSVG(options?)` | 피그마 호환 순수 벡터 SVG 문자열 추출 |
-| `chart.on(event, handler)` / `off()` | 타입 안전 이벤트 구독 (`'hover'`, `'resize'`, `'legendToggle'`, 이탈 시 `'hover'`에 `null` 전달) |
-| `chart.destroy()` | `ResizeObserver`, DOM 캔버스, 이벤트 리스너, 애니메이션 자원 완전 해제 |
+- **지원 Figma Variable 컬렉션**: `1.Color Palette`, `2.Color token`, `3.Color token - point`, `4.Radius`, `5.Spacing`
+- **등록 방법**: Figma 데스크톱 앱 → `Plugins` → `Development` → `Import plugin from manifest...` → `figma-plugin/manifest.json` 선택
 
 ---
 
-## 🧩 Figma Plugin & 디자인 시스템 변수(Variables) 연동
+## 빌드 및 배포 명령어
 
-`figma-plugin/` 디렉토리에는 `@ju9nu7/nanocharts` 엔진이 내장된 **피그마 벡터 차트 스튜디오 플러그인**이 포함되어 있습니다.
-
-### 1. 디자이너 5대 피그마 Variable 컬렉션 100% 호환
-차트를 피그마에 벡터(SVG)로 삽입할 때 16진수(HEX)나 픽셀 하드코딩 대신 프로젝트의 **Figma Local Variables**에 자동으로 바인딩됩니다:
-
-| 컬렉션 이름 | 지원 변수 범위 | 자동 바인딩 대상 |
-| :--- | :--- | :--- |
-| **`1.Color Palette`** | `Primary/500`, `point red/500`, `Common/white`, `Transparency/50` 등 (266개) | 팔레트 직접 입력 및 별칭(Alias) 역추적 |
-| **`2.Color token`** | `primary/-`, `on-primary/*`, `surface/*`, `on-surface/*`, `outline/*`, `overlay/white/*`, `overlay/gray/*`, `overlay/black/*`, `transparent` (75개) | 차트 시리즈, 배경, 축/그리드, 라벨, 줄무늬 배경(반투명 Alpha 포함) |
-| **`3.Color token - point`** | `red/*` ~ `pink/*` (112개) + `on-red/*` ~ `on-pink/*` (112개) 총 224개 | 포인트 컬러 시리즈 및 상태별 강조 색상 |
-| **`4.Radius`** | `rounded-xxs`(2px) ~ `rounded-full`(999px) (8개) | 바 차트 개별 막대의 상단 모서리(`topLeftRadius`, `topRightRadius`) 및 카드 배경 프레임 |
-| **`5.Spacing`** | `padding/p-0_5` ~ `p-10`(12개) + `gap/gap-0_5` ~ `gap-10`(12개) (24개) | 차트 루트 프레임의 상하좌우 여백(`padding*`) 및 요소 간격(`itemSpacing`) |
-
-### 2. 디자이너 최초 1회 플러그인 등록 방법
-1. 피그마 데스크톱 앱 실행 → 상단 메뉴 **`Plugins`** → **`Development`** → **`Import plugin from manifest...`** 클릭
-2. `figma-plugin/manifest.json` 파일 선택
-3. 최초 1회만 등록해 두면 이후에는 **GitHub(`junwoo1519/nanocharts`) 및 npm CDN(`@ju9nu7/nanocharts`)을 통해 원격 자동 업데이트(OTA)** 되므로 디자이너가 다시 Import 할 필요가 없습니다.
-
----
-
-## 📦 빌드 및 배포 명령어 (Build & Release Guide)
-
-> **💡 Windows PowerShell 참고**: PowerShell 보안 정책으로 `npm.ps1` 실행이 차단된 환경에서는 `npm` 대신 **`npm.cmd`**를 사용하세요.
-
-### 1. 로컬 개발 및 빌드 명령어
+> Windows PowerShell에서 `npm.ps1` 실행 정책 제한이 있는 경우 `npm.cmd`를 사용합니다.
 
 ```bash
 # 로컬 데모 개발 서버 실행 (Vite)
 npm.cmd run dev
 
-# 라이브러리 프로덕션 빌드 (dist/ 생성)
+# 라이브러리 프로덕션 빌드 (tsc && vite build -> dist/)
 npm.cmd run build
 
-# 라이브러리 + 피그마 플러그인(figma-plugin/dist/) 통합 빌드
+# 라이브러리 + Figma 플러그인(figma-plugin/dist/) 통합 빌드
 npm.cmd run build:figma
-```
 
-### 2. 피그마 플러그인 원격 자동 업데이트 배포 (GitHub OTA)
-코드를 수정한 뒤 디자이너의 피그마 플러그인에 **파일 전달 없이 즉시 최신 버전을 반영**하려면 아래 명령어를 실행합니다:
-
-```bash
 # 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
 npm.cmd version patch --no-git-tag-version
 
-# 라이브러리 + 피그마 번들 통합 빌드
-npm.cmd run build:figma
-git add .
-git commit -m "feat: 차트 기능 및 피그마 플러그인 업데이트"
-git push origin main
-```
+# Figma 플러그인 빌드 후 Git 커밋 및 푸시 (OTA)
+npm.cmd run deploy:figma
 
-### 3. npm 패키지 정식 배포 (`@ju9nu7/nanocharts`)
-npm 레지스트리는 이미 배포된 버전 번호로 덮어쓰기를 허용하지 않으므로(`403 Forbidden` 방지), **반드시 버전을 먼저 올린 후 배포**합니다:
-
-```bash
-npm.cmd login
+# npm 패키지 정식 배포 (prepublishOnly 훅으로 build:figma 자동 실행)
 npm.cmd publish --access public
 ```
 
 ---
 
-## 📄 License
+## 상세 문서 안내
 
-MIT License © 2026
+| 문서 | 설명 |
+| :--- | :--- |
+| [docs/API.md](docs/API.md) | 공통 Props, 차트별 고유 옵션, 데이터 포맷, 커스텀 렌더러 시그니처, 메서드 및 이벤트 |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 디렉토리 구조, 데이터→스케일→렌더링→인터랙션 파이프라인, 상태 및 성능 최적화 구조 |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | 컬러 팔레트·디자인 토큰, 폰트, 여백 및 반응형 보정, 축/그리드/범례 규칙, 스타일 격리 |
+| [docs/EDGE_CASES.md](docs/EDGE_CASES.md) | 빈 배열, `null`/`NaN`, 동일 값, 음수, 긴 라벨, 컨테이너 크기 `0`, SSR 방어 로직 |
+| [docs/WORK_LOG.md](docs/WORK_LOG.md) | 세션 간 변경 이력 및 작업 맥락 누적 로그 |
+
+---
+
+## License
+
+MIT License
