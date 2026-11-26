@@ -192,11 +192,11 @@ npm.cmd run build
 # 라이브러리 + Figma 플러그인(figma-plugin/dist/) 통합 빌드
 npm.cmd run build:figma
 
-# 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
-npm.cmd version patch --no-git-tag-version
-
 # Figma 플러그인 빌드 후 Git 커밋 및 푸시 (OTA)
 npm.cmd run deploy:figma
+
+# 패치 버전 자동 증가 (예: 0.1.8 -> 0.1.9)
+npm.cmd version patch --no-git-tag-version
 
 # npm 패키지 정식 배포 (prepublishOnly 훅으로 build:figma 자동 실행)
 npm.cmd publish --access public

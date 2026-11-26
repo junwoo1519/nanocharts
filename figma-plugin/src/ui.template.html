@@ -45,12 +45,13 @@
       background: rgba(34, 108, 255, 0.25);
     }
     .sidebar-header {
-      padding: 13px 18px;
+      padding: 12px 14px;
       background: #FFFFFF;
       border-bottom: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       flex-shrink: 0;
     }
     .sidebar-header h1 {
@@ -69,15 +70,67 @@
       border-radius: 999px;
       font-weight: 600;
     }
+    /* 상단 고정 빠른 목차 (TOC) 바 */
+    .sidebar-toc {
+      padding: 8px 12px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E4E4E7;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .toc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #E4E4E7;
+      background: #FAFAFA;
+      color: #52525B;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      line-height: 1.2;
+      font-family: inherit;
+    }
+    .toc-btn:hover {
+      background: #F4F4F5;
+      border-color: #D4D4D8;
+      color: #111111;
+    }
+    .toc-btn.active {
+      background: #226CFF;
+      border-color: #226CFF;
+      color: #FFFFFF;
+      box-shadow: 0 1px 2px rgba(34, 108, 255, 0.25);
+    }
+    .toc-btn.is-type-pill:not(.active) {
+      background: #F0F6FF;
+      border-color: #BFDBFE;
+      color: #1D4ED8;
+    }
+    .toc-btn .toc-num {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 9.5px;
+      opacity: 0.78;
+    }
+    .toc-btn.active .toc-num {
+      opacity: 0.92;
+    }
     .sidebar-body {
-      padding: 0 0 28px 0;
+      padding: 10px 12px 28px 12px;
+      background: #F3F4F6;
       overflow-y: scroll;
       overflow-x: hidden;
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 10px;
     }
     .sidebar-body > * {
       flex-shrink: 0;
@@ -86,7 +139,7 @@
       width: 7px;
     }
     .sidebar-body::-webkit-scrollbar-track {
-      background: #FFFFFF;
+      background: #F3F4F6;
     }
     .sidebar-body::-webkit-scrollbar-thumb {
       background: #D4D4D8;
@@ -95,71 +148,162 @@
     .sidebar-body::-webkit-scrollbar-thumb:hover {
       background: #A1A1AA;
     }
-    /* 카테고리 섹션 (선 기반 영역 구분 — 플랫 인스펙터 스타일) */
+    /* 카테고리 섹션 (목적별 카드 구분 + 접기/펼치기 지원) */
     .option-card {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #E5E5E5;
-      border-radius: 0;
-      overflow: visible;
-      box-shadow: none;
-      padding: 16px 18px;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      padding: 0;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
-    .option-card:last-child {
-      border-bottom: none;
+    .option-card.is-type-specific {
+      border-color: #BFDBFE;
+      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.08);
+    }
+    .option-card.is-focused {
+      border-color: #226CFF;
+      box-shadow: 0 0 0 2px rgba(34, 108, 255, 0.16);
     }
     .section-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      padding: 0;
-      margin-bottom: 12px;
-      background: transparent;
-      border: none;
+      gap: 8px;
+      padding: 10px 13px;
+      margin-bottom: 0;
+      background: #F9FAFB;
+      border-bottom: 1px solid #ECEEF2;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s ease;
+    }
+    .section-header:hover {
+      background: #F3F4F6;
+    }
+    .option-card.is-type-specific .section-header {
+      background: #F0F6FF;
+      border-bottom-color: #DBEAFE;
+    }
+    .option-card.is-type-specific .section-header:hover {
+      background: #E6F0FF;
+    }
+    .option-card.collapsed .section-header {
+      border-bottom: none;
     }
     .section-title {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 9px;
+      min-width: 0;
+    }
+    .section-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+    .section-title-text {
       font-size: 12.5px;
       font-weight: 700;
       color: #111111;
       letter-spacing: -0.015em;
+      line-height: 1.25;
+    }
+    .section-desc {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: #71717A;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .section-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: auto;
-      height: auto;
-      padding: 0;
-      border-radius: 0;
-      background: transparent;
-      border: none;
+      min-width: 24px;
+      height: 22px;
+      padding: 0 5px;
+      border-radius: 6px;
+      background: #EBF2FF;
+      border: 1px solid #D6E4FF;
       color: #226CFF;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       font-family: 'JetBrains Mono', Consolas, monospace;
+      flex-shrink: 0;
+    }
+    .option-card.is-type-specific .section-num {
+      background: #226CFF;
+      border-color: #226CFF;
+      color: #FFFFFF;
+    }
+    .section-header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
     .section-sub {
-      font-size: 10.5px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 600;
+      color: #52525B;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
+      padding: 2px 7px;
+      border-radius: 999px;
+      line-height: 1.3;
+    }
+    .option-card.is-type-specific .section-sub {
+      background: #FFFFFF;
+      border-color: #93C5FD;
+      color: #1D4ED8;
+    }
+    .section-chevron {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       color: #71717A;
-      background: transparent;
-      border: none;
-      padding: 0;
-      border-radius: 0;
+      font-size: 10px;
+      transition: transform 0.16s ease;
+    }
+    .option-card.collapsed .section-chevron {
+      transform: rotate(-90deg);
     }
     .section-body {
-      padding: 0;
+      padding: 13px 14px 14px 14px;
       display: flex;
       flex-direction: column;
       gap: 11px;
     }
+    .option-card.collapsed .section-body {
+      display: none;
+    }
     .sub-divider {
       height: 1px;
       background: #EFEFEF;
-      margin: 4px 0;
+      margin: 2px 0;
+    }
+    .sub-group-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #71717A;
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+    }
+    .sub-group-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #EFEFEF;
     }
     /* 폼 필드 & 라벨 정렬 */
     .field {
@@ -730,14 +874,35 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <h1>NanoCharts <span class="badge">v0.1.7 Studio</span></h1>
+      <button class="btn-mini" id="toggle-all-sections-btn" title="모든 옵션 섹션을 한 번에 접거나 펼칩니다">모두 접기</button>
     </div>
+
+    <!-- 상단 고정 빠른 목차 (TOC) -->
+    <nav class="sidebar-toc" id="sidebar-toc" aria-label="옵션 목차">
+      <button class="toc-btn active" data-target="sec-type"><span class="toc-num">01</span>유형</button>
+      <button class="toc-btn" data-target="sec-color"><span class="toc-num">02</span>컬러</button>
+      <button class="toc-btn" data-target="sec-data"><span class="toc-num">03</span>데이터</button>
+      <button class="toc-btn is-type-pill" data-target="sec-shape" id="toc-shape-btn"><span class="toc-num">04</span><span id="toc-shape-label">Bar 도형</span></button>
+      <button class="toc-btn" data-target="sec-typo"><span class="toc-num">05</span>라벨·폰트</button>
+      <button class="toc-btn" data-target="grid-controls" id="toc-grid-btn"><span class="toc-num">06</span>그리드</button>
+      <button class="toc-btn" data-target="sec-export" id="toc-export-btn"><span class="toc-num" id="toc-export-num">07</span>크기·추출</button>
+    </nav>
 
     <div class="sidebar-body">
       <!-- [01] 차트 유형 & 시리즈 구성 -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">01</span>차트 유형 & 시리즈</div>
-          <span class="section-sub">Chart Type</span>
+      <section class="option-card" id="sec-type">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">01</span>
+            <div class="section-heading">
+              <span class="section-title-text">차트 유형 · 시리즈</span>
+              <span class="section-desc">차트 종류 및 단일·다중 배치 방식 선택</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">기본</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
           <div class="field">
@@ -764,10 +929,19 @@
       </section>
 
       <!-- [02] 컬러 토큰 & 피그마 변수 -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">02</span>컬러 토큰 & 피그마 변수</div>
-          <span class="section-sub">1~3.Color Token</span>
+      <section class="option-card" id="sec-color">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">02</span>
+            <div class="section-heading">
+              <span class="section-title-text">컬러 토큰 · 피그마 변수</span>
+              <span class="section-desc">배경 테마 및 시리즈별 컬러 변수 매핑</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">Color Token</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
           <div class="row-2">
@@ -828,10 +1002,19 @@
       </section>
 
       <!-- [03] 데이터 & 라벨 편집 -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">03</span>데이터 & 시리즈 편집</div>
-          <span class="section-sub">Data Input</span>
+      <section class="option-card" id="sec-data">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">03</span>
+            <div class="section-heading">
+              <span class="section-title-text">데이터 · 시리즈 편집</span>
+              <span class="section-desc">항목 라벨, 시리즈 이름 및 수치 입력</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">Data</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
           <div class="field" id="series-names-field">
@@ -855,10 +1038,19 @@
       </section>
 
       <!-- [04] 차트 전용 도형 스타일 (4.Radius / 곡선 / 도넛 / 퍼널) -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">04</span>차트 전용 도형 스타일</div>
-          <span class="section-sub" id="shape-section-sub">Bar · 4.Radius</span>
+      <section class="option-card is-type-specific" id="sec-shape">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">04</span>
+            <div class="section-heading">
+              <span class="section-title-text" id="shape-section-title">Bar 도형 스타일</span>
+              <span class="section-desc" id="shape-section-desc">모서리 둥글기(Radius) · 바 폭 비율 조절</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub" id="shape-section-sub">Bar 전용</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
           <!-- Bar 전용 -->
@@ -989,12 +1181,22 @@
       </section>
 
       <!-- [05] 범례(12방향) · 라벨 & 타이포그래피 -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">05</span>범례 · 라벨 & 타이포그래피</div>
-          <span class="section-sub">Legend, Label & Font</span>
+      <section class="option-card" id="sec-typo">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">05</span>
+            <div class="section-heading">
+              <span class="section-title-text">범례 · 라벨 · 타이포그래피</span>
+              <span class="section-desc">범례 배치, 서체 스타일 및 수치 라벨 위치</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">Text</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
+          <div class="sub-group-label">범례 & 폰트</div>
           <div class="row-2">
             <div class="field">
               <label>범례 위치 (12방향)</label>
@@ -1051,7 +1253,7 @@
             </div>
           </div>
 
-          <div class="sub-divider"></div>
+          <div class="sub-group-label">수치 라벨 배치</div>
 
           <div class="row-2">
             <div class="field">
@@ -1083,9 +1285,18 @@
 
       <!-- [06] 그리드(Grid) 선 & 테두리 커스텀 -->
       <section class="option-card" id="grid-controls">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num">06</span>그리드 선 & 플롯 테두리</div>
-          <span class="section-sub">Grid & Border</span>
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num">06</span>
+            <div class="section-heading">
+              <span class="section-title-text">그리드 선 · 플롯 테두리</span>
+              <span class="section-desc">격자선 패턴, 축 그리드 및 배경 줄무늬</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">Bar·Line</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
           <div class="row-2">
@@ -1124,12 +1335,22 @@
       </section>
 
       <!-- [07] 5.Spacing(여백·간격) 및 반응형 추출 옵션 -->
-      <section class="option-card">
-        <div class="section-header">
-          <div class="section-title"><span class="section-num" id="spacing-section-num">07</span>여백 · 반응형 크기 & 바인딩</div>
-          <span class="section-sub">5.Spacing & Export</span>
+      <section class="option-card" id="sec-export">
+        <div class="section-header" role="button" tabindex="0">
+          <div class="section-title">
+            <span class="section-num" id="spacing-section-num">07</span>
+            <div class="section-heading">
+              <span class="section-title-text">여백 · 크기 · 피그마 추출</span>
+              <span class="section-desc">패딩, 반응형 캔버스 크기 및 변수 바인딩</span>
+            </div>
+          </div>
+          <div class="section-header-right">
+            <span class="section-sub">Export</span>
+            <span class="section-chevron">▾</span>
+          </div>
         </div>
         <div class="section-body">
+          <div class="sub-group-label">여백 & 요소 간격</div>
           <div class="row-2" id="spacing-row">
             <div class="field">
               <label>차트 여백 <span class="val-badge" id="padding-txt">24px</span></label>
@@ -1145,7 +1366,7 @@
             </div>
           </div>
 
-          <div class="sub-divider"></div>
+          <div class="sub-group-label">캔버스 크기 & 반응형</div>
 
           <div class="field">
             <label>빠른 반응형 프리셋 (우측 프리뷰에서 자유 드래그 가능)</label>
@@ -1166,6 +1387,8 @@
               <input type="number" id="export-h" value="400" min="160" max="1600" step="20" />
             </div>
           </div>
+
+          <div class="sub-group-label">추출 & 바인딩 옵션</div>
 
           <div class="row-2">
             <label class="checkbox-row">
@@ -1796,22 +2019,58 @@
       document.getElementById('custom-font-field').style.display =
         state.fontFamilyPreset === 'custom' ? '' : 'none';
 
+      const shapeTitleEl = document.getElementById('shape-section-title');
+      const shapeDescEl = document.getElementById('shape-section-desc');
       const shapeSubEl = document.getElementById('shape-section-sub');
-      if (shapeSubEl) {
-        shapeSubEl.textContent = isBar
-          ? 'Bar · 4.Radius'
-          : isLine
-            ? 'Line · Area HSL'
-            : isDonut
-              ? 'Donut · Arc'
-              : isPie
-                ? 'Pie · Arc'
-                : 'Funnel · Stage';
-      }
+      const tocShapeLabelEl = document.getElementById('toc-shape-label');
+      const tocGridBtn = document.getElementById('toc-grid-btn');
+      const tocExportNumEl = document.getElementById('toc-export-num');
+
+      const shapeMeta = isBar
+        ? {
+            title: 'Bar 도형 스타일',
+            desc: '모서리 둥글기(Radius) · 바 폭 비율 조절',
+            sub: 'Bar 전용',
+            toc: 'Bar 도형',
+          }
+        : isLine
+          ? {
+              title: 'Line · Area 스타일',
+              desc: '라인 곡선 · 영역 투명도 및 채도·명도 조절',
+              sub: 'Line 전용',
+              toc: 'Line 도형',
+            }
+          : isDonut
+            ? {
+                title: 'Donut 도형 스타일',
+                desc: '내부 구멍 비율 · 조각 간격 · 100% 기준값',
+                sub: 'Donut 전용',
+                toc: 'Donut 도형',
+              }
+            : isPie
+              ? {
+                  title: 'Pie 도형 스타일',
+                  desc: '조각 간격 · 100% 기준값 · 잔여 트랙',
+                  sub: 'Pie 전용',
+                  toc: 'Pie 도형',
+                }
+              : {
+                  title: 'Funnel 도형 스타일',
+                  desc: '진행 방향 · 도형 모양 · 단계 간격 조절',
+                  sub: 'Funnel 전용',
+                  toc: 'Funnel 도형',
+                };
+
+      if (shapeTitleEl) shapeTitleEl.textContent = shapeMeta.title;
+      if (shapeDescEl) shapeDescEl.textContent = shapeMeta.desc;
+      if (shapeSubEl) shapeSubEl.textContent = shapeMeta.sub;
+      if (tocShapeLabelEl) tocShapeLabelEl.textContent = shapeMeta.toc;
+      if (tocGridBtn) tocGridBtn.style.display = isBar || isLine ? '' : 'none';
+
+      const exportNum = isBar || isLine ? '07' : '06';
       const spacingNumEl = document.getElementById('spacing-section-num');
-      if (spacingNumEl) {
-        spacingNumEl.textContent = isBar || isLine ? '07' : '06';
-      }
+      if (spacingNumEl) spacingNumEl.textContent = exportNum;
+      if (tocExportNumEl) tocExportNumEl.textContent = exportNum;
     }
 
     function getSurfaceTokens() {
@@ -3243,7 +3502,11 @@
 
       sidebarBodyEl?.addEventListener('mousedown', (e) => {
         const tag = (e.target?.tagName || '').toLowerCase();
-        if (['input', 'select', 'textarea', 'button', 'option'].includes(tag) || e.target?.closest('.token-chip')) {
+        if (
+          ['input', 'select', 'textarea', 'button', 'option'].includes(tag) ||
+          e.target?.closest('.token-chip') ||
+          e.target?.closest('.section-header')
+        ) {
           return;
         }
         isGrabScrolling = true;
@@ -3299,6 +3562,94 @@
           renderPreview();
         }
       });
+
+      // 좌측 사이드바 목차(TOC) 이동, 스크롤 스파이 & 섹션 접기/펼치기
+      const tocButtons = Array.from(document.querySelectorAll('#sidebar-toc .toc-btn'));
+      const optionCards = Array.from(document.querySelectorAll('.sidebar-body .option-card'));
+      const toggleAllBtn = document.getElementById('toggle-all-sections-btn');
+      let focusTimer = null;
+
+      function syncToggleAllBtnLabel() {
+        if (!toggleAllBtn) return;
+        const visibleCards = optionCards.filter((c) => c.style.display !== 'none');
+        const allCollapsed = visibleCards.length > 0 && visibleCards.every((c) => c.classList.contains('collapsed'));
+        toggleAllBtn.textContent = allCollapsed ? '모두 펼치기' : '모두 접기';
+      }
+
+      function setActiveToc(targetId) {
+        tocButtons.forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.target === targetId);
+        });
+      }
+
+      optionCards.forEach((card) => {
+        const header = card.querySelector('.section-header');
+        if (!header) return;
+        const toggleCard = () => {
+          card.classList.toggle('collapsed');
+          syncToggleAllBtnLabel();
+        };
+        header.addEventListener('click', toggleCard);
+        header.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCard();
+          }
+        });
+      });
+
+      if (toggleAllBtn) {
+        toggleAllBtn.addEventListener('click', () => {
+          const visibleCards = optionCards.filter((c) => c.style.display !== 'none');
+          const allCollapsed = visibleCards.length > 0 && visibleCards.every((c) => c.classList.contains('collapsed'));
+          visibleCards.forEach((c) => c.classList.toggle('collapsed', !allCollapsed));
+          syncToggleAllBtnLabel();
+        });
+      }
+
+      tocButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.target;
+          const targetCard = targetId ? document.getElementById(targetId) : null;
+          if (!targetCard || targetCard.style.display === 'none' || !sidebarBodyEl) return;
+
+          if (targetCard.classList.contains('collapsed')) {
+            targetCard.classList.remove('collapsed');
+            syncToggleAllBtnLabel();
+          }
+
+          const topOffset = targetCard.offsetTop - 10;
+          sidebarBodyEl.scrollTo({ top: Math.max(0, topOffset), behavior: 'smooth' });
+          setActiveToc(targetId);
+
+          optionCards.forEach((c) => c.classList.remove('is-focused'));
+          targetCard.classList.add('is-focused');
+          if (focusTimer) clearTimeout(focusTimer);
+          focusTimer = setTimeout(() => {
+            targetCard.classList.remove('is-focused');
+          }, 950);
+        });
+      });
+
+      if (sidebarBodyEl) {
+        let scrollRaf = null;
+        sidebarBodyEl.addEventListener('scroll', () => {
+          if (scrollRaf) return;
+          scrollRaf = requestAnimationFrame(() => {
+            scrollRaf = null;
+            const visibleCards = optionCards.filter((c) => c.style.display !== 'none');
+            if (visibleCards.length === 0) return;
+            const scrollTop = sidebarBodyEl.scrollTop;
+            let activeId = visibleCards[0].id;
+            for (const card of visibleCards) {
+              if (card.offsetTop - 28 <= scrollTop) {
+                activeId = card.id;
+              }
+            }
+            setActiveToc(activeId);
+          });
+        });
+      }
     })();
 
     populateProjectVariableControls();
