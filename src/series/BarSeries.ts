@@ -122,7 +122,7 @@ export class BarSeries {
     const rawX = xScale.scale(index);
     const rawWidth = xScale.bandwidth();
 
-    // 슬롯 내에서 바의 두께 비율 적용 및 가운데 정렬
+    // 슬롯 내에서 바의 두께 비율 적용 및 가운데 정렬 (바 폭과 요소 간격 독립 유지)
     const ratio = Math.max(0.05, Math.min(1.0, this.barOptions.widthRatio ?? 0.65));
     const width = rawWidth * ratio;
     const x = rawX + (rawWidth - width) / 2;
@@ -161,18 +161,37 @@ export class BarSeries {
 
     const geometries: BarGeometry[] = [];
 
+    const useBarGap =
+      typeof this.barOptions.barGap === 'number' && Number.isFinite(this.barOptions.barGap);
+    const rawBarGap = useBarGap ? Math.max(0, this.barOptions.barGap!) : 0;
+
     if (mode === 'grouped') {
-      const stepWidth = totalGroupWidth / seriesCount;
-      const gapRatio = seriesCount > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0;
-      const barWidth = Math.max(1, stepWidth * (1 - gapRatio));
       const baseZero = yScale.scale(0);
+      let barWidth: number;
+      let effectiveGap = 0;
+
+      if (useBarGap && seriesCount > 1) {
+        // 바 폭(widthRatio)과 요소 간격(barGap)을 독립 계산:
+        // barWidth는 widthRatio로 고정 유지하고, barGap은 슬롯 내 여유 공간(rawWidth) 범위에서만 간격을 확장
+        barWidth = Math.max(1, totalGroupWidth / seriesCount);
+        const maxGap = Math.max(0, (rawWidth - 2 - barWidth * seriesCount) / (seriesCount - 1));
+        effectiveGap = Math.min(rawBarGap, maxGap);
+      } else {
+        const stepWidth = totalGroupWidth / seriesCount;
+        const gapRatio = seriesCount > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0;
+        barWidth = Math.max(1, stepWidth * (1 - gapRatio));
+        effectiveGap = seriesCount > 1 ? stepWidth - barWidth : 0;
+      }
+
+      const usedWidth = barWidth * seriesCount + effectiveGap * Math.max(0, seriesCount - 1);
+      const alignedStartX = rawX + (rawWidth - usedWidth) / 2;
 
       for (let s = 0; s < seriesCount; s++) {
         const series = activeSeries[s];
         const item = series.items[slotIndex];
         if (!item) continue;
 
-        const x = groupStartX + s * stepWidth + (stepWidth - barWidth) / 2;
+        const x = alignedStartX + s * (barWidth + effectiveGap);
         const safeValue = typeof item.value === 'number' && Number.isFinite(item.value) ? item.value : 0;
         const targetY = yScale.scale(safeValue);
         const isPositive = safeValue >= 0;
@@ -218,6 +237,8 @@ export class BarSeries {
 
     let posAcc = 0;
     let negAcc = 0;
+    let posRenderedCount = 0;
+    let negRenderedCount = 0;
 
     for (let s = 0; s < seriesCount; s++) {
       const series = activeSeries[s];
@@ -246,8 +267,16 @@ export class BarSeries {
 
         const yBottom = yScale.scale(startVal);
         const yTop = yScale.scale(endVal);
-        const height = Math.max(0, yBottom - yTop);
+        let height = Math.max(0, yBottom - yTop);
         const y = yTop;
+
+        if (effectiveVal > 0) {
+          if (posRenderedCount > 0 && rawBarGap > 0 && height > 2) {
+            const gapTrim = Math.min(rawBarGap, height - 2);
+            height -= gapTrim;
+          }
+          posRenderedCount++;
+        }
 
         const isTopCap = s === topPosSeriesIdx;
         geometries.push({
@@ -273,8 +302,17 @@ export class BarSeries {
 
         const yTop = yScale.scale(startVal);
         const yBottom = yScale.scale(endVal);
-        const height = Math.max(0, yBottom - yTop);
-        const y = yTop;
+        let height = Math.max(0, yBottom - yTop);
+        let y = yTop;
+
+        if (effectiveVal < 0) {
+          if (negRenderedCount > 0 && rawBarGap > 0 && height > 2) {
+            const gapTrim = Math.min(rawBarGap, height - 2);
+            y += gapTrim;
+            height -= gapTrim;
+          }
+          negRenderedCount++;
+        }
 
         const isBottomCap = s === bottomNegSeriesIdx;
         geometries.push({

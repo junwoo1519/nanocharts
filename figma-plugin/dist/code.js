@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.17","buildId":"0.1.17-1795654893795","buildTime":1795654893795,"builtAt":"2026-11-26T01:01:33.795Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.18","buildId":"0.1.18-1795658468188","buildTime":1795658468188,"builtAt":"2026-11-26T02:01:08.188Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -322,7 +322,7 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
     var _a, _b, _c, _d, _e, _f;
     const liveW = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.width) || rawState.exportW || 640);
     const liveH = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.height) || rawState.exportH || 400);
-    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, pieGapMode: 'px', pieSliceGap: 3, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
+    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, pieGapMode: 'px', pieSliceGap: 3, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', barLabelPos: 'auto', lineLabelPos: 'top-outside', pieLabelPos: 'outside', pieLabelFormat: 'label-percent', labelOffset: 8, funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
     const { xLabels, singleData, multiSeries } = parseSavedDataForCodegen(state);
     const tokenList = state.theme === 'custom' && state.customTokens
         ? String(state.customTokens)
@@ -371,10 +371,16 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
     optionsLines.push(`  responsive: { enabled: true },`);
     optionsLines.push(`  padding: { top: ${padOpt.top}, right: ${padOpt.right}, bottom: ${padOpt.bottom}, left: ${padOpt.left} }, // ${state.paddingToken} (${state.paddingPx}px)`);
     optionsLines.push(`  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`);
+    const labelOffsetVal = (_a = state.labelOffset) !== null && _a !== void 0 ? _a : 8;
     if (state.chartType === 'bar') {
         className = 'BarChart';
         const mode = state.seriesMode === 'stacked' ? 'stacked' : state.seriesMode === 'percent' ? 'percent' : 'grouped';
-        const labelOffset = Math.max(4, Math.min(12, (_a = state.gapPx) !== null && _a !== void 0 ? _a : 6));
+        const barLabelPos = state.barLabelPos && state.barLabelPos !== 'auto'
+            ? state.barLabelPos
+            : mode === 'stacked' || mode === 'percent'
+                ? 'inside-center'
+                : 'top-outside';
+        const isInsideBar = barLabelPos === 'inside-top' || barLabelPos === 'inside-center' || barLabelPos === 'inside-bottom';
         if (isMulti) {
             optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
             optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
@@ -382,9 +388,9 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
         else {
             optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         }
-        optionsLines.push(`  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`);
+        optionsLines.push(`  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    barGap: ${(_b = state.gapPx) !== null && _b !== void 0 ? _b : 0},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`);
         optionsLines.push(legendCode);
-        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: '${mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside'}',\n    color: '${mode === 'stacked' || mode === 'percent' ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffset},\n  },`);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels && barLabelPos !== 'none'},\n    position: '${barLabelPos}',\n    color: '${isInsideBar ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`);
         optionsLines.push(gridCode);
         optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
         optionsLines.push(mode === 'percent'
@@ -394,7 +400,7 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
     else if (state.chartType === 'line') {
         className = 'LineChart';
         const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
-        const labelOffset = Math.max(4, Math.min(14, (_b = state.gapPx) !== null && _b !== void 0 ? _b : 8));
+        const lineLabelPos = state.lineLabelPos || 'top-outside';
         if (isMulti) {
             optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
             optionsLines.push(`  series: [\n${seriesCode}\n  ],`);
@@ -407,16 +413,17 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
         optionsLines.push(`  points: {\n    fill: '${bgToken}',\n  },`);
         optionsLines.push(`  area: {\n    visible: true,\n    topOpacity: ${state.areaTopOpacity},\n    bottomOpacity: 0.02,\n    saturationDelta: ${state.areaSatDelta},\n    lightnessDelta: ${state.areaLightDelta},\n  },`);
         optionsLines.push(legendCode);
-        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: 'top-outside',\n    color: '${strongTextToken}',\n    offset: ${labelOffset},\n  },`);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels && lineLabelPos !== 'none'},\n    position: '${lineLabelPos}',\n    color: '${strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`);
         optionsLines.push(gridCode);
         optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
         optionsLines.push(`  yAxis: { labelColor: '${labelToken}' },`);
     }
     else if (state.chartType === 'funnel') {
         className = 'FunnelChart';
+        const funnelLabelPos = state.funnelLabelPos || 'inside';
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(`  funnel: {\n    direction: '${state.funnelDirection}',\n    shape: '${state.funnelShape}',\n    gap: ${state.funnelGap},\n    borderRadius: ${state.radius},\n    colors: ${JSON.stringify(cssTokens)},\n    showConversion: true,\n  },`);
-        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`);
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels && funnelLabelPos !== 'none'},\n    position: '${funnelLabelPos}',\n    offset: ${labelOffsetVal},\n    color: '${funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`);
         optionsLines.push(legendCode);
     }
     else {
@@ -454,7 +461,10 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
                 ? `  pie: {\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
                 : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`);
         }
-        optionsLines.push(`  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`);
+        const pieLabelPos = state.pieLabelPos || 'outside';
+        const pieLabelFormat = state.pieLabelFormat || 'label-percent';
+        const pieLabelColorToken = pieLabelPos === 'inside' ? insideLabelToken : strongTextToken;
+        optionsLines.push(`  labels: {\n    visible: ${state.showLabels && pieLabelPos !== 'none'},\n    position: '${pieLabelPos}',\n    offset: ${labelOffsetVal},\n    format: '${pieLabelFormat}',\n    color: '${pieLabelColorToken}',\n  },`);
         optionsLines.push(legendCode);
     }
     optionsLines.push(`}`);

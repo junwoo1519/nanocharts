@@ -392,6 +392,11 @@ function generateDevModeCodeBlocks(
     piePadDeg: 1.5,
     pieMaxValue: 0,
     pieTrackToken: 'auto',
+    barLabelPos: 'auto',
+    lineLabelPos: 'top-outside',
+    pieLabelPos: 'outside',
+    pieLabelFormat: 'label-percent',
+    labelOffset: 8,
     funnelDirection: 'vertical',
     funnelShape: 'trapezoid',
     funnelGap: 4,
@@ -483,11 +488,20 @@ function generateDevModeCodeBlocks(
     `  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`
   );
 
+  const labelOffsetVal = state.labelOffset ?? 8;
+
   if (state.chartType === 'bar') {
     className = 'BarChart';
     const mode =
       state.seriesMode === 'stacked' ? 'stacked' : state.seriesMode === 'percent' ? 'percent' : 'grouped';
-    const labelOffset = Math.max(4, Math.min(12, state.gapPx ?? 6));
+    const barLabelPos =
+      state.barLabelPos && state.barLabelPos !== 'auto'
+        ? state.barLabelPos
+        : mode === 'stacked' || mode === 'percent'
+          ? 'inside-center'
+          : 'top-outside';
+    const isInsideBar =
+      barLabelPos === 'inside-top' || barLabelPos === 'inside-center' || barLabelPos === 'inside-bottom';
 
     if (isMulti) {
       optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
@@ -497,11 +511,11 @@ function generateDevModeCodeBlocks(
     }
 
     optionsLines.push(
-      `  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`
+      `  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    barGap: ${state.gapPx ?? 0},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`
     );
     optionsLines.push(legendCode);
     optionsLines.push(
-      `  labels: {\n    visible: ${state.showLabels},\n    position: '${mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside'}',\n    color: '${mode === 'stacked' || mode === 'percent' ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffset},\n  },`
+      `  labels: {\n    visible: ${state.showLabels && barLabelPos !== 'none'},\n    position: '${barLabelPos}',\n    color: '${isInsideBar ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`
     );
     optionsLines.push(gridCode);
     optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
@@ -513,7 +527,7 @@ function generateDevModeCodeBlocks(
   } else if (state.chartType === 'line') {
     className = 'LineChart';
     const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
-    const labelOffset = Math.max(4, Math.min(14, state.gapPx ?? 8));
+    const lineLabelPos = state.lineLabelPos || 'top-outside';
 
     if (isMulti) {
       optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
@@ -532,19 +546,20 @@ function generateDevModeCodeBlocks(
     );
     optionsLines.push(legendCode);
     optionsLines.push(
-      `  labels: {\n    visible: ${state.showLabels},\n    position: 'top-outside',\n    color: '${strongTextToken}',\n    offset: ${labelOffset},\n  },`
+      `  labels: {\n    visible: ${state.showLabels && lineLabelPos !== 'none'},\n    position: '${lineLabelPos}',\n    color: '${strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`
     );
     optionsLines.push(gridCode);
     optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
     optionsLines.push(`  yAxis: { labelColor: '${labelToken}' },`);
   } else if (state.chartType === 'funnel') {
     className = 'FunnelChart';
+    const funnelLabelPos = state.funnelLabelPos || 'inside';
     optionsLines.push(`  data: [\n${dataCode}\n  ],`);
     optionsLines.push(
       `  funnel: {\n    direction: '${state.funnelDirection}',\n    shape: '${state.funnelShape}',\n    gap: ${state.funnelGap},\n    borderRadius: ${state.radius},\n    colors: ${JSON.stringify(cssTokens)},\n    showConversion: true,\n  },`
     );
     optionsLines.push(
-      `  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
+      `  labels: {\n    visible: ${state.showLabels && funnelLabelPos !== 'none'},\n    position: '${funnelLabelPos}',\n    offset: ${labelOffsetVal},\n    color: '${funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
     );
     optionsLines.push(legendCode);
   } else {
@@ -590,8 +605,11 @@ function generateDevModeCodeBlocks(
           : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
       );
     }
+    const pieLabelPos = state.pieLabelPos || 'outside';
+    const pieLabelFormat = state.pieLabelFormat || 'label-percent';
+    const pieLabelColorToken = pieLabelPos === 'inside' ? insideLabelToken : strongTextToken;
     optionsLines.push(
-      `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+      `  labels: {\n    visible: ${state.showLabels && pieLabelPos !== 'none'},\n    position: '${pieLabelPos}',\n    offset: ${labelOffsetVal},\n    format: '${pieLabelFormat}',\n    color: '${pieLabelColorToken}',\n  },`
     );
     optionsLines.push(legendCode);
   }

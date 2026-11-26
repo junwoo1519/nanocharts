@@ -202,6 +202,12 @@ export interface BarStyleOptions {
   widthRatio?: number;
   /** 그룹형(grouped) 바 차트에서 같은 슬롯 내 개별 바 사이의 간격 비율 (0.0 ~ 0.5, 기본값: 0.12) */
   groupGap?: number;
+  /**
+   * 바 요소 사이의 픽셀 간격 (px, 선택)
+   * - `grouped` 모드: `widthRatio`로 결정된 개별 바 폭을 유지한 채, 슬롯 여유 공간 내에서 바 사이 직선 간격(px)을 조절합니다 (`groupGap` 비율보다 우선 적용).
+   * - `stacked` / `percent` 모드: 누적된 세그먼트 사이의 세로 간격(px)을 지정합니다.
+   */
+  barGap?: number;
   /** 바의 최대 허용 너비 (픽셀) */
   maxWidth?: number;
   /** 바의 최소 허용 너비 (픽셀) */
@@ -666,6 +672,16 @@ export interface PieStyleOptions {
 }
 
 /**
+ * 파이/도넛 내장 데이터 라벨 표시 형식 프리셋
+ * - `'label-percent'`: 이름 + 비율 (예: `1월 24%`, 기본값)
+ * - `'percent'`: 비율만 (예: `24%`)
+ * - `'value'`: 수치만 (예: `120`)
+ * - `'label-value'`: 이름 + 수치 (예: `1월 120`)
+ * - `'label'`: 이름만 (예: `1월`)
+ */
+export type PieLabelFormat = 'label-percent' | 'percent' | 'value' | 'label-value' | 'label';
+
+/**
  * 파이 데이터 라벨 옵션
  */
 export interface PieLabelOptions {
@@ -673,11 +689,19 @@ export interface PieLabelOptions {
   visible?: boolean;
   /** 라벨 위치 ('outside': 바깥쪽 가이드선, 'inside': 조각 내부, 'none': 숨김) */
   position?: 'outside' | 'inside' | 'none';
+  /** 도형(조각)과 라벨 사이의 간격 오프셋 (px, 기본값: 4) */
+  offset?: number;
+  /** 내장 라벨 표시 형식 프리셋 (`formatter` 미지정 시 적용, 기본값: `'label-percent'`) */
+  format?: PieLabelFormat;
+  /** 라벨을 표시할 최소 조각 비율 (0 ~ 1, 기본값: `0.04` = 4%) */
+  minPercentage?: number;
+  /** `position: 'inside'`일 때 내부~외부 반지름 사이 배치 비율 (0.15 ~ 0.9, 미지정 시 파이 `0.62` / 도넛 `0.5`) */
+  insideRadiusRatio?: number;
   /** 폰트 스타일 */
   font?: string;
   /** 글자 색상 */
   color?: string;
-  /** 텍스트 포맷터 (기본: `${item.label} (${(percent * 100).toFixed(1)}%)`) */
+  /** 텍스트 포맷터 (지정 시 `format` 프리셋보다 우선 적용) */
   formatter?: (item: DataItem, percentage: number) => string;
 }
 
@@ -1103,6 +1127,8 @@ export interface FunnelLabelOptions {
   visible?: boolean;
   /** 라벨 위치 ('inside': 도형 중앙, 'outside': 바깥쪽 측면, 'none': 숨김, 기본값: 'inside') */
   position?: 'inside' | 'outside' | 'none';
+  /** `position: 'outside'`일 때 도형과 라벨 사이의 간격 오프셋 (px, 기본값: 10) */
+  offset?: number;
   /** 폰트 스타일 */
   font?: string;
   /** 글자 색상 */

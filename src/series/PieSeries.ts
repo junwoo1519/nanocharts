@@ -507,6 +507,51 @@ export class PieSeries {
   }
 
   /**
+   * 라벨 옵션(`formatter` 또는 `format` 프리셋)에 따라 조각 라벨 문자열을 생성합니다.
+   */
+  private formatLabelText(item: DataItem, percentage: number): string {
+    const opts = this.labelOptions;
+    if (opts?.formatter) {
+      return opts.formatter(item, percentage);
+    }
+    const pctText = `${(percentage * 100).toFixed(0)}%`;
+    const valText =
+      typeof item.value === 'number' && Number.isFinite(item.value)
+        ? item.value.toLocaleString()
+        : String(item.value ?? 0);
+
+    switch (opts?.format) {
+      case 'percent':
+        return pctText;
+      case 'value':
+        return valText;
+      case 'label-value':
+        return `${item.label} ${valText}`;
+      case 'label':
+        return item.label;
+      case 'label-percent':
+      default:
+        return `${item.label} ${pctText}`;
+    }
+  }
+
+  /**
+   * `position: 'inside'` 라벨의 중심 반지름 위치를 계산합니다.
+   * 순수 파이 차트는 중심부 밀집을 피하기 위해 기본 `0.62`, 도넛 차트는 링 중앙(`0.5`)을 사용합니다.
+   */
+  private resolveInsideLabelRadius(innerRadius: number, outerRadius: number): number {
+    const customRatio = this.labelOptions?.insideRadiusRatio;
+    if (typeof customRatio === 'number' && Number.isFinite(customRatio)) {
+      const clamped = Math.max(0.15, Math.min(0.9, customRatio));
+      return innerRadius + (outerRadius - innerRadius) * clamped;
+    }
+    if (innerRadius <= 0.5) {
+      return outerRadius * 0.62;
+    }
+    return (innerRadius + outerRadius) / 2;
+  }
+
+  /**
    * 데이터 라벨 및 리더 라인(Leader Line) 렌더링
    */
   private drawLabels(
@@ -516,13 +561,17 @@ export class PieSeries {
   ): void {
     const opts = this.labelOptions!;
     if (opts.position === 'none') return;
+    const minPct =
+      typeof opts.minPercentage === 'number' && Number.isFinite(opts.minPercentage)
+        ? Math.max(0, opts.minPercentage)
+        : 0.04;
 
     ctx.save();
     ctx.font = opts.font || '600 11px Pretendard, -apple-system, sans-serif';
 
     slices.forEach((slice, idx) => {
-      // 배경 트랙 조각이거나 4% 미만의 너무 작은 조각은 라벨 겹침 방지를 위해 스킵
-      if (slice.isTrack || slice.percentage < 0.04) return;
+      // 배경 트랙 조각이거나 최소 비율 미만의 너무 작은 조각은 라벨 겹침 방지를 위해 스킵
+      if (slice.isTrack || slice.percentage < minPct) return;
 
       const hoverRatio = resolveHoverRatio ? resolveHoverRatio(idx) : 0;
       const explodeDist = (this.styleOptions.hoverExplode ?? 10) * hoverRatio;
@@ -534,13 +583,14 @@ export class PieSeries {
       const cx = slice.cx + offsetX;
       const cy = slice.cy + offsetY;
 
-      const text = opts.formatter
-        ? opts.formatter(item, percentage)
-        : `${item.label} ${(percentage * 100).toFixed(0)}%`;
+      const text = this.formatLabelText(item, percentage);
 
       if (opts.position === 'inside') {
         // 1. 조각 내부 라벨
-        const r = (innerRadius + outerRadius) / 2;
+        const baseR = this.resolveInsideLabelRadius(innerRadius, outerRadius);
+        const insideOffset =
+          typeof opts.offset === 'number' && Number.isFinite(opts.offset) ? opts.offset - 4 : 0;
+        const r = Math.max(innerRadius + 4, Math.min(outerRadius - 4, baseR + insideOffset));
         const lx = cx + Math.cos(midAngle) * r;
         const ly = cy + Math.sin(midAngle) * r;
 
@@ -550,8 +600,10 @@ export class PieSeries {
         ctx.fillText(text, lx, ly);
       } else {
         // 2. 바깥쪽 가이드라인(Leader line) 라벨
+        const labelOffset =
+          typeof opts.offset === 'number' && Number.isFinite(opts.offset) ? Math.max(0, opts.offset) : 4;
         const lineStartRadius = outerRadius + 4;
-        const lineBreakRadius = outerRadius + 14;
+        const lineBreakRadius = outerRadius + 10 + labelOffset;
 
         const x0 = cx + Math.cos(midAngle) * lineStartRadius;
         const y0 = cy + Math.sin(midAngle) * lineStartRadius;
@@ -560,7 +612,7 @@ export class PieSeries {
         const y1 = cy + Math.sin(midAngle) * lineBreakRadius;
 
         const isRightSide = Math.cos(midAngle) >= 0;
-        const x2 = x1 + (isRightSide ? 14 : -14);
+        const x2 = x1 + (isRightSide ? 10 + Math.round(labelOffset * 0.5) : -(10 + Math.round(labelOffset * 0.5)));
         const y2 = y1;
 
         // 리더 라인 그리기
@@ -707,15 +759,20 @@ export class PieSeries {
     const lOpts = this.labelOptions;
     if (lOpts?.visible && lOpts.position !== 'none') {
       const font = lOpts.font || '600 11px Pretendard, sans-serif';
+      const minPct =
+        typeof lOpts.minPercentage === 'number' && Number.isFinite(lOpts.minPercentage)
+          ? Math.max(0, lOpts.minPercentage)
+          : 0.04;
       slices.forEach((slice) => {
-        if (slice.isTrack || slice.percentage < 0.04) return;
+        if (slice.isTrack || slice.percentage < minPct) return;
         const { midAngle, innerRadius, outerRadius, cx, cy, item, percentage } = slice;
-        const text = lOpts.formatter
-          ? lOpts.formatter(item, percentage)
-          : `${item.label} ${(percentage * 100).toFixed(0)}%`;
+        const text = this.formatLabelText(item, percentage);
 
         if (lOpts.position === 'inside') {
-          const r = (innerRadius + outerRadius) / 2;
+          const baseR = this.resolveInsideLabelRadius(innerRadius, outerRadius);
+          const insideOffset =
+            typeof lOpts.offset === 'number' && Number.isFinite(lOpts.offset) ? lOpts.offset - 4 : 0;
+          const r = Math.max(innerRadius + 4, Math.min(outerRadius - 4, baseR + insideOffset));
           const lx = cx + Math.cos(midAngle) * r;
           const ly = cy + Math.sin(midAngle) * r;
           labelEls.push(
@@ -731,14 +788,16 @@ export class PieSeries {
             })
           );
         } else {
+          const labelOffset =
+            typeof lOpts.offset === 'number' && Number.isFinite(lOpts.offset) ? Math.max(0, lOpts.offset) : 4;
           const lineStartRadius = outerRadius + 4;
-          const lineBreakRadius = outerRadius + 14;
+          const lineBreakRadius = outerRadius + 10 + labelOffset;
           const x0 = cx + Math.cos(midAngle) * lineStartRadius;
           const y0 = cy + Math.sin(midAngle) * lineStartRadius;
           const x1 = cx + Math.cos(midAngle) * lineBreakRadius;
           const y1 = cy + Math.sin(midAngle) * lineBreakRadius;
           const isRightSide = Math.cos(midAngle) >= 0;
-          const x2 = x1 + (isRightSide ? 14 : -14);
+          const x2 = x1 + (isRightSide ? 10 + Math.round(labelOffset * 0.5) : -(10 + Math.round(labelOffset * 0.5)));
           const y2 = y1;
 
           const parsedLeader = parseSvgColor(lOpts.color || '#676C75');

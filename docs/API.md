@@ -78,6 +78,7 @@
 | `bar.stacked` | `boolean` | `false` | `true`일 때 `mode: 'stacked'` 단축 설정 |
 | `bar.widthRatio` | `number` | `0.65` | 슬롯 대비 바(그룹) 너비 비율 (`0.05` ~ `1.0` 클램핑) |
 | `bar.groupGap` | `number` | `0.12` | 그룹형 모드 내 바 간격 비율 (`0.0` ~ `0.5` 클램핑) |
+| `bar.barGap` | `number` | - | 바 요소 사이 픽셀 간격 (px). `grouped`에서는 `widthRatio` 바 폭을 유지한 채 슬롯 여유 공간 내에서 바 간 간격 조절(`groupGap` 우선), `stacked`/`percent`에서는 누적 세그먼트 세로 간격 적용 |
 | `bar.fill` | `ColorAccessor` | `'#4F46E5'` | 단색, `GradientConfig`, 또는 `(item, index) => ColorStyle` |
 | `bar.borderRadius` | `number \| number[]` | `[4, 4, 0, 0]` | 4개 모서리 `[TL, TR, BR, BL]` 둥글기 (px) |
 | `bar.border` | `BarBorderStyle \| Callback` | - | `{ color, width, dash? }` 외곽선 |
@@ -114,7 +115,7 @@
 | `pie` / `donut` (`hoverExplode`) | `number` | `8` (일부 계산 `10` 폴백) | 호버 시 바깥으로 튀어나오는 거리 (px) |
 | `pie` / `donut` (`border`) | `{ color?: string; width?: number }` | - | 조각 외곽선 |
 | `pie` / `donut` (`cornerRadius`) | `number` | `0` | 타입 선언 존재 (현재 Canvas `ctx.arc` 렌더링에는 미적용) |
-| `labels` | `PieLabelOptions` / `DonutLabelOptions` | `visible: true`, `position: 'outside'` | `'outside' \| 'inside' \| 'none'`, `font`, `color`, `formatter` |
+| `labels` | `PieLabelOptions` / `DonutLabelOptions` | `visible: true`, `position: 'outside'`, `offset: 4`, `format: 'label-percent'` | `position` (`'outside' \| 'inside' \| 'none'`), `offset` (px), `format` (`'label-percent' \| 'percent' \| 'value' \| 'label-value' \| 'label'`), `minPercentage`(`0.04`), `insideRadiusRatio`(파이 `0.62` / 도넛 `0.5`), `font`, `color`, `formatter` |
 | `center` | `PieCenterContentOptions` / `DonutCenterContentOptions` | `title`: 합계/비율, `subtitle`: `'Total'` | 도넛(`innerRadius > 15`) 중앙 타이틀/서브타이틀, 폰트/색상, `renderCustom` |
 
 ### 3.4 `FunnelChartOptions` (`FunnelChart`)
@@ -132,7 +133,7 @@
 | `funnel.showConversion` | `boolean` | `true` | 단계별 전환율(`%`) 자동 표시 여부 |
 | `funnel.conversionBase` | `'previous' \| 'first'` | `'previous'` | 전환율 기준 (직전 단계 대비 / 1단계 대비) |
 | `funnel.border` | `{ color?: string; width?: number }` | - | 단계 외곽선 스타일 |
-| `labels` | `FunnelLabelOptions` | `visible: true`, `position: 'inside'` | `'inside' \| 'outside' \| 'none'`, `font`, `color`, `formatter` |
+| `labels` | `FunnelLabelOptions` | `visible: true`, `position: 'inside'`, `offset: 10` | `'inside' \| 'outside' \| 'none'`, `offset` (px), `font`, `color`, `formatter` |
 
 ---
 

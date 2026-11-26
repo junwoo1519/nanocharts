@@ -24,6 +24,63 @@
 
 ---
 
+## [2026-11-26 10:59] 전체 차트 라벨 위치·라벨 간격 독립 옵션 분리 (`요소 간격`과의 결합 해제)
+
+- **변경된 파일 목록:**
+  - 수정: `src/types/index.ts`, `src/series/PieSeries.ts`, `src/series/FunnelSeries.ts`, `figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`, `docs/API.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 기존 Figma 플러그인에서 `BarChart`·`LineChart`의 `labels.offset`이 하단 `요소 간격 (gap-slider)`에 묶여 있던 결합을 완전히 해제함.
+  - 라이브러리 `PieLabelOptions`와 `FunnelLabelOptions`에도 `offset?: number` (px) 옵션을 추가하고 `PieSeries` 및 `FunnelSeries`의 Canvas·SVG 렌더링에 반영함.
+  - Figma 플러그인 섹션 05(`범례 · 라벨 & 타이포그래피`)에 전체 5종 차트 공통으로 동작하는 `라벨 위치 (#label-pos-select)`와 `라벨 간격 (#label-offset-slider, 0~28px)` 컨트롤을 신설하고, Donut/Pie의 `라벨 표시 형식`도 함께 통합 배치함.
+  - `요소 간격 (gap-slider)`은 실제 바 간격(`barGap`)이 적용되는 다중 Bar 모드(`grouped`/`stacked`/`percent`)에서만 표시되도록 정리하고, 코드 내보내기·Dev Mode 코드젠(`code.ts`)·저장 상태 복원 로직을 모두 동기화함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 10:53] `BarSeries` 바 폭(`widthRatio`)과 요소 간격(`barGap`) 독립 계산으로 개선
+
+- **변경된 파일 목록:**
+  - 수정: `src/series/BarSeries.ts`, `src/types/index.ts`, `docs/API.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - Grouped 바 차트에서 `barGap` 증가 시 `barWidth`가 줄어들고, 단일 바 차트에서 `barGap`이 `widthRatio`를 침범하던 간섭 문제를 해결함.
+  - Grouped 모드에서 `barWidth`는 `widthRatio`로 독립 고정하고, `barGap`은 슬롯 여유 공간(`rawWidth - 2 - barWidth * seriesCount`) 내에서만 인접 그룹과 겹치지 않게 간격을 확장하도록 변경함.
+  - 단일 바 모드(`getBarGeometry`)에서는 `barGap` 차감을 제거하여 `widthRatio`가 순수하게 바 폭만 제어하도록 분리함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 10:49] Bar 차트 픽셀 요소 간격(`bar.barGap`) 구현 및 Figma 플러그인 `요소 간격` 슬라이더 연동 수정
+
+- **변경된 파일 목록:**
+  - 수정: `src/types/index.ts`, `src/series/BarSeries.ts`, `figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`, `docs/API.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 기존 Figma 플러그인의 `요소 간격 (gap-slider)` 값이 `BarChart`의 `bar` 옵션으로 전달되지 않고 `labels.offset`(4~12px 클램핑)에만 연결되어 있어 바 간격이 변하지 않던 문제를 원인 파악 후 수정함.
+  - `BarStyleOptions.barGap?: number` (px 단위) 옵션을 추가하고 `BarSeries`의 `getBarGeometry()`(단일 바) 및 `getMultiBarGeometriesAtSlot()`(Grouped: 그룹 내 바 간 픽셀 간격, Stacked/Percent: 누적 세그먼트 간 세로 픽셀 간격, 최소 바 너비/높이 2px 안전 클램핑)에 적용함.
+  - Figma 플러그인 `GAP_STEPS`에 `0px` 단계를 추가하고, `renderPreview()`·코드 내보내기·Dev Mode 코드젠(`code.ts`)에 `bar.barGap`을 동기화함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 10:38] 도넛·파이 차트 라벨 내부 표시 및 커스텀 형식 옵션 추가 (`PieSeries` + Figma 플러그인)
+
+- **변경된 파일 목록:**
+  - 수정: `src/types/index.ts`, `src/series/PieSeries.ts`, `figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`, `docs/API.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - `PieLabelOptions`에 `format` (`'label-percent' | 'percent' | 'value' | 'label-value' | 'label'`), `minPercentage` (기본 `0.04`), `insideRadiusRatio` (순수 파이 기본 `0.62` / 도넛 기본 `0.5`) 옵션을 추가하여 라벨 포맷과 차트 내부 라벨 배치를 세밀하게 커스텀할 수 있도록 확장함.
+  - `PieSeries`의 Canvas(`drawLabels`) 및 SVG(`toSvgElements`) 렌더링에 `formatLabelText()`와 `resolveInsideLabelRadius()`를 통합 적용함.
+  - Figma 플러그인(`figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`)의 Donut/Pie 컨트롤에 `라벨 표시 위치`(`차트 바깥쪽 (Outside)` / `차트 조각 안쪽 (Inside)` / `숨김 (None)`) 및 `라벨 표시 형식` 5종 선택 UI를 추가하고, 프리뷰·코드 내보내기·Dev Mode 코드젠·저장 상태 복원에 모두 동기화함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
 ## [2026-11-26 10:01] `DonutChart` / `PieChart` 라이브러리 클래스 및 Figma 플러그인 UI 완전 분리
 
 - **변경된 파일 목록:**

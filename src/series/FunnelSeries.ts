@@ -351,16 +351,22 @@ export class FunnelSeries {
             : `${stage.item.label} · ${valStr}`;
 
         if (lOpts.position === 'outside') {
+          const labelOffset =
+            typeof lOpts.offset === 'number' && Number.isFinite(lOpts.offset)
+              ? Math.max(0, lOpts.offset)
+              : direction === 'horizontal'
+                ? 8
+                : 10;
           ctx.fillStyle = resolveTokenColor(lOpts.color || '#64748B');
           if (direction === 'horizontal') {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText(text, stage.cx, stage.y + stage.height + 8);
+            ctx.fillText(text, stage.cx, stage.y + stage.height + labelOffset);
           } else {
             const rightEdge = Math.max(stage.points[1].x, stage.points[2].x);
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, rightEdge + 10, stage.cy);
+            ctx.fillText(text, rightEdge + labelOffset, stage.cy);
           }
         } else {
           ctx.fillStyle = resolveTokenColor(lOpts.color || '#FFFFFF');
@@ -437,13 +443,19 @@ export class FunnelSeries {
             : `${stage.item.label} · ${valStr}`;
 
         if (lOpts.position === 'outside') {
+          const labelOffset =
+            typeof lOpts.offset === 'number' && Number.isFinite(lOpts.offset)
+              ? Math.max(0, lOpts.offset)
+              : direction === 'horizontal'
+                ? 8
+                : 10;
           const fill = lOpts.color || '#64748B';
           if (direction === 'horizontal') {
             labelEls.push(
               svgTextElement({
                 id: `Label: ${stage.item.label}`,
                 x: stage.cx,
-                y: stage.y + stage.height + 8,
+                y: stage.y + stage.height + labelOffset,
                 text,
                 font,
                 fill,
@@ -456,7 +468,7 @@ export class FunnelSeries {
             labelEls.push(
               svgTextElement({
                 id: `Label: ${stage.item.label}`,
-                x: rightEdge + 10,
+                x: rightEdge + labelOffset,
                 y: stage.cy,
                 text,
                 font,

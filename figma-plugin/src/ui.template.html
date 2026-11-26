@@ -978,30 +978,21 @@
                 </select>
               </div>
             </div>
-            <div class="row-2">
-              <div class="field">
-                <label>단계 간격 <span class="val-badge" id="funnel-gap-txt">4px</span></label>
-                <div class="slider-box">
-                  <input type="range" id="funnel-gap-slider" min="0" max="6" value="2" step="1" />
-                </div>
-              </div>
-              <div class="field">
-                <label>라벨 표시 위치</label>
-                <select id="funnel-label-pos">
-                  <option value="inside">도형 내부 (Inside)</option>
-                  <option value="outside">바깥 측면 (Outside)</option>
-                </select>
+            <div class="field">
+              <label>단계 간격 <span class="val-badge" id="funnel-gap-txt">4px</span></label>
+              <div class="slider-box">
+                <input type="range" id="funnel-gap-slider" min="0" max="6" value="2" step="1" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- [05] 범례(12방향) & 타이포그래피 -->
+      <!-- [05] 범례(12방향) · 라벨 & 타이포그래피 -->
       <section class="option-card">
         <div class="section-header">
-          <div class="section-title"><span class="section-num">05</span>범례(12방향) & 타이포그래피</div>
-          <span class="section-sub">Legend & Font</span>
+          <div class="section-title"><span class="section-num">05</span>범례 · 라벨 & 타이포그래피</div>
+          <span class="section-sub">Legend, Label & Font</span>
         </div>
         <div class="section-body">
           <div class="row-2">
@@ -1058,6 +1049,34 @@
                 <option value="700">Bold (700)</option>
               </select>
             </div>
+          </div>
+
+          <div class="sub-divider"></div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>라벨 위치 (Label Position)</label>
+              <select id="label-pos-select">
+                <option value="auto" selected>자동 (기본)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>라벨 간격 <span class="val-badge" id="label-offset-txt">8px</span></label>
+              <div class="slider-box">
+                <input type="range" id="label-offset-slider" min="0" max="28" value="8" step="1" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="pie-label-format-field" style="display:none;">
+            <label>라벨 표시 형식 (Donut / Pie)</label>
+            <select id="pie-label-format">
+              <option value="label-percent" selected>이름 + 비율 (1월 24%)</option>
+              <option value="percent">비율만 (24%)</option>
+              <option value="value">수치만 (120)</option>
+              <option value="label-value">이름 + 수치 (1월 120)</option>
+              <option value="label">이름만 (1월)</option>
+            </select>
           </div>
         </div>
       </section>
@@ -1121,7 +1140,7 @@
             <div class="field" id="gap-field">
               <label>요소 간격 <span class="val-badge" id="gap-txt">8px</span></label>
               <div class="slider-box">
-                <input type="range" id="gap-slider" min="0" max="11" value="3" step="1" />
+                <input type="range" id="gap-slider" min="0" max="12" value="4" step="1" />
               </div>
             </div>
           </div>
@@ -1304,6 +1323,11 @@
       piePadDeg: 1.5,
       pieMaxValue: 0,
       pieTrackToken: 'auto',
+      barLabelPos: 'auto',
+      lineLabelPos: 'top-outside',
+      pieLabelPos: 'outside',
+      pieLabelFormat: 'label-percent',
+      labelOffset: 8,
       funnelDirection: 'vertical',
       funnelShape: 'trapezoid',
       funnelGap: 4,
@@ -1681,6 +1705,65 @@
       return { xLabels, singleData, multiSeries, palette };
     }
 
+    const LABEL_POS_OPTIONS_BY_TYPE = {
+      bar: [
+        { value: 'auto', label: '자동 (기본)' },
+        { value: 'top-outside', label: '바 상단 바깥 (top-outside)' },
+        { value: 'inside-top', label: '바 내부 상단 (inside-top)' },
+        { value: 'inside-center', label: '바 내부 중앙 (inside-center)' },
+        { value: 'inside-bottom', label: '바 내부 하단 (inside-bottom)' },
+        { value: 'bottom-outside', label: '바 하단 바깥 (bottom-outside)' },
+        { value: 'none', label: '숨김 (none)' },
+      ],
+      line: [
+        { value: 'top-outside', label: '포인트 위 (top-outside)' },
+        { value: 'bottom-outside', label: '포인트 아래 (bottom-outside)' },
+        { value: 'none', label: '숨김 (none)' },
+      ],
+      donut: [
+        { value: 'outside', label: '차트 바깥쪽 (outside)' },
+        { value: 'inside', label: '차트 조각 안쪽 (inside)' },
+        { value: 'none', label: '숨김 (none)' },
+      ],
+      pie: [
+        { value: 'outside', label: '차트 바깥쪽 (outside)' },
+        { value: 'inside', label: '차트 조각 안쪽 (inside)' },
+        { value: 'none', label: '숨김 (none)' },
+      ],
+      funnel: [
+        { value: 'inside', label: '도형 내부 (inside)' },
+        { value: 'outside', label: '바깥 측면 (outside)' },
+        { value: 'none', label: '숨김 (none)' },
+      ],
+    };
+
+    function getCurrentLabelPositionValue() {
+      if (state.chartType === 'bar') return state.barLabelPos || 'auto';
+      if (state.chartType === 'line') return state.lineLabelPos || 'top-outside';
+      if (state.chartType === 'funnel') return state.funnelLabelPos || 'inside';
+      return state.pieLabelPos || 'outside';
+    }
+
+    function syncLabelPositionSelect() {
+      const sel = document.getElementById('label-pos-select');
+      if (!sel) return;
+      const opts = LABEL_POS_OPTIONS_BY_TYPE[state.chartType] || LABEL_POS_OPTIONS_BY_TYPE.bar;
+      const curVal = getCurrentLabelPositionValue();
+      const validVal = opts.some((o) => o.value === curVal) ? curVal : opts[0].value;
+      sel.innerHTML = opts
+        .map((o) => `<option value="${o.value}" ${o.value === validVal ? 'selected' : ''}>${o.label}</option>`)
+        .join('');
+    }
+
+    function resolveEffectiveBarLabelPos(mode) {
+      if (state.barLabelPos && state.barLabelPos !== 'auto') return state.barLabelPos;
+      return mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside';
+    }
+
+    function isInsideBarLabelPos(pos) {
+      return pos === 'inside-top' || pos === 'inside-center' || pos === 'inside-bottom';
+    }
+
     function updateControlVisibility() {
       const isBar = state.chartType === 'bar';
       const isLine = state.chartType === 'line';
@@ -1701,7 +1784,11 @@
       if (pieGapRow) pieGapRow.style.gridTemplateColumns = isDonut ? '' : '1fr';
       document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
       document.getElementById('grid-controls').style.display = isBar || isLine ? '' : 'none';
-      const showElementGap = isBar || isLine;
+      const pieLabelFormatField = document.getElementById('pie-label-format-field');
+      if (pieLabelFormatField) pieLabelFormatField.style.display = isCircular ? '' : 'none';
+      syncLabelPositionSelect();
+
+      const showElementGap = isBar && state.seriesMode !== 'single';
       const gapFieldEl = document.getElementById('gap-field');
       const spacingRowEl = document.getElementById('spacing-row');
       if (gapFieldEl) gapFieldEl.style.display = showElementGap ? '' : 'none';
@@ -1837,6 +1924,8 @@
 
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
 
+      const labelOffsetVal = state.labelOffset ?? 8;
+
       if (state.chartType === 'bar') {
         const mode =
           state.seriesMode === 'stacked'
@@ -1844,6 +1933,7 @@
             : state.seriesMode === 'percent'
               ? 'percent'
               : 'grouped';
+        const barLabelPos = resolveEffectiveBarLabelPos(mode);
 
         activeChart = new BarChart(containerEl, {
           data: isMulti ? undefined : singleData,
@@ -1856,15 +1946,16 @@
           bar: {
             mode,
             widthRatio: state.widthRatio,
+            barGap: state.gapPx ?? 0,
             borderRadius: [state.radius, state.radius, 0, 0],
             fill: palette[0],
           },
           legend: legendOpt,
           labels: {
-            visible: state.showLabels,
-            position: mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside',
-            color: mode === 'stacked' || mode === 'percent' ? insideLabelHex : strongTextHex,
-            offset: Math.max(4, Math.min(12, state.gapPx ?? 6)),
+            visible: state.showLabels && barLabelPos !== 'none',
+            position: barLabelPos,
+            color: isInsideBarLabelPos(barLabelPos) ? insideLabelHex : strongTextHex,
+            offset: labelOffsetVal,
           },
           grid: gridOpt,
           xAxis: { labelColor: labelHex, color: axisLineHex },
@@ -1875,6 +1966,7 @@
         });
       } else if (state.chartType === 'line') {
         const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
+        const lineLabelPos = state.lineLabelPos || 'top-outside';
         activeChart = new LineChart(containerEl, {
           data: isMulti ? undefined : singleData,
           series: isMulti ? multiSeries : undefined,
@@ -1901,16 +1993,17 @@
           },
           legend: legendOpt,
           labels: {
-            visible: state.showLabels,
-            position: 'top-outside',
+            visible: state.showLabels && lineLabelPos !== 'none',
+            position: lineLabelPos,
             color: strongTextHex,
-            offset: Math.max(4, Math.min(14, state.gapPx ?? 8)),
+            offset: labelOffsetVal,
           },
           grid: gridOpt,
           xAxis: { labelColor: labelHex, color: axisLineHex },
           yAxis: { labelColor: labelHex },
         });
       } else if (state.chartType === 'funnel') {
+        const funnelLabelPos = state.funnelLabelPos || 'inside';
         activeChart = new FunnelChart(containerEl, {
           data: singleData,
           padding: padOpt,
@@ -1926,9 +2019,10 @@
             showConversion: true,
           },
           labels: {
-            visible: state.showLabels,
-            position: state.funnelLabelPos,
-            color: state.funnelLabelPos === 'inside' ? insideLabelHex : strongTextHex,
+            visible: state.showLabels && funnelLabelPos !== 'none',
+            position: funnelLabelPos,
+            offset: labelOffsetVal,
+            color: funnelLabelPos === 'inside' ? insideLabelHex : strongTextHex,
           },
           legend: legendOpt,
         });
@@ -1937,6 +2031,8 @@
         const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
         const sliceGapVal = state.pieSliceGap ?? 3;
         const padRad = ((state.piePadDeg ?? 1.5) * Math.PI) / 180;
+        const labelPos = state.pieLabelPos || 'outside';
+        const labelFormat = state.pieLabelFormat || 'label-percent';
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -1971,9 +2067,11 @@
                 }
               : undefined,
           labels: {
-            visible: state.showLabels,
-            position: 'outside',
-            color: strongTextHex,
+            visible: state.showLabels && labelPos !== 'none',
+            position: labelPos,
+            offset: labelOffsetVal,
+            format: labelFormat,
+            color: labelPos === 'inside' ? insideLabelHex : strongTextHex,
           },
           legend: legendOpt,
         });
@@ -1981,6 +2079,8 @@
         const isPxGap = (state.pieGapMode || 'px') === 'px';
         const sliceGapVal = state.pieSliceGap ?? 0;
         const padRad = ((state.piePadDeg ?? 0) * Math.PI) / 180;
+        const labelPos = state.pieLabelPos || 'outside';
+        const labelFormat = state.pieLabelFormat || 'label-percent';
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -2003,9 +2103,11 @@
             colors: palette,
           },
           labels: {
-            visible: state.showLabels,
-            position: 'outside',
-            color: strongTextHex,
+            visible: state.showLabels && labelPos !== 'none',
+            position: labelPos,
+            offset: labelOffsetVal,
+            format: labelFormat,
+            color: labelPos === 'inside' ? insideLabelHex : strongTextHex,
           },
           legend: legendOpt,
         });
@@ -2206,6 +2308,7 @@
     ];
 
     const GAP_STEPS = [
+      { token: '', label: '0px', px: 0 },
       { token: 'gap/gap-0_5', label: '2px', px: 2 },
       { token: 'gap/gap-1', label: '4px', px: 4 },
       { token: 'gap/gap-1_5', label: '6px', px: 6 },
@@ -2334,6 +2437,27 @@
       renderPreview();
     });
 
+    document.getElementById('label-pos-select').addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (state.chartType === 'bar') state.barLabelPos = val;
+      else if (state.chartType === 'line') state.lineLabelPos = val;
+      else if (state.chartType === 'funnel') state.funnelLabelPos = val;
+      else state.pieLabelPos = val;
+      renderPreview();
+    });
+
+    document.getElementById('label-offset-slider').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10) || 0;
+      state.labelOffset = val;
+      document.getElementById('label-offset-txt').innerText = `${val}px`;
+      renderPreview();
+    });
+
+    document.getElementById('pie-label-format').addEventListener('change', (e) => {
+      state.pieLabelFormat = e.target.value;
+      renderPreview();
+    });
+
     document.getElementById('funnel-dir-select').addEventListener('change', (e) => {
       state.funnelDirection = e.target.value;
       renderPreview();
@@ -2368,11 +2492,6 @@
       state.gapToken = item.token;
       state.gapPx = item.px;
       document.getElementById('gap-txt').innerText = item.label;
-      renderPreview();
-    });
-
-    document.getElementById('funnel-label-pos').addEventListener('change', (e) => {
-      state.funnelLabelPos = e.target.value;
       renderPreview();
     });
 
@@ -2557,6 +2676,8 @@
         `  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`
       );
 
+      const labelOffsetVal = state.labelOffset ?? 8;
+
       if (state.chartType === 'bar') {
         className = 'BarChart';
         const mode =
@@ -2565,7 +2686,7 @@
             : state.seriesMode === 'percent'
               ? 'percent'
               : 'grouped';
-        const labelOffset = Math.max(4, Math.min(12, state.gapPx ?? 6));
+        const barLabelPos = resolveEffectiveBarLabelPos(mode);
 
         if (isMulti) {
           optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
@@ -2575,11 +2696,11 @@
         }
 
         optionsLines.push(
-          `  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // 4.Radius: ${state.radiusToken} (${state.radius}px)\n    fill: '${cssTokens[0]}', // ${tokenList[0]}\n  },`
+          `  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    barGap: ${state.gapPx ?? 0}, // 5.Spacing: ${state.gapToken || 'none'}\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // 4.Radius: ${state.radiusToken} (${state.radius}px)\n    fill: '${cssTokens[0]}', // ${tokenList[0]}\n  },`
         );
         optionsLines.push(legendCode);
         optionsLines.push(
-          `  labels: {\n    visible: ${state.showLabels},\n    position: '${mode === 'stacked' || mode === 'percent' ? 'inside-center' : 'top-outside'}',\n    color: '${mode === 'stacked' || mode === 'percent' ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffset}, // 5.Spacing: ${state.gapToken}\n  },`
+          `  labels: {\n    visible: ${state.showLabels && barLabelPos !== 'none'},\n    position: '${barLabelPos}',\n    color: '${isInsideBarLabelPos(barLabelPos) ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`
         );
         optionsLines.push(gridCode);
         optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
@@ -2591,7 +2712,7 @@
       } else if (state.chartType === 'line') {
         className = 'LineChart';
         const isStacked = state.seriesMode === 'stacked' || state.seriesMode === 'percent';
-        const labelOffset = Math.max(4, Math.min(14, state.gapPx ?? 8));
+        const lineLabelPos = state.lineLabelPos || 'top-outside';
 
         if (isMulti) {
           optionsLines.push(`  xLabels: ${JSON.stringify(xLabels)},`);
@@ -2610,19 +2731,20 @@
         );
         optionsLines.push(legendCode);
         optionsLines.push(
-          `  labels: {\n    visible: ${state.showLabels},\n    position: 'top-outside',\n    color: '${strongTextToken}',\n    offset: ${labelOffset}, // 5.Spacing: ${state.gapToken}\n  },`
+          `  labels: {\n    visible: ${state.showLabels && lineLabelPos !== 'none'},\n    position: '${lineLabelPos}',\n    color: '${strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`
         );
         optionsLines.push(gridCode);
         optionsLines.push(`  xAxis: { labelColor: '${labelToken}', color: '${axisLineToken}' },`);
         optionsLines.push(`  yAxis: { labelColor: '${labelToken}' },`);
       } else if (state.chartType === 'funnel') {
         className = 'FunnelChart';
+        const funnelLabelPos = state.funnelLabelPos || 'inside';
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(
           `  funnel: {\n    direction: '${state.funnelDirection}',\n    shape: '${state.funnelShape}',\n    gap: ${state.funnelGap}, // 5.Spacing: ${state.funnelGapToken}\n    borderRadius: ${state.radius}, // 4.Radius: ${state.radiusToken}\n    colors: ${JSON.stringify(cssTokens)},\n    showConversion: true,\n  },`
         );
         optionsLines.push(
-          `  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
+          `  labels: {\n    visible: ${state.showLabels && funnelLabelPos !== 'none'},\n    position: '${funnelLabelPos}',\n    offset: ${labelOffsetVal},\n    color: '${funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
         );
         optionsLines.push(legendCode);
       } else if (state.chartType === 'donut') {
@@ -2631,6 +2753,9 @@
         const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
         const sliceGapVal = state.pieSliceGap ?? 3;
         const padRad = Number((((state.piePadDeg ?? 1.5) * Math.PI) / 180).toFixed(4));
+        const labelPos = state.pieLabelPos || 'outside';
+        const labelFormat = state.pieLabelFormat || 'label-percent';
+        const labelColorToken = labelPos === 'inside' ? insideLabelToken : strongTextToken;
         const gapCodeLine = isPxGap
           ? `    sliceGap: ${sliceGapVal},`
           : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 1.5}°`;
@@ -2656,7 +2781,7 @@
           );
         }
         optionsLines.push(
-          `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+          `  labels: {\n    visible: ${state.showLabels && labelPos !== 'none'},\n    position: '${labelPos}',\n    offset: ${labelOffsetVal},\n    format: '${labelFormat}',\n    color: '${labelColorToken}',\n  },`
         );
         optionsLines.push(legendCode);
       } else {
@@ -2664,6 +2789,9 @@
         const isPxGap = (state.pieGapMode || 'px') === 'px';
         const sliceGapVal = state.pieSliceGap ?? 0;
         const padRad = Number((((state.piePadDeg ?? 0) * Math.PI) / 180).toFixed(4));
+        const labelPos = state.pieLabelPos || 'outside';
+        const labelFormat = state.pieLabelFormat || 'label-percent';
+        const labelColorToken = labelPos === 'inside' ? insideLabelToken : strongTextToken;
         const gapCodeLine = isPxGap
           ? `    sliceGap: ${sliceGapVal},`
           : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 0}°`;
@@ -2682,7 +2810,7 @@
             : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
         );
         optionsLines.push(
-          `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+          `  labels: {\n    visible: ${state.showLabels && labelPos !== 'none'},\n    position: '${labelPos}',\n    offset: ${labelOffsetVal},\n    format: '${labelFormat}',\n    color: '${labelColorToken}',\n  },`
         );
         optionsLines.push(legendCode);
       }
@@ -2969,6 +3097,11 @@
           document.getElementById('pie-max-txt').innerText =
             state.pieMaxValue && state.pieMaxValue > 0 ? `${state.pieMaxValue}` : '자동 합계';
           document.getElementById('pie-track-select').value = state.pieTrackToken || 'auto';
+          document.getElementById('pie-label-format').value = state.pieLabelFormat || 'label-percent';
+          const restoredLabelOffset = state.labelOffset ?? 8;
+          state.labelOffset = restoredLabelOffset;
+          document.getElementById('label-offset-slider').value = restoredLabelOffset;
+          document.getElementById('label-offset-txt').innerText = `${restoredLabelOffset}px`;
           document.getElementById('funnel-dir-select').value = state.funnelDirection || 'vertical';
           document.getElementById('funnel-shape-select').value = state.funnelShape || 'trapezoid';
           const fGapIdx = Math.max(
@@ -2989,10 +3122,9 @@
             0,
             GAP_STEPS.findIndex((s) => s.px === (state.gapPx ?? 8) || s.token === state.gapToken)
           );
-          const gapItem = GAP_STEPS[gapIdx] || GAP_STEPS[3];
+          const gapItem = GAP_STEPS[gapIdx] || GAP_STEPS[4];
           document.getElementById('gap-slider').value = gapIdx;
           document.getElementById('gap-txt').innerText = gapItem.label;
-          document.getElementById('funnel-label-pos').value = state.funnelLabelPos || 'inside';
           document.getElementById('legend-pos-select').value = state.legendPos || 'top-right';
           document.getElementById('font-family-select').value = state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
           document.getElementById('custom-font-input').value = state.customFontFamily || '';
