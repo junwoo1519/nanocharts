@@ -24,6 +24,19 @@
 
 ---
 
+## [2026-11-26 11:31] Figma 플러그인 사이드바 체크박스를 토글 스위치 UI로 교체
+
+- **변경된 파일 목록:**
+  - 수정: `figma-plugin/src/ui.template.html`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 기존 기본 체크박스(`.checkbox-row`)를 좌측 라벨 + 우측 필형 토글 스위치(`appearance: none` + 슬라이딩 썸) 형태로 변경하여 ON/OFF 상태 가시성을 높임.
+  - 활성화된 항목(`:has(input:checked)`)에 연한 블루 틴트 배경(`#F0F6FF`)과 테두리(`#BFDBFE`), 볼드 텍스트를 적용해 켜져 있는 옵션을 한눈에 구분할 수 있도록 개선함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 해당 없음 (플러그인 UI 컴포넌트 스타일 개선)
+- **다음 세션 주의사항:** 없음
+
+---
+
 ## [2026-11-26 11:27] Figma 플러그인 좌측 사이드바 목차(TOC) · 목적별 카드 위계 및 차트 유형별 시인성 개편
 
 - **변경된 파일 목록:**
