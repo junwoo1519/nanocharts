@@ -43,7 +43,7 @@
 
 ---
 
-## 2. 공통 Props (4종 차트 공통)
+## 2. 공통 Props (5종 차트 공통)
 
 모든 차트 생성자는 `new XxxChart(container: string | HTMLElement, options: XxxChartOptions)` 시그니처를 가집니다.
 
@@ -98,22 +98,24 @@
 | `labels` | `DataLabelOptions` | `visible: false`, `offset: 8` | 포인트 상/하단 라벨 (`visibleCount <= 45`일 때 표시) |
 | `samplingThreshold` | `number \| false` | `600` | LTTB 다운샘플링 임계치 (`0` 또는 `false` 시 비활성화, `stacked`에서는 자동 비활성화) |
 
-### 3.3 `PieChartOptions` (`PieChart`)
+### 3.3 `PieChartOptions` (`PieChart`) & `DonutChartOptions` (`DonutChart`)
+
+> **`PieChart` vs `DonutChart`**: 순수 파이 차트는 `PieChart`(`pie` 옵션, 기본 `innerRadiusRatio: 0`), 도넛 차트는 `DonutChart`(`donut` 옵션, 기본 `innerRadiusRatio: 0.6` 및 `center` 요약 텍스트)로 분리되어 있습니다. `PieChart`에 `pie.innerRadiusRatio`를 지정하는 기존 방식도 하위 호환으로 계속 지원됩니다.
 
 | 옵션명 | 타입 | 기본값 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `data` | `DataItem[]` | (필수) | 조각 데이터 배열 |
-| `pie.innerRadiusRatio` | `number` | `0` | 도넛 내부 구멍 비율 (`0.0` ~ `0.85` 클램핑) |
-| `pie.maxValue` | `number` | - | 100%(360°) 기준 목표 최대값 (잔여 영역 트랙 자동 생성) |
-| `pie.trackColor` | `string` | `'var(--surface-low)'` (`maxValue` 지정 시) | 잔여 영역 배경 트랙 색상 (`'transparent'`/`'none'` 시 숨김) |
-| `pie.padAngle` | `number` | 도넛 `0.02`, 파이 `0` | 조각 사이 여백 각도 (라디안) |
-| `pie.sliceGap` | `number` | - | 조각 사이 일정한 평행 픽셀 간격 (px). 지정 시 `padAngle`보다 우선 적용되어 안쪽~바깥쪽이 동일한 폭으로 분리됨 |
-| `pie.colors` | `string[] \| ((item, index) => string)` | `DEFAULT_PALETTE` | 조각 팔레트 또는 동적 색상 함수 |
-| `pie.hoverExplode` | `number` | `8` (일부 계산 `10` 폴백) | 호버 시 바깥으로 튀어나오는 거리 (px) |
-| `pie.border` | `{ color?: string; width?: number }` | - | 조각 외곽선 |
-| `pie.cornerRadius` | `number` | `0` | 타입 선언 존재 (현재 Canvas `ctx.arc` 렌더링에는 미적용) |
-| `labels` | `PieLabelOptions` | `visible: true`, `position: 'outside'` | `'outside' \| 'inside' \| 'none'`, `font`, `color`, `formatter` |
-| `center` | `PieCenterContentOptions` | `title`: 합계/비율, `subtitle`: `'Total'` | 도넛(`innerRadius > 15`) 중앙 타이틀/서브타이틀, 폰트/색상, `renderCustom` |
+| `pie` / `donut` (`innerRadiusRatio`) | `number` | `PieChart`: `0` / `DonutChart`: `0.6` | 도넛 내부 구멍 비율 (`0.0` ~ `0.85` 클램핑, `DonutChart`는 0 이하 지정 시 `0.6` 폴백) |
+| `pie` / `donut` (`maxValue`) | `number` | - | 100%(360°) 기준 목표 최대값 (잔여 영역 트랙 자동 생성) |
+| `pie` / `donut` (`trackColor`) | `string` | `'var(--surface-low)'` (`maxValue` 지정 시) | 잔여 영역 배경 트랙 색상 (`'transparent'`/`'none'` 시 숨김) |
+| `pie` / `donut` (`padAngle`) | `number` | 도넛 `0.02`, 파이 `0` | 조각 사이 여백 각도 (라디안) |
+| `pie` / `donut` (`sliceGap`) | `number` | - | 조각 사이 일정한 평행 픽셀 간격 (px). 지정 시 `padAngle`보다 우선 적용되어 안쪽~바깥쪽이 동일한 폭으로 분리됨 |
+| `pie` / `donut` (`colors`) | `string[] \| ((item, index) => string)` | `DEFAULT_PALETTE` | 조각 팔레트 또는 동적 색상 함수 |
+| `pie` / `donut` (`hoverExplode`) | `number` | `8` (일부 계산 `10` 폴백) | 호버 시 바깥으로 튀어나오는 거리 (px) |
+| `pie` / `donut` (`border`) | `{ color?: string; width?: number }` | - | 조각 외곽선 |
+| `pie` / `donut` (`cornerRadius`) | `number` | `0` | 타입 선언 존재 (현재 Canvas `ctx.arc` 렌더링에는 미적용) |
+| `labels` | `PieLabelOptions` / `DonutLabelOptions` | `visible: true`, `position: 'outside'` | `'outside' \| 'inside' \| 'none'`, `font`, `color`, `formatter` |
+| `center` | `PieCenterContentOptions` / `DonutCenterContentOptions` | `title`: 합계/비율, `subtitle`: `'Total'` | 도넛(`innerRadius > 15`) 중앙 타이틀/서브타이틀, 폰트/색상, `renderCustom` |
 
 ### 3.4 `FunnelChartOptions` (`FunnelChart`)
 
@@ -157,19 +159,19 @@
 
 | 메서드 | 지원 차트 | 설명 |
 | :--- | :--- | :--- |
-| `update(partialOptions)` | 전체 4종 | 데이터/스타일/범례/여백 동적 갱신 및 리렌더링 |
-| `resize(width, height)` | 전체 4종 | 캔버스 크기 수동 재설정 및 `'resize'` 이벤트 발행 |
-| `render(animate?: boolean)` | 전체 4종 | 전체 레이어 수동 리렌더링 |
-| `replayAnimation()` | 전체 4종 | 등장 애니메이션 처음부터 재실행 |
+| `update(partialOptions)` | 전체 5종 | 데이터/스타일/범례/여백 동적 갱신 및 리렌더링 |
+| `resize(width, height)` | 전체 5종 | 캔버스 크기 수동 재설정 및 `'resize'` 이벤트 발행 |
+| `render(animate?: boolean)` | 전체 5종 | 전체 레이어 수동 리렌더링 |
+| `replayAnimation()` | 전체 5종 | 등장 애니메이션 처음부터 재실행 |
 | `resetZoom()` | `BarChart`, `LineChart` | 줌/팬 뷰포트를 전체 데이터 범위로 초기화 |
-| `getEffectivePadding(w?, h?)` | 전체 4종 | 반응형 및 범례 예약 여백이 합산된 최종 `Padding` 반환 |
-| `toSVG(exportOptions?: SvgExportOptions)` | 전체 4종 | Figma 호환 순수 벡터 SVG XML 문자열 반환 |
-| `on(event, handler)` / `off(event, handler)` | 전체 4종 | 이벤트 구독 (`on`은 구독 해제 함수 반환) 및 해제 |
-| `destroy()` | 전체 4종 | `ResizeObserver`, `window` 리스너, rAF, DOM 요소, 이벤트 완전 해제 |
+| `getEffectivePadding(w?, h?)` | 전체 5종 | 반응형 및 범례 예약 여백이 합산된 최종 `Padding` 반환 |
+| `toSVG(exportOptions?: SvgExportOptions)` | 전체 5종 | Figma 호환 순수 벡터 SVG XML 문자열 반환 |
+| `on(event, handler)` / `off(event, handler)` | 전체 5종 | 이벤트 구독 (`on`은 구독 해제 함수 반환) 및 해제 |
+| `destroy()` | 전체 5종 | `ResizeObserver`, `window` 리스너, rAF, DOM 요소, 이벤트 완전 해제 |
 
 ### 5.2 이벤트 맵
 
-| 이벤트명 | `BarChart` | `LineChart` | `PieChart` | `FunnelChart` |
+| 이벤트명 | `BarChart` | `LineChart` | `PieChart` / `DonutChart` | `FunnelChart` |
 | :--- | :--- | :--- | :--- | :--- |
 | `'hover'` | `{ item, index, seriesKey?, geometry } \| null` | `{ item, index, seriesKey?, point } \| null` | `{ item, index, slice } \| null` | `{ item, index, stage } \| null` |
 | `'resize'` | `{ width, height, isCompact }` | `{ width, height, isCompact }` | `{ width, height, isCompact }` | `{ width, height, isCompact }` |

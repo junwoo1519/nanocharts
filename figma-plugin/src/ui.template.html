@@ -12,8 +12,8 @@
     }
     body {
       font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0B0F19;
-      color: #E2E8F0;
+      background: #FFFFFF;
+      color: #111111;
       height: 100vh;
       display: flex;
       overflow: hidden;
@@ -24,8 +24,8 @@
       width: 400px;
       min-width: 320px;
       max-width: 580px;
-      background: #111622;
-      border-right: 1px solid #232D3F;
+      background: #FFFFFF;
+      border-right: 1px solid #E5E5E5;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -42,12 +42,12 @@
       z-index: 30;
     }
     .sidebar-splitter:hover {
-      background: rgba(56, 189, 248, 0.35);
+      background: rgba(34, 108, 255, 0.25);
     }
     .sidebar-header {
       padding: 13px 18px;
-      background: #111622;
-      border-bottom: 1px solid #232D3F;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -56,15 +56,15 @@
     .sidebar-header h1 {
       font-size: 14px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       display: flex;
       align-items: center;
       gap: 7px;
     }
     .badge {
       font-size: 10px;
-      background: linear-gradient(135deg, #226CFF, #785CFD);
-      color: #fff;
+      background: #226CFF;
+      color: #FFFFFF;
       padding: 2px 8px;
       border-radius: 999px;
       font-weight: 600;
@@ -86,20 +86,20 @@
       width: 7px;
     }
     .sidebar-body::-webkit-scrollbar-track {
-      background: #111622;
+      background: #FFFFFF;
     }
     .sidebar-body::-webkit-scrollbar-thumb {
-      background: #2C384E;
+      background: #D4D4D8;
       border-radius: 4px;
     }
     .sidebar-body::-webkit-scrollbar-thumb:hover {
-      background: #435370;
+      background: #A1A1AA;
     }
     /* 카테고리 섹션 (선 기반 영역 구분 — 플랫 인스펙터 스타일) */
     .option-card {
       background: transparent;
       border: none;
-      border-bottom: 1px solid #232D3F;
+      border-bottom: 1px solid #E5E5E5;
       border-radius: 0;
       overflow: visible;
       box-shadow: none;
@@ -123,7 +123,7 @@
       gap: 6px;
       font-size: 12.5px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       letter-spacing: -0.015em;
     }
     .section-num {
@@ -136,7 +136,7 @@
       border-radius: 0;
       background: transparent;
       border: none;
-      color: #60A5FA;
+      color: #226CFF;
       font-size: 11px;
       font-weight: 700;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -144,7 +144,7 @@
     .section-sub {
       font-size: 10.5px;
       font-weight: 500;
-      color: #64748B;
+      color: #71717A;
       background: transparent;
       border: none;
       padding: 0;
@@ -158,7 +158,7 @@
     }
     .sub-divider {
       height: 1px;
-      background: #1F293B;
+      background: #EFEFEF;
       margin: 4px 0;
     }
     /* 폼 필드 & 라벨 정렬 */
@@ -172,7 +172,7 @@
       min-height: 16px;
       font-size: 11px;
       font-weight: 600;
-      color: #A8B6CA;
+      color: #3F3F46;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -183,7 +183,7 @@
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 11px;
       font-weight: 600;
-      color: #60A5FA;
+      color: #226CFF;
       background: transparent;
       border: none;
       padding: 0;
@@ -192,26 +192,26 @@
     }
     .seg-group {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 3px;
-      background: #182032;
+      background: #F4F4F5;
       padding: 3px;
       border-radius: 6px;
-      border: 1px solid #2A364F;
+      border: 1px solid #E4E4E7;
     }
     .seg-group-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 3px;
-      background: #182032;
+      background: #F4F4F5;
       padding: 3px;
       border-radius: 6px;
-      border: 1px solid #2A364F;
+      border: 1px solid #E4E4E7;
     }
     .seg-btn {
       background: transparent;
       border: none;
-      color: #94A3B8;
+      color: #52525B;
       padding: 6px 4px;
       font-size: 11px;
       font-weight: 600;
@@ -220,20 +220,20 @@
       transition: all 0.12s;
     }
     .seg-btn:hover {
-      color: #F8FAFC;
-      background: rgba(255, 255, 255, 0.04);
+      color: #111111;
+      background: rgba(0, 0, 0, 0.04);
     }
     .seg-btn.active {
       background: #226CFF;
       color: #FFFFFF;
-      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.35);
+      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.25);
     }
     select, input[type="text"], input[type="number"] {
       width: 100%;
       height: 32px;
-      background: #182032;
-      color: #F8FAFC;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       border-radius: 6px;
       padding: 0 9px;
       font-size: 11.5px;
@@ -242,13 +242,13 @@
       transition: border-color 0.12s, background 0.12s;
     }
     select:hover, input[type="text"]:hover, input[type="number"]:hover, textarea:hover {
-      border-color: #3D4E6E;
+      border-color: #A1A1AA;
     }
     textarea {
       width: 100%;
-      background: #182032;
-      color: #F8FAFC;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       border-radius: 6px;
       padding: 8px 10px;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -260,8 +260,8 @@
       transition: border-color 0.12s;
     }
     select:focus, input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
-      border-color: #3B82F6;
-      background: #1B253A;
+      border-color: #226CFF;
+      background: #FFFFFF;
     }
     .row-2 {
       display: grid;
@@ -288,7 +288,7 @@
     input[type="range"] {
       width: 100%;
       height: 18px;
-      accent-color: #3B82F6;
+      accent-color: #226CFF;
       cursor: ew-resize;
       margin: 0;
     }
@@ -304,17 +304,17 @@
       gap: 7px;
       font-size: 11.5px;
       font-weight: 500;
-      color: #CBD5E1;
+      color: #27272A;
       cursor: pointer;
       user-select: none;
       transition: background 0.12s, color 0.12s;
     }
     .checkbox-row:hover {
-      background: rgba(148, 163, 184, 0.09);
-      color: #F8FAFC;
+      background: #F4F4F5;
+      color: #111111;
     }
     .checkbox-row input[type="checkbox"] {
-      accent-color: #3B82F6;
+      accent-color: #226CFF;
       width: 14px;
       height: 14px;
       cursor: pointer;
@@ -323,7 +323,7 @@
     .token-box {
       background: transparent;
       border: none;
-      border-top: 1px solid #1F293B;
+      border-top: 1px solid #EFEFEF;
       border-radius: 0;
       padding: 10px 0 0 0;
       display: flex;
@@ -341,21 +341,21 @@
       gap: 5px;
       font-size: 10.5px;
       font-family: 'JetBrains Mono', Consolas, monospace;
-      background: #182032;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
       padding: 3px 7px;
       border-radius: 4px;
-      color: #CBD5E1;
+      color: #27272A;
       cursor: pointer;
       transition: all 0.12s;
     }
     .token-chip:hover {
-      border-color: #5991FF;
-      color: #FFFFFF;
+      border-color: #226CFF;
+      color: #226CFF;
     }
     .token-chip.selected {
-      border-color: #3B82F6;
-      background: rgba(34, 108, 255, 0.24);
+      border-color: #226CFF;
+      background: #226CFF;
       color: #FFFFFF;
     }
     .token-dot {
@@ -365,9 +365,9 @@
       display: inline-block;
     }
     .btn-mini {
-      background: #1C263B;
-      color: #93C5FD;
-      border: 1px solid #2E3D59;
+      background: #FFFFFF;
+      color: #226CFF;
+      border: 1px solid rgba(34, 108, 255, 0.35);
       border-radius: 5px;
       padding: 3px 8px;
       font-size: 10.5px;
@@ -376,25 +376,25 @@
       transition: all 0.12s;
     }
     .btn-mini:hover {
-      background: #273552;
-      color: #FFFFFF;
-      border-color: #4B628C;
+      background: rgba(34, 108, 255, 0.08);
+      color: #1A56DB;
+      border-color: #226CFF;
     }
     /* 우측 프리뷰 & 액션 영역 */
     .main-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #0B0F19;
+      background: #F5F5F7;
       height: 100%;
     }
     .preview-toolbar {
       padding: 10px 18px;
-      border-bottom: 1px solid #1E293B;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #111827;
+      background: #FFFFFF;
       gap: 8px;
     }
     .toolbar-badges {
@@ -404,17 +404,17 @@
     }
     .var-status-badge {
       font-size: 11px;
-      color: #34D399;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #18181B;
+      background: #F4F4F5;
+      border: 1px solid #E4E4E7;
       padding: 3px 8px;
       border-radius: 6px;
     }
     .selection-badge {
       font-size: 11px;
-      color: #38BDF8;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #226CFF;
+      background: rgba(34, 108, 255, 0.1);
+      border: 1px solid rgba(34, 108, 255, 0.28);
       padding: 3px 8px;
       border-radius: 6px;
       display: none;
@@ -435,10 +435,10 @@
       min-width: 220px;
       min-height: 160px;
       background: #FFFFFF;
-      border: 1px solid #334155;
+      border: 1px solid #E4E4E7;
       border-radius: 14px;
       position: relative;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
       transition: background 0.18s;
     }
     .plugin-window-resizer {
@@ -450,7 +450,7 @@
       cursor: nwse-resize;
       z-index: 100;
       opacity: 0.7;
-      background: linear-gradient(135deg, transparent 50%, #64748B 50%, #64748B 65%, transparent 65%, transparent 80%, #94A3B8 80%);
+      background: linear-gradient(135deg, transparent 50%, #A1A1AA 50%, #A1A1AA 65%, transparent 65%, transparent 80%, #52525B 80%);
     }
     .plugin-window-resizer:hover {
       opacity: 1;
@@ -472,12 +472,11 @@
       width: 4px;
       height: 38px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.65);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+      background: rgba(34, 108, 255, 0.45);
       transition: transform 0.15s, background 0.15s;
     }
     .resize-handle-right:hover::after {
-      background: #38BDF8;
+      background: #226CFF;
       transform: scaleY(1.2);
     }
     .resize-handle-bottom {
@@ -497,11 +496,11 @@
       width: 38px;
       height: 4px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.65);
+      background: rgba(34, 108, 255, 0.45);
       transition: transform 0.15s, background 0.15s;
     }
     .resize-handle-bottom:hover::after {
-      background: #38BDF8;
+      background: #226CFF;
       transform: scaleX(1.2);
     }
     .resize-handle-corner {
@@ -511,25 +510,29 @@
       width: 16px;
       height: 16px;
       cursor: nwse-resize;
-      border-right: 3px solid #38BDF8;
-      border-bottom: 3px solid #38BDF8;
+      border-right: 3px solid #226CFF;
+      border-bottom: 3px solid #226CFF;
       border-bottom-right-radius: 4px;
       z-index: 25;
+    }
+    .resize-handle-corner:hover {
+      border-color: #1A56DB;
     }
     .live-size-pill {
       position: absolute;
       top: -26px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid #334155;
-      color: #93C5FD;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
+      color: #3F3F46;
       font-size: 10px;
       font-weight: 600;
       padding: 2px 10px;
       border-radius: 999px;
       white-space: nowrap;
       pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
     #preview-canvas {
       width: 100%;
@@ -538,8 +541,8 @@
     }
     .footer-bar {
       padding: 12px 18px;
-      border-top: 1px solid #1E293B;
-      background: #111827;
+      border-top: 1px solid #E5E5E5;
+      background: #FFFFFF;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -547,14 +550,17 @@
     }
     .footer-hint {
       font-size: 11px;
-      color: #64748B;
+      color: #71717A;
+    }
+    .footer-hint strong {
+      color: #111111;
     }
     .action-btns {
       display: flex;
       gap: 8px;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #226CFF, #785CFD);
+      background: #226CFF;
       color: #FFFFFF;
       border: none;
       padding: 8px 16px;
@@ -562,29 +568,31 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background 0.15s;
     }
     .btn-primary:hover {
-      opacity: 0.92;
+      background: #1A56DB;
     }
     .btn-secondary {
-      background: #1E293B;
-      color: #F8FAFC;
-      border: 1px solid #334155;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       padding: 8px 14px;
       border-radius: 7px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: none;
+      transition: all 0.15s;
     }
     .btn-secondary:hover {
-      background: #334155;
+      background: #F4F4F5;
+      border-color: #A1A1AA;
     }
     .btn-code {
-      background: rgba(59, 130, 246, 0.14);
-      color: #93C5FD;
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: #FFFFFF;
+      color: #226CFF;
+      border: 1px solid rgba(34, 108, 255, 0.35);
       padding: 8px 14px;
       border-radius: 7px;
       font-size: 12px;
@@ -593,16 +601,16 @@
       transition: all 0.15s;
     }
     .btn-code:hover {
-      background: rgba(59, 130, 246, 0.26);
-      color: #FFFFFF;
-      border-color: #60A5FA;
+      background: rgba(34, 108, 255, 0.08);
+      color: #1A56DB;
+      border-color: #226CFF;
     }
     /* 개발자용 코드 내보내기 모달 */
     .code-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(7, 11, 20, 0.76);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(3px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -615,18 +623,18 @@
     .code-modal {
       width: min(780px, 92vw);
       max-height: 84vh;
-      background: #111827;
-      border: 1px solid #334155;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
       border-radius: 12px;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.16);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     .code-modal-header {
       padding: 14px 18px;
-      background: #0F172A;
-      border-bottom: 1px solid #1E293B;
+      background: #FAFAFA;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -635,7 +643,7 @@
     .code-modal-title {
       font-size: 13px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -643,9 +651,9 @@
     .copy-toast {
       font-size: 11px;
       font-weight: 600;
-      color: #34D399;
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #226CFF;
+      background: rgba(34, 108, 255, 0.1);
+      border: 1px solid rgba(34, 108, 255, 0.28);
       padding: 3px 9px;
       border-radius: 999px;
     }
@@ -654,8 +662,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 18px;
-      background: #111827;
-      border-bottom: 1px solid #1E293B;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E5E5;
       gap: 8px;
     }
     .code-tab-group {
@@ -663,9 +671,9 @@
       gap: 6px;
     }
     .code-tab-btn {
-      background: #0B0F19;
-      color: #94A3B8;
-      border: 1px solid #1E293B;
+      background: #FFFFFF;
+      color: #52525B;
+      border: 1px solid #E4E4E7;
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 11px;
@@ -674,12 +682,13 @@
       transition: all 0.12s;
     }
     .code-tab-btn:hover {
-      color: #F8FAFC;
+      color: #111111;
+      border-color: #A1A1AA;
     }
     .code-tab-btn.active {
       background: #226CFF;
       color: #FFFFFF;
-      border-color: #3B82F6;
+      border-color: #226CFF;
     }
     .code-modal-body {
       padding: 14px 18px;
@@ -692,9 +701,9 @@
     .code-editor-area {
       width: 100%;
       height: 420px;
-      background: #080C14;
-      color: #E2E8F0;
-      border: 1px solid #1E293B;
+      background: #FAFAFA;
+      color: #18181B;
+      border: 1px solid #E4E4E7;
       border-radius: 8px;
       padding: 14px;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -707,8 +716,8 @@
     }
     .code-modal-footer {
       padding: 12px 18px;
-      background: #0F172A;
-      border-top: 1px solid #1E293B;
+      background: #FAFAFA;
+      border-top: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -734,10 +743,11 @@
           <div class="field">
             <label>차트 종류</label>
             <div class="seg-group" id="type-group">
-              <button class="seg-btn active" data-type="bar">📊 Bar</button>
-              <button class="seg-btn" data-type="line">📈 Line</button>
-              <button class="seg-btn" data-type="pie">🍩 Donut</button>
-              <button class="seg-btn" data-type="funnel">🔻 Funnel</button>
+              <button class="seg-btn active" data-type="bar">Bar</button>
+              <button class="seg-btn" data-type="line">Line</button>
+              <button class="seg-btn" data-type="donut">Donut</button>
+              <button class="seg-btn" data-type="pie">Pie</button>
+              <button class="seg-btn" data-type="funnel">Funnel</button>
             </div>
           </div>
 
@@ -769,7 +779,7 @@
                 <option value="weseed-palette-scale">Primary 팔레트 스케일 (Primary/500, Primary/100...)</option>
                 <option value="weseed-cool">Cool 블루/청록 (blue/-, sky/-...)</option>
                 <option value="weseed-warm">Warm 레드/앰버 (red/-, amber/-...)</option>
-                <option value="custom">✏️ 직접 변수 지정 (Custom)</option>
+                <option value="custom">직접 변수 지정 (Custom)</option>
               </select>
             </div>
             <div class="field">
@@ -784,8 +794,8 @@
           <!-- 활성 토큰 미리보기, 카테고리별 변수 선택 및 직접 입력 -->
           <div class="token-box">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:10.5px;color:#94A3B8;font-weight:600;">시리즈 변수 (칩 클릭 후 카테고리·세부 단계 선택)</span>
-              <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">📦 파일에 변수 등록</button>
+              <span style="font-size:10.5px;color:#52525B;font-weight:600;">시리즈 변수 (칩 클릭 후 카테고리·세부 단계 선택)</span>
+              <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">파일에 변수 등록</button>
             </div>
             <div class="token-chips" id="active-token-chips"></div>
             <div class="row-2" style="margin-top:2px;">
@@ -798,7 +808,7 @@
               <div class="field">
                 <label id="project-var-step-label">2. 세부 토큰 (#1 변경)</label>
                 <select id="project-var-select" title="선택된 시리즈 칩에 적용할 세부 단계 변수를 선택합니다">
-                  <option value="">🎨 세부 단계 선택...</option>
+                  <option value="">세부 단계 선택...</option>
                 </select>
               </div>
             </div>
@@ -832,7 +842,7 @@
           <div class="field">
             <label>
               <span>데이터 편집 (라벨: 값1, 값2...)</span>
-              <span style="color:#60A5FA;cursor:pointer;font-weight:700;" id="random-data-btn">🎲 랜덤 생성</span>
+              <span style="color:#226CFF;cursor:pointer;font-weight:700;" id="random-data-btn">랜덤 생성</span>
             </label>
             <textarea id="data-textarea">1월: 120, 85, 45
 2월: 155, 110, 60
@@ -901,13 +911,13 @@
             </div>
           </div>
 
-          <!-- Pie / Donut 전용 -->
+          <!-- Donut / Pie 전용 -->
           <div id="pie-controls" style="display:none;flex-direction:column;gap:10px;">
-            <div class="row-2">
-              <div class="field">
+            <div class="row-2" id="pie-gap-row">
+              <div class="field" id="donut-hole-field">
                 <label>내부 구멍 비율 <span class="val-badge" id="hole-txt">60%</span></label>
                 <div class="slider-box">
-                  <input type="range" id="hole-slider" min="0" max="80" value="60" step="5" />
+                  <input type="range" id="hole-slider" min="20" max="80" value="60" step="5" />
                 </div>
               </div>
               <div class="field">
@@ -998,19 +1008,19 @@
             <div class="field">
               <label>범례 위치 (12방향)</label>
               <select id="legend-pos-select">
-                <option value="top-left">↖ 상좌 (top-left)</option>
-                <option value="top-center">⬆ 상중 (top-center)</option>
-                <option value="top-right" selected>↗ 상우 (top-right)</option>
-                <option value="bottom-left">↙ 하좌 (bottom-left)</option>
-                <option value="bottom-center">⬇ 하중 (bottom-center)</option>
-                <option value="bottom-right">↘ 하우 (bottom-right)</option>
-                <option value="left-top">⬅ 좌상 (left-top)</option>
-                <option value="left-middle">⬅ 좌중 (left-middle)</option>
-                <option value="left-bottom">⬅ 좌하 (left-bottom)</option>
-                <option value="right-top">➡ 우상 (right-top)</option>
-                <option value="right-middle">➡ 우중 (right-middle)</option>
-                <option value="right-bottom">➡ 우하 (right-bottom)</option>
-                <option value="none">🚫 숨김 (None)</option>
+                <option value="top-left">상좌 (top-left)</option>
+                <option value="top-center">상중 (top-center)</option>
+                <option value="top-right" selected>상우 (top-right)</option>
+                <option value="bottom-left">하좌 (bottom-left)</option>
+                <option value="bottom-center">하중 (bottom-center)</option>
+                <option value="bottom-right">하우 (bottom-right)</option>
+                <option value="left-top">좌상 (left-top)</option>
+                <option value="left-middle">좌중 (left-middle)</option>
+                <option value="left-bottom">좌하 (left-bottom)</option>
+                <option value="right-top">우상 (right-top)</option>
+                <option value="right-middle">우중 (right-middle)</option>
+                <option value="right-bottom">우하 (right-bottom)</option>
+                <option value="none">숨김 (None)</option>
               </select>
             </div>
             <div class="field">
@@ -1121,9 +1131,9 @@
           <div class="field">
             <label>빠른 반응형 프리셋 (우측 프리뷰에서 자유 드래그 가능)</label>
             <div class="seg-group-3" id="size-preset-group">
-              <button class="seg-btn active" data-w="640" data-h="400">🖥 Desktop (640)</button>
-              <button class="seg-btn" data-w="480" data-h="320">📱 Tablet (480)</button>
-              <button class="seg-btn" data-w="320" data-h="240">📲 Mobile (320)</button>
+              <button class="seg-btn active" data-w="640" data-h="400">Desktop (640)</button>
+              <button class="seg-btn" data-w="480" data-h="320">Tablet (480)</button>
+              <button class="seg-btn" data-w="320" data-h="240">Mobile (320)</button>
             </div>
           </div>
 
@@ -1148,7 +1158,7 @@
           </div>
 
           <label class="checkbox-row">
-            <input type="checkbox" id="chk-bind-vars" checked /> 🔗 프로젝트 피그마 변수(Variables)에 자동 바인딩
+            <input type="checkbox" id="chk-bind-vars" checked /> 프로젝트 피그마 변수(Variables)에 자동 바인딩
           </label>
         </div>
       </section>
@@ -1159,24 +1169,24 @@
   <!-- 우측 실시간 Canvas 2D 프리뷰 및 삽입 액션 -->
   <main class="main-area">
     <div class="preview-toolbar">
-      <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
+      <div style="font-weight:600;color:#111111;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
       <div class="toolbar-badges">
         <div
           class="var-status-badge"
           id="ota-status-badge"
-          style="cursor:pointer;background:rgba(34,108,255,0.14);border-color:rgba(34,108,255,0.35);color:#93C5FD;"
+          style="cursor:pointer;background:#FFFFFF;border-color:#E4E4E7;color:#52525B;"
           title="클릭하여 GitHub(junwoo1519/nanocharts) 최신 버전 수동 확인"
         >
-          🔄 GitHub 버전 확인 중...
+          GitHub 버전 확인 중...
         </div>
-        <div class="var-status-badge" id="var-status-badge">🔗 variables.scss 기본 토큰 사용 중</div>
+        <div class="var-status-badge" id="var-status-badge">variables.scss 기본 토큰 사용 중</div>
         <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
       </div>
     </div>
 
     <div class="preview-stage" id="preview-stage">
       <div class="chart-box" id="chart-box">
-        <div class="live-size-pill" id="live-size-pill">640 × 400 px · ↔ 우측/하단 핸들을 드래그하여 유동 반응형 조절</div>
+        <div class="live-size-pill" id="live-size-pill">640 × 400 px · 우측/하단 핸들을 드래그하여 유동 반응형 조절</div>
         <div id="preview-canvas"></div>
         <div class="resize-handle-right" id="resize-handle-right" title="좌우로 드래그하여 유동 반응형 너비 조절"></div>
         <div class="resize-handle-bottom" id="resize-handle-bottom" title="상하로 드래그하여 유동 반응형 높이 조절"></div>
@@ -1186,12 +1196,12 @@
 
     <div class="footer-bar">
       <div class="footer-hint">
-        💡 삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
+        삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
       </div>
       <div class="action-btns">
-        <button class="btn-code" id="export-code-btn" title="현재 설정된 차트 옵션과 디자인 토큰을 개발자가 바로 붙여넣을 수 있는 코드로 내보냅니다">💻 개발자용 코드 내보내기</button>
-        <button class="btn-secondary" id="update-selected-btn">🔄 선택된 차트 업데이트</button>
-        <button class="btn-primary" id="insert-new-btn">➕ 피그마에 벡터(SVG)로 삽입</button>
+        <button class="btn-code" id="export-code-btn" title="현재 설정된 차트 옵션과 디자인 토큰을 개발자가 바로 붙여넣을 수 있는 코드로 내보냅니다">개발자용 코드 내보내기</button>
+        <button class="btn-secondary" id="update-selected-btn">선택된 차트 업데이트</button>
+        <button class="btn-primary" id="insert-new-btn">피그마에 벡터(SVG)로 삽입</button>
       </div>
     </div>
     <div class="plugin-window-resizer" id="plugin-window-resizer" title="드래그하여 피그마 플러그인 창 크기 조절"></div>
@@ -1202,10 +1212,10 @@
     <div class="code-modal">
       <div class="code-modal-header">
         <div class="code-modal-title">
-          <span>💻 개발자 전달용 코드 내보내기 (`@ju9nu7/nanocharts`)</span>
-          <span class="copy-toast" id="code-copy-toast">✅ 클립보드에 자동 복사됨</span>
+          <span>개발자 전달용 코드 내보내기 (`@ju9nu7/nanocharts`)</span>
+          <span class="copy-toast" id="code-copy-toast">클립보드에 자동 복사됨</span>
         </div>
-        <button class="btn-mini" id="close-code-modal-btn" style="padding:4px 10px;font-size:11px;">✕ 닫기 (ESC)</button>
+        <button class="btn-mini" id="close-code-modal-btn" style="padding:4px 10px;font-size:11px;">닫기 (ESC)</button>
       </div>
       <div class="code-modal-tabs">
         <div class="code-tab-group" id="code-format-tabs">
@@ -1214,18 +1224,18 @@
           <button class="code-tab-btn" data-format="options">3. 옵션 객체만 (Options)</button>
           <button class="code-tab-btn" data-format="svg">4. 순수 SVG 태그 (SVG)</button>
         </div>
-        <span style="font-size:11px;color:#94A3B8;">디자인 토큰(`var(--*)`) · Tailwind 클래스 자동 매핑</span>
+        <span style="font-size:11px;color:#71717A;">디자인 토큰(`var(--*)`) · Tailwind 클래스 자동 매핑</span>
       </div>
       <div class="code-modal-body">
         <textarea class="code-editor-area" id="exported-code-textarea" readonly spellcheck="false"></textarea>
       </div>
       <div class="code-modal-footer">
-        <div style="font-size:11px;color:#94A3B8;">
-          💡 개발자에게 이 코드를 전달하면 웹 브라우저에서도 피그마와 100% 동일한 차트가 렌더링됩니다.
+        <div style="font-size:11px;color:#71717A;">
+          개발자에게 이 코드를 전달하면 웹 브라우저에서도 피그마와 100% 동일한 차트가 렌더링됩니다.
         </div>
         <div class="action-btns">
-          <button class="btn-code" id="download-code-btn">💾 파일로 저장 (.ts)</button>
-          <button class="btn-primary" id="copy-code-again-btn">📋 클립보드에 다시 복사</button>
+          <button class="btn-code" id="download-code-btn">파일로 저장 (.ts)</button>
+          <button class="btn-primary" id="copy-code-again-btn">클립보드에 다시 복사</button>
         </div>
       </div>
     </div>
@@ -1485,7 +1495,7 @@
 
       const groupInfo = categorizedVarGroups[groupKey];
       const items = groupInfo ? groupInfo.items : [];
-      const defaultOpt = `<option value="">🎨 #${selectedChipIndex + 1} 시리즈에 적용...</option>`;
+      const defaultOpt = `<option value="">#${selectedChipIndex + 1} 시리즈에 적용...</option>`;
 
       selectEl.innerHTML =
         defaultOpt +
@@ -1649,7 +1659,8 @@
 
       renderTokenChips(tokenList);
 
-      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+      const isEachColored =
+        state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
       const singleData = xLabels.map((label, i) => ({
         label,
         value: rows[i]?.[0] ?? 0,
@@ -1673,15 +1684,21 @@
     function updateControlVisibility() {
       const isBar = state.chartType === 'bar';
       const isLine = state.chartType === 'line';
+      const isDonut = state.chartType === 'donut';
       const isPie = state.chartType === 'pie';
+      const isCircular = isDonut || isPie;
       const isFunnel = state.chartType === 'funnel';
 
-      document.getElementById('series-mode-field').style.display = isPie || isFunnel ? 'none' : '';
+      document.getElementById('series-mode-field').style.display = isCircular || isFunnel ? 'none' : '';
       document.getElementById('series-names-field').style.display =
-        isPie || isFunnel || state.seriesMode === 'single' ? 'none' : '';
+        isCircular || isFunnel || state.seriesMode === 'single' ? 'none' : '';
       document.getElementById('bar-controls').style.display = isBar ? '' : 'none';
       document.getElementById('line-controls').style.display = isLine ? 'flex' : 'none';
-      document.getElementById('pie-controls').style.display = isPie ? 'flex' : 'none';
+      document.getElementById('pie-controls').style.display = isCircular ? 'flex' : 'none';
+      const donutHoleField = document.getElementById('donut-hole-field');
+      const pieGapRow = document.getElementById('pie-gap-row');
+      if (donutHoleField) donutHoleField.style.display = isDonut ? '' : 'none';
+      if (pieGapRow) pieGapRow.style.gridTemplateColumns = isDonut ? '' : '1fr';
       document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
       document.getElementById('grid-controls').style.display = isBar || isLine ? '' : 'none';
       const showElementGap = isBar || isLine;
@@ -1698,9 +1715,11 @@
           ? 'Bar · 4.Radius'
           : isLine
             ? 'Line · Area HSL'
-            : isPie
+            : isDonut
               ? 'Donut · Arc'
-              : 'Funnel · Stage';
+              : isPie
+                ? 'Pie · Arc'
+                : 'Funnel · Stage';
       }
       const spacingNumEl = document.getElementById('spacing-section-num');
       if (spacingNumEl) {
@@ -1772,7 +1791,7 @@
       const hasLeftLegend = state.legendPos !== 'none' && state.legendPos.startsWith('left');
       const hasRightLegend = state.legendPos !== 'none' && state.legendPos.startsWith('right');
 
-      if (state.chartType === 'pie' || state.chartType === 'funnel') {
+      if (state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel') {
         return {
           top: basePad + (hasTopLegend ? 20 : 4),
           right: basePad + (hasRightLegend ? 96 : 8),
@@ -1813,7 +1832,7 @@
       chartBoxEl.style.height = `${boxH}px`;
       const sizePillEl = document.getElementById('live-size-pill');
       if (sizePillEl) {
-        sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · ↔ 우측/하단 핸들 드래그로 유동 반응형 조절`;
+        sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · 우측/하단 핸들 드래그로 유동 반응형 조절`;
       }
 
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
@@ -1913,12 +1932,55 @@
           },
           legend: legendOpt,
         });
+      } else if (state.chartType === 'donut') {
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
+        const sliceGapVal = state.pieSliceGap ?? 3;
+        const padRad = ((state.piePadDeg ?? 1.5) * Math.PI) / 180;
+        const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
+        const resolvedTrackToken =
+          state.pieTrackToken && state.pieTrackToken !== 'auto'
+            ? state.pieTrackToken
+            : state.surfaceMode === 'dark'
+              ? 'surface/high'
+              : 'surface/low';
+        const trackHex = maxVal ? useTokenColor(resolvedTrackToken) : undefined;
+        activeChart = new DonutChart(containerEl, {
+          data: singleData,
+          padding: padOpt,
+          font: fontOpt,
+          animation: animOpt,
+          responsive: { enabled: true },
+          donut: {
+            innerRadiusRatio: holeRatio,
+            ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
+            maxValue: maxVal,
+            trackColor: trackHex,
+            colors: palette,
+          },
+          center:
+            holeRatio >= 0.35
+              ? {
+                  title: (_d, total) =>
+                    maxVal
+                      ? `${Math.round((total / Math.max(total, maxVal)) * 100)}%`
+                      : `${total.toLocaleString()}`,
+                  subtitle: maxVal ? `Max ${maxVal.toLocaleString()}` : 'Total',
+                  titleColor: strongTextHex,
+                  subtitleColor: labelHex,
+                }
+              : undefined,
+          labels: {
+            visible: state.showLabels,
+            position: 'outside',
+            color: strongTextHex,
+          },
+          legend: legendOpt,
+        });
       } else {
         const isPxGap = (state.pieGapMode || 'px') === 'px';
-        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
-        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
-        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
-        const padRad = ((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180;
+        const sliceGapVal = state.pieSliceGap ?? 0;
+        const padRad = ((state.piePadDeg ?? 0) * Math.PI) / 180;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -1934,24 +1996,12 @@
           animation: animOpt,
           responsive: { enabled: true },
           pie: {
-            innerRadiusRatio: state.holeRatio,
+            innerRadiusRatio: 0,
             ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
             maxValue: maxVal,
             trackColor: trackHex,
             colors: palette,
           },
-          center:
-            state.holeRatio >= 0.35
-              ? {
-                  title: (_d, total) =>
-                    maxVal
-                      ? `${Math.round((total / Math.max(total, maxVal)) * 100)}%`
-                      : `${total.toLocaleString()}`,
-                  subtitle: maxVal ? `Max ${maxVal.toLocaleString()}` : 'Total',
-                  titleColor: strongTextHex,
-                  subtitleColor: labelHex,
-                }
-              : undefined,
           labels: {
             visible: state.showLabels,
             position: 'outside',
@@ -1979,7 +2029,8 @@
       const titleMap = {
         bar: `NanoChart — Bar (${state.seriesMode})`,
         line: `NanoChart — Line (${state.seriesMode})`,
-        pie: `NanoChart — Donut`,
+        donut: `NanoChart — Donut`,
+        pie: `NanoChart — Pie`,
         funnel: `NanoChart — Funnel (${state.funnelDirection})`,
       };
 
@@ -2008,9 +2059,25 @@
     // 이벤트 바인딩
     document.querySelectorAll('#type-group .seg-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const prevType = state.chartType;
+        const nextType = btn.dataset.type;
         document.querySelectorAll('#type-group .seg-btn').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        state.chartType = btn.dataset.type;
+        state.chartType = nextType;
+        if (nextType === 'pie' && prevType !== 'pie') {
+          state.pieSliceGap = 0;
+          state.piePadDeg = 0;
+          syncPieGapControlUI();
+        } else if (nextType === 'donut' && prevType !== 'donut') {
+          if ((state.holeRatio ?? 0) < 0.2) state.holeRatio = 0.6;
+          if ((state.pieSliceGap ?? 0) === 0 && (state.piePadDeg ?? 0) === 0) {
+            state.pieSliceGap = 3;
+            state.piePadDeg = 1.5;
+          }
+          document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
+          document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          syncPieGapControlUI();
+        }
         renderPreview();
       });
     });
@@ -2207,19 +2274,20 @@
 
     function syncPieGapControlUI() {
       const mode = state.pieGapMode || 'px';
+      const isDonut = state.chartType === 'donut';
       const modeSelect = document.getElementById('pie-gap-mode-select');
       const padSlider = document.getElementById('pie-pad-slider');
       const padTxt = document.getElementById('pie-pad-txt');
       if (modeSelect) modeSelect.value = mode;
       if (mode === 'px') {
-        const pxVal = state.pieSliceGap ?? (state.holeRatio > 0 ? 3 : 0);
+        const pxVal = state.pieSliceGap ?? (isDonut ? 3 : 0);
         padSlider.min = '0';
         padSlider.max = '16';
         padSlider.step = '1';
         padSlider.value = String(pxVal);
         padTxt.innerText = `${pxVal}px`;
       } else {
-        const degVal = state.piePadDeg ?? (state.holeRatio > 0 ? 1.5 : 0);
+        const degVal = state.piePadDeg ?? (isDonut ? 1.5 : 0);
         padSlider.min = '0';
         padSlider.max = '5';
         padSlider.step = '0.5';
@@ -2230,19 +2298,8 @@
 
     document.getElementById('hole-slider').addEventListener('input', (e) => {
       const pct = parseInt(e.target.value, 10);
-      const prevHole = state.holeRatio;
       state.holeRatio = pct / 100;
       document.getElementById('hole-txt').innerText = `${pct}%`;
-
-      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격을 0으로 자동 전환
-      if (pct === 0) {
-        state.pieSliceGap = 0;
-        state.piePadDeg = 0;
-      } else if (prevHole === 0) {
-        if ((state.pieSliceGap ?? 0) === 0) state.pieSliceGap = 3;
-        if ((state.piePadDeg ?? 0) === 0) state.piePadDeg = 1.5;
-      }
-      syncPieGapControlUI();
       renderPreview();
     });
 
@@ -2461,7 +2518,8 @@
       const padOpt = computeChartPadding();
       const fontFamily = getActiveFontFamily();
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
-      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+      const isEachColored =
+        state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
 
       const dataCode = singleData
         .map((d, idx) => {
@@ -2567,16 +2625,15 @@
           `  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
         );
         optionsLines.push(legendCode);
-      } else {
-        className = 'PieChart';
+      } else if (state.chartType === 'donut') {
+        className = 'DonutChart';
         const isPxGap = (state.pieGapMode || 'px') === 'px';
-        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
-        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
-        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
-        const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
+        const sliceGapVal = state.pieSliceGap ?? 3;
+        const padRad = Number((((state.piePadDeg ?? 1.5) * Math.PI) / 180).toFixed(4));
         const gapCodeLine = isPxGap
           ? `    sliceGap: ${sliceGapVal},`
-          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°`;
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 1.5}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -2588,16 +2645,42 @@
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(
           maxVal
-            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            ? `  donut: {\n    innerRadiusRatio: ${holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  donut: {\n    innerRadiusRatio: ${holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
         );
-        if (state.holeRatio >= 0.35) {
+        if (holeRatio >= 0.35) {
           optionsLines.push(
             maxVal
               ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
               : `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
           );
         }
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+        );
+        optionsLines.push(legendCode);
+      } else {
+        className = 'PieChart';
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const sliceGapVal = state.pieSliceGap ?? 0;
+        const padRad = Number((((state.piePadDeg ?? 0) * Math.PI) / 180).toFixed(4));
+        const gapCodeLine = isPxGap
+          ? `    sliceGap: ${sliceGapVal},`
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 0}°`;
+        const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
+        const resolvedTrackToken =
+          state.pieTrackToken && state.pieTrackToken !== 'auto'
+            ? state.pieTrackToken
+            : isDark
+              ? 'surface/high'
+              : 'surface/low';
+        const trackCssToken = toCssVarToken(resolvedTrackToken);
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(
+          maxVal
+            ? `  pie: {\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+        );
         optionsLines.push(
           `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
         );
@@ -2705,7 +2788,7 @@
       const toastEl = document.getElementById('code-copy-toast');
       const showCopiedToast = () => {
         if (!toastEl) return;
-        toastEl.innerText = '✅ 클립보드에 복사되었습니다!';
+        toastEl.innerText = '클립보드에 복사되었습니다!';
         toastEl.style.opacity = '1';
       };
 
@@ -2746,10 +2829,10 @@
       if (downloadBtn) {
         downloadBtn.innerText =
           format === 'svg'
-            ? '💾 파일로 저장 (.svg)'
+            ? '파일로 저장 (.svg)'
             : format === 'tailwind'
-              ? '💾 파일로 저장 (.tsx)'
-              : '💾 파일로 저장 (.ts)';
+              ? '파일로 저장 (.tsx)'
+              : '파일로 저장 (.ts)';
       }
 
       const code = generateDeveloperCode(format);
@@ -2820,9 +2903,9 @@
         if (msg.matchedCount > 0) {
           const radText = msg.radiusMatchedCount > 0 ? ` · Radius ${msg.radiusMatchedCount}` : '';
           const spText = msg.spacingMatchedCount > 0 ? ` · Spacing ${msg.spacingMatchedCount}` : '';
-          varBadge.innerText = `🔗 컬러 ${msg.matchedCount}${radText}${spText} 연결됨`;
+          varBadge.innerText = `컬러 ${msg.matchedCount}${radText}${spText} 연결됨`;
         } else {
-          varBadge.innerText = `🔗 기본 토큰 (primary/-, rounded-md, p-6...) 사용 중`;
+          varBadge.innerText = `기본 토큰 (primary/-, rounded-md, p-6...) 사용 중`;
         }
         renderPreview();
       } else if (msg.type === 'SELECTION_SAVED_CHART') {
@@ -2835,6 +2918,10 @@
           updateBtn.style.display = 'inline-block';
 
           state = { ...state, ...msg.state };
+          // 기존 통합 버전(chartType: 'pie', holeRatio > 0)으로 저장된 도넛 차트 하위 호환 복원
+          if (state.chartType === 'pie' && (state.holeRatio ?? 0) > 0) {
+            state.chartType = 'donut';
+          }
           document.querySelectorAll('#type-group .seg-btn').forEach((b) => {
             b.classList.toggle('active', b.dataset.type === state.chartType);
           });
@@ -2864,12 +2951,14 @@
           document.getElementById('area-sat-txt').innerText = `${state.areaSatDelta ?? 0}%`;
           document.getElementById('area-light-slider').value = state.areaLightDelta ?? 0;
           document.getElementById('area-light-txt').innerText = `${state.areaLightDelta ?? 0}%`;
-          document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
-          document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          const restoredHoleRatio = state.chartType === 'donut' ? Math.max(0.2, state.holeRatio || 0.6) : 0.6;
+          if (state.chartType === 'donut') state.holeRatio = restoredHoleRatio;
+          document.getElementById('hole-slider').value = Math.round(restoredHoleRatio * 100);
+          document.getElementById('hole-txt').innerText = `${Math.round(restoredHoleRatio * 100)}%`;
           state.pieGapMode = state.pieGapMode || 'px';
-          if (state.holeRatio <= 0) {
-            state.pieSliceGap = 0;
-            state.piePadDeg = 0;
+          if (state.chartType === 'pie') {
+            state.pieSliceGap = state.pieSliceGap ?? 0;
+            state.piePadDeg = state.piePadDeg ?? 0;
           } else {
             state.pieSliceGap = state.pieSliceGap ?? 3;
             state.piePadDeg = state.piePadDeg ?? 1.5;
@@ -3130,8 +3219,8 @@
     async function checkAndApplyOtaUpdate(isManual = false) {
       if (otaBadgeEl) {
         otaBadgeEl.innerText = isManual
-          ? '🔄 GitHub 최신 빌드 확인 중...'
-          : `✅ v${localMeta.version} · 자동업데이트 켜짐`;
+          ? 'GitHub 최신 빌드 확인 중...'
+          : `v${localMeta.version} · 자동업데이트 켜짐`;
       }
 
       const ts = Date.now();
@@ -3161,14 +3250,14 @@
 
       if (!newestRemote || !newestEndpoint) {
         if (otaBadgeEl) {
-          otaBadgeEl.innerText = `⚡ v${localMeta.version} (로컬 실행 중)`;
+          otaBadgeEl.innerText = `v${localMeta.version} (로컬 실행 중)`;
         }
         return;
       }
 
       if (newestRemote.buildTime > (localMeta.buildTime || 0)) {
         if (otaBadgeEl) {
-          otaBadgeEl.innerText = `⏳ 새 버전(v${newestRemote.version}) 자동 업데이트 중...`;
+          otaBadgeEl.innerText = `새 버전(v${newestRemote.version}) 자동 업데이트 중...`;
         }
         const remoteUiHtml = await fetchTextWithTimeout(`${newestEndpoint.baseUrl}/ui.html?t=${ts}`);
         if (remoteUiHtml && remoteUiHtml.includes('NanoCharts')) {
@@ -3189,7 +3278,7 @@
       }
 
       if (otaBadgeEl) {
-        otaBadgeEl.innerText = `✅ 최신 v${localMeta.version} (${newestEndpoint.name} 동기화됨)`;
+        otaBadgeEl.innerText = `최신 v${localMeta.version} (${newestEndpoint.name} 동기화됨)`;
       }
     }
 

@@ -12,8 +12,8 @@
     }
     body {
       font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0B0F19;
-      color: #E2E8F0;
+      background: #FFFFFF;
+      color: #111111;
       height: 100vh;
       display: flex;
       overflow: hidden;
@@ -24,8 +24,8 @@
       width: 400px;
       min-width: 320px;
       max-width: 580px;
-      background: #111622;
-      border-right: 1px solid #232D3F;
+      background: #FFFFFF;
+      border-right: 1px solid #E5E5E5;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -42,12 +42,12 @@
       z-index: 30;
     }
     .sidebar-splitter:hover {
-      background: rgba(56, 189, 248, 0.35);
+      background: rgba(34, 108, 255, 0.25);
     }
     .sidebar-header {
       padding: 13px 18px;
-      background: #111622;
-      border-bottom: 1px solid #232D3F;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -56,15 +56,15 @@
     .sidebar-header h1 {
       font-size: 14px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       display: flex;
       align-items: center;
       gap: 7px;
     }
     .badge {
       font-size: 10px;
-      background: linear-gradient(135deg, #226CFF, #785CFD);
-      color: #fff;
+      background: #226CFF;
+      color: #FFFFFF;
       padding: 2px 8px;
       border-radius: 999px;
       font-weight: 600;
@@ -86,20 +86,20 @@
       width: 7px;
     }
     .sidebar-body::-webkit-scrollbar-track {
-      background: #111622;
+      background: #FFFFFF;
     }
     .sidebar-body::-webkit-scrollbar-thumb {
-      background: #2C384E;
+      background: #D4D4D8;
       border-radius: 4px;
     }
     .sidebar-body::-webkit-scrollbar-thumb:hover {
-      background: #435370;
+      background: #A1A1AA;
     }
     /* 카테고리 섹션 (선 기반 영역 구분 — 플랫 인스펙터 스타일) */
     .option-card {
       background: transparent;
       border: none;
-      border-bottom: 1px solid #232D3F;
+      border-bottom: 1px solid #E5E5E5;
       border-radius: 0;
       overflow: visible;
       box-shadow: none;
@@ -123,7 +123,7 @@
       gap: 6px;
       font-size: 12.5px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       letter-spacing: -0.015em;
     }
     .section-num {
@@ -136,7 +136,7 @@
       border-radius: 0;
       background: transparent;
       border: none;
-      color: #60A5FA;
+      color: #226CFF;
       font-size: 11px;
       font-weight: 700;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -144,7 +144,7 @@
     .section-sub {
       font-size: 10.5px;
       font-weight: 500;
-      color: #64748B;
+      color: #71717A;
       background: transparent;
       border: none;
       padding: 0;
@@ -158,7 +158,7 @@
     }
     .sub-divider {
       height: 1px;
-      background: #1F293B;
+      background: #EFEFEF;
       margin: 4px 0;
     }
     /* 폼 필드 & 라벨 정렬 */
@@ -172,7 +172,7 @@
       min-height: 16px;
       font-size: 11px;
       font-weight: 600;
-      color: #A8B6CA;
+      color: #3F3F46;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -183,7 +183,7 @@
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 11px;
       font-weight: 600;
-      color: #60A5FA;
+      color: #226CFF;
       background: transparent;
       border: none;
       padding: 0;
@@ -192,26 +192,26 @@
     }
     .seg-group {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 3px;
-      background: #182032;
+      background: #F4F4F5;
       padding: 3px;
       border-radius: 6px;
-      border: 1px solid #2A364F;
+      border: 1px solid #E4E4E7;
     }
     .seg-group-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 3px;
-      background: #182032;
+      background: #F4F4F5;
       padding: 3px;
       border-radius: 6px;
-      border: 1px solid #2A364F;
+      border: 1px solid #E4E4E7;
     }
     .seg-btn {
       background: transparent;
       border: none;
-      color: #94A3B8;
+      color: #52525B;
       padding: 6px 4px;
       font-size: 11px;
       font-weight: 600;
@@ -220,20 +220,20 @@
       transition: all 0.12s;
     }
     .seg-btn:hover {
-      color: #F8FAFC;
-      background: rgba(255, 255, 255, 0.04);
+      color: #111111;
+      background: rgba(0, 0, 0, 0.04);
     }
     .seg-btn.active {
       background: #226CFF;
       color: #FFFFFF;
-      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.35);
+      box-shadow: 0 1px 3px rgba(34, 108, 255, 0.25);
     }
     select, input[type="text"], input[type="number"] {
       width: 100%;
       height: 32px;
-      background: #182032;
-      color: #F8FAFC;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       border-radius: 6px;
       padding: 0 9px;
       font-size: 11.5px;
@@ -242,13 +242,13 @@
       transition: border-color 0.12s, background 0.12s;
     }
     select:hover, input[type="text"]:hover, input[type="number"]:hover, textarea:hover {
-      border-color: #3D4E6E;
+      border-color: #A1A1AA;
     }
     textarea {
       width: 100%;
-      background: #182032;
-      color: #F8FAFC;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       border-radius: 6px;
       padding: 8px 10px;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -260,8 +260,8 @@
       transition: border-color 0.12s;
     }
     select:focus, input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
-      border-color: #3B82F6;
-      background: #1B253A;
+      border-color: #226CFF;
+      background: #FFFFFF;
     }
     .row-2 {
       display: grid;
@@ -288,7 +288,7 @@
     input[type="range"] {
       width: 100%;
       height: 18px;
-      accent-color: #3B82F6;
+      accent-color: #226CFF;
       cursor: ew-resize;
       margin: 0;
     }
@@ -304,17 +304,17 @@
       gap: 7px;
       font-size: 11.5px;
       font-weight: 500;
-      color: #CBD5E1;
+      color: #27272A;
       cursor: pointer;
       user-select: none;
       transition: background 0.12s, color 0.12s;
     }
     .checkbox-row:hover {
-      background: rgba(148, 163, 184, 0.09);
-      color: #F8FAFC;
+      background: #F4F4F5;
+      color: #111111;
     }
     .checkbox-row input[type="checkbox"] {
-      accent-color: #3B82F6;
+      accent-color: #226CFF;
       width: 14px;
       height: 14px;
       cursor: pointer;
@@ -323,7 +323,7 @@
     .token-box {
       background: transparent;
       border: none;
-      border-top: 1px solid #1F293B;
+      border-top: 1px solid #EFEFEF;
       border-radius: 0;
       padding: 10px 0 0 0;
       display: flex;
@@ -341,21 +341,21 @@
       gap: 5px;
       font-size: 10.5px;
       font-family: 'JetBrains Mono', Consolas, monospace;
-      background: #182032;
-      border: 1px solid #2A364F;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
       padding: 3px 7px;
       border-radius: 4px;
-      color: #CBD5E1;
+      color: #27272A;
       cursor: pointer;
       transition: all 0.12s;
     }
     .token-chip:hover {
-      border-color: #5991FF;
-      color: #FFFFFF;
+      border-color: #226CFF;
+      color: #226CFF;
     }
     .token-chip.selected {
-      border-color: #3B82F6;
-      background: rgba(34, 108, 255, 0.24);
+      border-color: #226CFF;
+      background: #226CFF;
       color: #FFFFFF;
     }
     .token-dot {
@@ -365,9 +365,9 @@
       display: inline-block;
     }
     .btn-mini {
-      background: #1C263B;
-      color: #93C5FD;
-      border: 1px solid #2E3D59;
+      background: #FFFFFF;
+      color: #226CFF;
+      border: 1px solid rgba(34, 108, 255, 0.35);
       border-radius: 5px;
       padding: 3px 8px;
       font-size: 10.5px;
@@ -376,25 +376,25 @@
       transition: all 0.12s;
     }
     .btn-mini:hover {
-      background: #273552;
-      color: #FFFFFF;
-      border-color: #4B628C;
+      background: rgba(34, 108, 255, 0.08);
+      color: #1A56DB;
+      border-color: #226CFF;
     }
     /* 우측 프리뷰 & 액션 영역 */
     .main-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #0B0F19;
+      background: #F5F5F7;
       height: 100%;
     }
     .preview-toolbar {
       padding: 10px 18px;
-      border-bottom: 1px solid #1E293B;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #111827;
+      background: #FFFFFF;
       gap: 8px;
     }
     .toolbar-badges {
@@ -404,17 +404,17 @@
     }
     .var-status-badge {
       font-size: 11px;
-      color: #34D399;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #18181B;
+      background: #F4F4F5;
+      border: 1px solid #E4E4E7;
       padding: 3px 8px;
       border-radius: 6px;
     }
     .selection-badge {
       font-size: 11px;
-      color: #38BDF8;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #226CFF;
+      background: rgba(34, 108, 255, 0.1);
+      border: 1px solid rgba(34, 108, 255, 0.28);
       padding: 3px 8px;
       border-radius: 6px;
       display: none;
@@ -435,10 +435,10 @@
       min-width: 220px;
       min-height: 160px;
       background: #FFFFFF;
-      border: 1px solid #334155;
+      border: 1px solid #E4E4E7;
       border-radius: 14px;
       position: relative;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
       transition: background 0.18s;
     }
     .plugin-window-resizer {
@@ -450,7 +450,7 @@
       cursor: nwse-resize;
       z-index: 100;
       opacity: 0.7;
-      background: linear-gradient(135deg, transparent 50%, #64748B 50%, #64748B 65%, transparent 65%, transparent 80%, #94A3B8 80%);
+      background: linear-gradient(135deg, transparent 50%, #A1A1AA 50%, #A1A1AA 65%, transparent 65%, transparent 80%, #52525B 80%);
     }
     .plugin-window-resizer:hover {
       opacity: 1;
@@ -472,12 +472,11 @@
       width: 4px;
       height: 38px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.65);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+      background: rgba(34, 108, 255, 0.45);
       transition: transform 0.15s, background 0.15s;
     }
     .resize-handle-right:hover::after {
-      background: #38BDF8;
+      background: #226CFF;
       transform: scaleY(1.2);
     }
     .resize-handle-bottom {
@@ -497,11 +496,11 @@
       width: 38px;
       height: 4px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.65);
+      background: rgba(34, 108, 255, 0.45);
       transition: transform 0.15s, background 0.15s;
     }
     .resize-handle-bottom:hover::after {
-      background: #38BDF8;
+      background: #226CFF;
       transform: scaleX(1.2);
     }
     .resize-handle-corner {
@@ -511,25 +510,29 @@
       width: 16px;
       height: 16px;
       cursor: nwse-resize;
-      border-right: 3px solid #38BDF8;
-      border-bottom: 3px solid #38BDF8;
+      border-right: 3px solid #226CFF;
+      border-bottom: 3px solid #226CFF;
       border-bottom-right-radius: 4px;
       z-index: 25;
+    }
+    .resize-handle-corner:hover {
+      border-color: #1A56DB;
     }
     .live-size-pill {
       position: absolute;
       top: -26px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid #334155;
-      color: #93C5FD;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
+      color: #3F3F46;
       font-size: 10px;
       font-weight: 600;
       padding: 2px 10px;
       border-radius: 999px;
       white-space: nowrap;
       pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
     #preview-canvas {
       width: 100%;
@@ -538,8 +541,8 @@
     }
     .footer-bar {
       padding: 12px 18px;
-      border-top: 1px solid #1E293B;
-      background: #111827;
+      border-top: 1px solid #E5E5E5;
+      background: #FFFFFF;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -547,14 +550,17 @@
     }
     .footer-hint {
       font-size: 11px;
-      color: #64748B;
+      color: #71717A;
+    }
+    .footer-hint strong {
+      color: #111111;
     }
     .action-btns {
       display: flex;
       gap: 8px;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #226CFF, #785CFD);
+      background: #226CFF;
       color: #FFFFFF;
       border: none;
       padding: 8px 16px;
@@ -562,29 +568,31 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background 0.15s;
     }
     .btn-primary:hover {
-      opacity: 0.92;
+      background: #1A56DB;
     }
     .btn-secondary {
-      background: #1E293B;
-      color: #F8FAFC;
-      border: 1px solid #334155;
+      background: #FFFFFF;
+      color: #111111;
+      border: 1px solid #D4D4D8;
       padding: 8px 14px;
       border-radius: 7px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: none;
+      transition: all 0.15s;
     }
     .btn-secondary:hover {
-      background: #334155;
+      background: #F4F4F5;
+      border-color: #A1A1AA;
     }
     .btn-code {
-      background: rgba(59, 130, 246, 0.14);
-      color: #93C5FD;
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: #FFFFFF;
+      color: #226CFF;
+      border: 1px solid rgba(34, 108, 255, 0.35);
       padding: 8px 14px;
       border-radius: 7px;
       font-size: 12px;
@@ -593,16 +601,16 @@
       transition: all 0.15s;
     }
     .btn-code:hover {
-      background: rgba(59, 130, 246, 0.26);
-      color: #FFFFFF;
-      border-color: #60A5FA;
+      background: rgba(34, 108, 255, 0.08);
+      color: #1A56DB;
+      border-color: #226CFF;
     }
     /* 개발자용 코드 내보내기 모달 */
     .code-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(7, 11, 20, 0.76);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(3px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -615,18 +623,18 @@
     .code-modal {
       width: min(780px, 92vw);
       max-height: 84vh;
-      background: #111827;
-      border: 1px solid #334155;
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
       border-radius: 12px;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.16);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     .code-modal-header {
       padding: 14px 18px;
-      background: #0F172A;
-      border-bottom: 1px solid #1E293B;
+      background: #FAFAFA;
+      border-bottom: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -635,7 +643,7 @@
     .code-modal-title {
       font-size: 13px;
       font-weight: 700;
-      color: #F8FAFC;
+      color: #111111;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -643,9 +651,9 @@
     .copy-toast {
       font-size: 11px;
       font-weight: 600;
-      color: #34D399;
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #226CFF;
+      background: rgba(34, 108, 255, 0.1);
+      border: 1px solid rgba(34, 108, 255, 0.28);
       padding: 3px 9px;
       border-radius: 999px;
     }
@@ -654,8 +662,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 18px;
-      background: #111827;
-      border-bottom: 1px solid #1E293B;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E5E5;
       gap: 8px;
     }
     .code-tab-group {
@@ -663,9 +671,9 @@
       gap: 6px;
     }
     .code-tab-btn {
-      background: #0B0F19;
-      color: #94A3B8;
-      border: 1px solid #1E293B;
+      background: #FFFFFF;
+      color: #52525B;
+      border: 1px solid #E4E4E7;
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 11px;
@@ -674,12 +682,13 @@
       transition: all 0.12s;
     }
     .code-tab-btn:hover {
-      color: #F8FAFC;
+      color: #111111;
+      border-color: #A1A1AA;
     }
     .code-tab-btn.active {
       background: #226CFF;
       color: #FFFFFF;
-      border-color: #3B82F6;
+      border-color: #226CFF;
     }
     .code-modal-body {
       padding: 14px 18px;
@@ -692,9 +701,9 @@
     .code-editor-area {
       width: 100%;
       height: 420px;
-      background: #080C14;
-      color: #E2E8F0;
-      border: 1px solid #1E293B;
+      background: #FAFAFA;
+      color: #18181B;
+      border: 1px solid #E4E4E7;
       border-radius: 8px;
       padding: 14px;
       font-family: 'JetBrains Mono', Consolas, monospace;
@@ -707,8 +716,8 @@
     }
     .code-modal-footer {
       padding: 12px 18px;
-      background: #0F172A;
-      border-top: 1px solid #1E293B;
+      background: #FAFAFA;
+      border-top: 1px solid #E5E5E5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -734,10 +743,11 @@
           <div class="field">
             <label>차트 종류</label>
             <div class="seg-group" id="type-group">
-              <button class="seg-btn active" data-type="bar">📊 Bar</button>
-              <button class="seg-btn" data-type="line">📈 Line</button>
-              <button class="seg-btn" data-type="pie">🍩 Donut</button>
-              <button class="seg-btn" data-type="funnel">🔻 Funnel</button>
+              <button class="seg-btn active" data-type="bar">Bar</button>
+              <button class="seg-btn" data-type="line">Line</button>
+              <button class="seg-btn" data-type="donut">Donut</button>
+              <button class="seg-btn" data-type="pie">Pie</button>
+              <button class="seg-btn" data-type="funnel">Funnel</button>
             </div>
           </div>
 
@@ -769,7 +779,7 @@
                 <option value="weseed-palette-scale">Primary 팔레트 스케일 (Primary/500, Primary/100...)</option>
                 <option value="weseed-cool">Cool 블루/청록 (blue/-, sky/-...)</option>
                 <option value="weseed-warm">Warm 레드/앰버 (red/-, amber/-...)</option>
-                <option value="custom">✏️ 직접 변수 지정 (Custom)</option>
+                <option value="custom">직접 변수 지정 (Custom)</option>
               </select>
             </div>
             <div class="field">
@@ -784,8 +794,8 @@
           <!-- 활성 토큰 미리보기, 카테고리별 변수 선택 및 직접 입력 -->
           <div class="token-box">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:10.5px;color:#94A3B8;font-weight:600;">시리즈 변수 (칩 클릭 후 카테고리·세부 단계 선택)</span>
-              <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">📦 파일에 변수 등록</button>
+              <span style="font-size:10.5px;color:#52525B;font-weight:600;">시리즈 변수 (칩 클릭 후 카테고리·세부 단계 선택)</span>
+              <button class="btn-mini" id="sync-tokens-btn" title="현재 피그마 파일에 변수가 없을 때 2.Color token / 3.Color token - point 폴더 구조로 변수를 생성합니다">파일에 변수 등록</button>
             </div>
             <div class="token-chips" id="active-token-chips"></div>
             <div class="row-2" style="margin-top:2px;">
@@ -798,7 +808,7 @@
               <div class="field">
                 <label id="project-var-step-label">2. 세부 토큰 (#1 변경)</label>
                 <select id="project-var-select" title="선택된 시리즈 칩에 적용할 세부 단계 변수를 선택합니다">
-                  <option value="">🎨 세부 단계 선택...</option>
+                  <option value="">세부 단계 선택...</option>
                 </select>
               </div>
             </div>
@@ -832,7 +842,7 @@
           <div class="field">
             <label>
               <span>데이터 편집 (라벨: 값1, 값2...)</span>
-              <span style="color:#60A5FA;cursor:pointer;font-weight:700;" id="random-data-btn">🎲 랜덤 생성</span>
+              <span style="color:#226CFF;cursor:pointer;font-weight:700;" id="random-data-btn">랜덤 생성</span>
             </label>
             <textarea id="data-textarea">1월: 120, 85, 45
 2월: 155, 110, 60
@@ -901,13 +911,13 @@
             </div>
           </div>
 
-          <!-- Pie / Donut 전용 -->
+          <!-- Donut / Pie 전용 -->
           <div id="pie-controls" style="display:none;flex-direction:column;gap:10px;">
-            <div class="row-2">
-              <div class="field">
+            <div class="row-2" id="pie-gap-row">
+              <div class="field" id="donut-hole-field">
                 <label>내부 구멍 비율 <span class="val-badge" id="hole-txt">60%</span></label>
                 <div class="slider-box">
-                  <input type="range" id="hole-slider" min="0" max="80" value="60" step="5" />
+                  <input type="range" id="hole-slider" min="20" max="80" value="60" step="5" />
                 </div>
               </div>
               <div class="field">
@@ -998,19 +1008,19 @@
             <div class="field">
               <label>범례 위치 (12방향)</label>
               <select id="legend-pos-select">
-                <option value="top-left">↖ 상좌 (top-left)</option>
-                <option value="top-center">⬆ 상중 (top-center)</option>
-                <option value="top-right" selected>↗ 상우 (top-right)</option>
-                <option value="bottom-left">↙ 하좌 (bottom-left)</option>
-                <option value="bottom-center">⬇ 하중 (bottom-center)</option>
-                <option value="bottom-right">↘ 하우 (bottom-right)</option>
-                <option value="left-top">⬅ 좌상 (left-top)</option>
-                <option value="left-middle">⬅ 좌중 (left-middle)</option>
-                <option value="left-bottom">⬅ 좌하 (left-bottom)</option>
-                <option value="right-top">➡ 우상 (right-top)</option>
-                <option value="right-middle">➡ 우중 (right-middle)</option>
-                <option value="right-bottom">➡ 우하 (right-bottom)</option>
-                <option value="none">🚫 숨김 (None)</option>
+                <option value="top-left">상좌 (top-left)</option>
+                <option value="top-center">상중 (top-center)</option>
+                <option value="top-right" selected>상우 (top-right)</option>
+                <option value="bottom-left">하좌 (bottom-left)</option>
+                <option value="bottom-center">하중 (bottom-center)</option>
+                <option value="bottom-right">하우 (bottom-right)</option>
+                <option value="left-top">좌상 (left-top)</option>
+                <option value="left-middle">좌중 (left-middle)</option>
+                <option value="left-bottom">좌하 (left-bottom)</option>
+                <option value="right-top">우상 (right-top)</option>
+                <option value="right-middle">우중 (right-middle)</option>
+                <option value="right-bottom">우하 (right-bottom)</option>
+                <option value="none">숨김 (None)</option>
               </select>
             </div>
             <div class="field">
@@ -1121,9 +1131,9 @@
           <div class="field">
             <label>빠른 반응형 프리셋 (우측 프리뷰에서 자유 드래그 가능)</label>
             <div class="seg-group-3" id="size-preset-group">
-              <button class="seg-btn active" data-w="640" data-h="400">🖥 Desktop (640)</button>
-              <button class="seg-btn" data-w="480" data-h="320">📱 Tablet (480)</button>
-              <button class="seg-btn" data-w="320" data-h="240">📲 Mobile (320)</button>
+              <button class="seg-btn active" data-w="640" data-h="400">Desktop (640)</button>
+              <button class="seg-btn" data-w="480" data-h="320">Tablet (480)</button>
+              <button class="seg-btn" data-w="320" data-h="240">Mobile (320)</button>
             </div>
           </div>
 
@@ -1148,7 +1158,7 @@
           </div>
 
           <label class="checkbox-row">
-            <input type="checkbox" id="chk-bind-vars" checked /> 🔗 프로젝트 피그마 변수(Variables)에 자동 바인딩
+            <input type="checkbox" id="chk-bind-vars" checked /> 프로젝트 피그마 변수(Variables)에 자동 바인딩
           </label>
         </div>
       </section>
@@ -1159,24 +1169,24 @@
   <!-- 우측 실시간 Canvas 2D 프리뷰 및 삽입 액션 -->
   <main class="main-area">
     <div class="preview-toolbar">
-      <div style="font-weight:600;color:#CBD5E1;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
+      <div style="font-weight:600;color:#111111;">실시간 프리뷰 (A/B 프로젝트 변수 자동 반영)</div>
       <div class="toolbar-badges">
         <div
           class="var-status-badge"
           id="ota-status-badge"
-          style="cursor:pointer;background:rgba(34,108,255,0.14);border-color:rgba(34,108,255,0.35);color:#93C5FD;"
+          style="cursor:pointer;background:#FFFFFF;border-color:#E4E4E7;color:#52525B;"
           title="클릭하여 GitHub(junwoo1519/nanocharts) 최신 버전 수동 확인"
         >
-          🔄 GitHub 버전 확인 중...
+          GitHub 버전 확인 중...
         </div>
-        <div class="var-status-badge" id="var-status-badge">🔗 variables.scss 기본 토큰 사용 중</div>
+        <div class="var-status-badge" id="var-status-badge">variables.scss 기본 토큰 사용 중</div>
         <div class="selection-badge" id="selection-badge">선택됨: NanoChart Frame</div>
       </div>
     </div>
 
     <div class="preview-stage" id="preview-stage">
       <div class="chart-box" id="chart-box">
-        <div class="live-size-pill" id="live-size-pill">640 × 400 px · ↔ 우측/하단 핸들을 드래그하여 유동 반응형 조절</div>
+        <div class="live-size-pill" id="live-size-pill">640 × 400 px · 우측/하단 핸들을 드래그하여 유동 반응형 조절</div>
         <div id="preview-canvas"></div>
         <div class="resize-handle-right" id="resize-handle-right" title="좌우로 드래그하여 유동 반응형 너비 조절"></div>
         <div class="resize-handle-bottom" id="resize-handle-bottom" title="상하로 드래그하여 유동 반응형 높이 조절"></div>
@@ -1186,12 +1196,12 @@
 
     <div class="footer-bar">
       <div class="footer-hint">
-        💡 삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
+        삽입 시 도형·텍스트의 Fill/Stroke가 현재 피그마 파일의 <strong>Color Variables</strong>에 자동 연결됩니다.
       </div>
       <div class="action-btns">
-        <button class="btn-code" id="export-code-btn" title="현재 설정된 차트 옵션과 디자인 토큰을 개발자가 바로 붙여넣을 수 있는 코드로 내보냅니다">💻 개발자용 코드 내보내기</button>
-        <button class="btn-secondary" id="update-selected-btn">🔄 선택된 차트 업데이트</button>
-        <button class="btn-primary" id="insert-new-btn">➕ 피그마에 벡터(SVG)로 삽입</button>
+        <button class="btn-code" id="export-code-btn" title="현재 설정된 차트 옵션과 디자인 토큰을 개발자가 바로 붙여넣을 수 있는 코드로 내보냅니다">개발자용 코드 내보내기</button>
+        <button class="btn-secondary" id="update-selected-btn">선택된 차트 업데이트</button>
+        <button class="btn-primary" id="insert-new-btn">피그마에 벡터(SVG)로 삽입</button>
       </div>
     </div>
     <div class="plugin-window-resizer" id="plugin-window-resizer" title="드래그하여 피그마 플러그인 창 크기 조절"></div>
@@ -1202,10 +1212,10 @@
     <div class="code-modal">
       <div class="code-modal-header">
         <div class="code-modal-title">
-          <span>💻 개발자 전달용 코드 내보내기 (`@ju9nu7/nanocharts`)</span>
-          <span class="copy-toast" id="code-copy-toast">✅ 클립보드에 자동 복사됨</span>
+          <span>개발자 전달용 코드 내보내기 (`@ju9nu7/nanocharts`)</span>
+          <span class="copy-toast" id="code-copy-toast">클립보드에 자동 복사됨</span>
         </div>
-        <button class="btn-mini" id="close-code-modal-btn" style="padding:4px 10px;font-size:11px;">✕ 닫기 (ESC)</button>
+        <button class="btn-mini" id="close-code-modal-btn" style="padding:4px 10px;font-size:11px;">닫기 (ESC)</button>
       </div>
       <div class="code-modal-tabs">
         <div class="code-tab-group" id="code-format-tabs">
@@ -1214,28 +1224,28 @@
           <button class="code-tab-btn" data-format="options">3. 옵션 객체만 (Options)</button>
           <button class="code-tab-btn" data-format="svg">4. 순수 SVG 태그 (SVG)</button>
         </div>
-        <span style="font-size:11px;color:#94A3B8;">디자인 토큰(`var(--*)`) · Tailwind 클래스 자동 매핑</span>
+        <span style="font-size:11px;color:#71717A;">디자인 토큰(`var(--*)`) · Tailwind 클래스 자동 매핑</span>
       </div>
       <div class="code-modal-body">
         <textarea class="code-editor-area" id="exported-code-textarea" readonly spellcheck="false"></textarea>
       </div>
       <div class="code-modal-footer">
-        <div style="font-size:11px;color:#94A3B8;">
-          💡 개발자에게 이 코드를 전달하면 웹 브라우저에서도 피그마와 100% 동일한 차트가 렌더링됩니다.
+        <div style="font-size:11px;color:#71717A;">
+          개발자에게 이 코드를 전달하면 웹 브라우저에서도 피그마와 100% 동일한 차트가 렌더링됩니다.
         </div>
         <div class="action-btns">
-          <button class="btn-code" id="download-code-btn">💾 파일로 저장 (.ts)</button>
-          <button class="btn-primary" id="copy-code-again-btn">📋 클립보드에 다시 복사</button>
+          <button class="btn-code" id="download-code-btn">파일로 저장 (.ts)</button>
+          <button class="btn-primary" id="copy-code-again-btn">클립보드에 다시 복사</button>
         </div>
       </div>
     </div>
   </div>
 
   <script type="module">
-    const NANOCHARTS_BUILD_META = {"version":"0.1.16","buildId":"0.1.16-1795596581793","buildTime":1795596581793,"builtAt":"2026-11-25T08:49:41.793Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+    const NANOCHARTS_BUILD_META = {"version":"0.1.17","buildId":"0.1.17-1795654893795","buildTime":1795654893795,"builtAt":"2026-11-26T01:01:33.795Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 
-var Ke = Object.defineProperty;
-var Ve = (u, t, e) => t in u ? Ke(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
+var Ne = Object.defineProperty;
+var Ve = (u, t, e) => t in u ? Ne(u, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : u[t] = e;
 var M = (u, t, e) => Ve(u, typeof t != "symbol" ? t + "" : t, e);
 class ce {
   constructor(t) {
@@ -1403,7 +1413,7 @@ class J {
     this.rafId !== null && (typeof cancelAnimationFrame < "u" && cancelAnimationFrame(this.rafId), this.rafId = null);
   }
 }
-class Ie {
+class Le {
   constructor(t, e) {
     /** 데이터 도메인 [최솟값, 최댓값] */
     M(this, "_domain", [0, 1]);
@@ -1455,8 +1465,8 @@ class Ie {
     let h;
     c <= 1 ? h = 1 * a : c <= 2 ? h = 2 * a : c <= 5 ? h = 5 * a : h = 10 * a;
     const d = Math.ceil(s / h) * h, f = [], g = Math.min(20, Math.max(0, -l)), m = 500;
-    for (let p = d; p <= n + h * 1e-3 && f.length < m; p += h)
-      f.push(Number(p.toFixed(g)));
+    for (let y = d; y <= n + h * 1e-3 && f.length < m; y += h)
+      f.push(Number(y.toFixed(g)));
     return e > i ? f.reverse() : f;
   }
   /**
@@ -1476,7 +1486,7 @@ class Ie {
     return this._domain = e > i ? [f, d] : [d, f], this;
   }
 }
-class Re {
+class Ie {
   constructor(t = 0, e = [0, 1]) {
     /** 전체 데이터 개수 */
     M(this, "_domainCount", 0);
@@ -1904,7 +1914,7 @@ const oe = {
   "on-pink-high": "#8C1C58",
   "on-pink-higher": "#681541",
   "on-pink-highest": "#460E2C"
-}, Qe = {
+}, tt = {
   "rounded-xxs": 2,
   "rounded-xs": 3,
   "rounded-sm": 4,
@@ -1913,7 +1923,7 @@ const oe = {
   "rounded-xl": 12,
   "rounded-xxl": 16,
   "rounded-full": 999
-}, Ne = {
+}, We = {
   "padding/p-0_5": 2,
   "padding/p-1": 4,
   "padding/p-1_5": 6,
@@ -1926,7 +1936,7 @@ const oe = {
   "padding/p-8": 32,
   "padding/p-9": 36,
   "padding/p-10": 40
-}, We = {
+}, _e = {
   "gap/gap-0_5": 2,
   "gap/gap-1": 4,
   "gap/gap-1_5": 6,
@@ -1939,10 +1949,10 @@ const oe = {
   "gap/gap-8": 32,
   "gap/gap-9": 36,
   "gap/gap-10": 40
-}, Je = {
-  ...Ne,
-  ...We
-}, _e = /* @__PURE__ */ new Set([
+}, it = {
+  ...We,
+  ..._e
+}, Ge = /* @__PURE__ */ new Set([
   "red",
   "orange",
   "amber",
@@ -1971,7 +1981,7 @@ const oe = {
   800: ["ultra-high", "highest", "high"],
   900: ["ultra-high", "highest", "higher"],
   950: ["ultra-high", "highest"]
-}, Ge = {
+}, Xe = {
   30: ["lower"],
   50: ["low"],
   100: ["lower", "low"],
@@ -1999,7 +2009,7 @@ function be(u) {
     return ke[i[1]];
   const s = t.match(/^([a-z-]+)-(\d+)$/);
   if (s) {
-    const n = s[1], o = s[2], r = _e.has(n) && Ge[o] || Ce[o];
+    const n = s[1], o = s[2], r = Ge.has(n) && Xe[o] || Ce[o];
     if (r)
       for (const l of r) {
         const a = l ? `${n}-${l}` : n;
@@ -2009,7 +2019,7 @@ function be(u) {
   }
   return t;
 }
-function et(u) {
+function st(u) {
   const t = (u || "").trim();
   if (!t) return "primary/-";
   if (t.includes("/"))
@@ -2054,7 +2064,7 @@ function T(u, t) {
   }
   return e;
 }
-function Xe(u) {
+function je(u) {
   const t = T(u).trim();
   if (t.startsWith("#")) {
     let i = t.slice(1);
@@ -2077,7 +2087,7 @@ function Xe(u) {
   } : { r: 34, g: 108, b: 255, a: 1 };
 }
 function Ee(u, t) {
-  const { r: e, g: i, b: s, a: n } = Xe(u), o = e / 255, r = i / 255, l = s / 255, a = Math.max(o, r, l), c = Math.min(o, r, l);
+  const { r: e, g: i, b: s, a: n } = je(u), o = e / 255, r = i / 255, l = s / 255, a = Math.max(o, r, l), c = Math.min(o, r, l);
   let h = 0, d = 0, f = (a + c) / 2;
   if (a !== c) {
     const F = a - c;
@@ -2096,24 +2106,24 @@ function Ee(u, t) {
   }
   let g = d * 100, m = f * 100;
   t.saturation !== void 0 && (g = t.saturation), t.saturationDelta !== void 0 && (g += t.saturationDelta), t.lightness !== void 0 && (m = t.lightness), t.lightnessDelta !== void 0 && (m += t.lightnessDelta), d = Math.max(0, Math.min(100, g)) / 100, f = Math.max(0, Math.min(100, m)) / 100;
-  let p, v, b;
+  let y, v, b;
   if (d === 0)
-    p = v = b = f;
+    y = v = b = f;
   else {
     const F = (k, B, D) => {
       let A = D;
       return A < 0 && (A += 1), A > 1 && (A -= 1), A < 0.16666666666666666 ? k + (B - k) * 6 * A : A < 0.5 ? B : A < 0.6666666666666666 ? k + (B - k) * (0.6666666666666666 - A) * 6 : k;
     }, x = f < 0.5 ? f * (1 + d) : f + d - f * d, E = 2 * f - x;
-    p = F(E, x, h + 1 / 3), v = F(E, x, h), b = F(E, x, h - 1 / 3);
+    y = F(E, x, h + 1 / 3), v = F(E, x, h), b = F(E, x, h - 1 / 3);
   }
-  const w = Math.round(p * 255), S = Math.round(v * 255), $ = Math.round(b * 255), C = t.alpha !== void 0 ? Math.max(0, Math.min(1, t.alpha)) : n;
+  const w = Math.round(y * 255), S = Math.round(v * 255), $ = Math.round(b * 255), C = t.alpha !== void 0 ? Math.max(0, Math.min(1, t.alpha)) : n;
   return C < 0.999 ? `rgba(${w}, ${S}, ${$}, ${Number(C.toFixed(3))})` : "#" + [w, S, $].map((F) => F.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
 function Y(u, t = 11, e = 500) {
   const i = (u == null ? void 0 : u.family) || 'Pretendard, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', s = (u == null ? void 0 : u.size) ?? t;
   return `${(u == null ? void 0 : u.weight) ?? e} ${s}px ${i}`;
 }
-function je(u) {
+function Ye(u) {
   if (u == null)
     return [0, 0, 0, 0];
   if (typeof u == "number")
@@ -2129,8 +2139,8 @@ function re(u, t, e, i, s, n) {
   if (i <= 0 || s === 0) return;
   let o = e, r = s;
   s < 0 && (o = e + s, r = -s);
-  const [l, a, c, h] = je(n), d = Math.min(i / 2, r / 2), f = Math.min(l, d), g = Math.min(a, d), m = Math.min(c, d), p = Math.min(h, d);
-  u.beginPath(), u.moveTo(t + f, o), u.lineTo(t + i - g, o), g > 0 && u.quadraticCurveTo(t + i, o, t + i, o + g), u.lineTo(t + i, o + r - m), m > 0 && u.quadraticCurveTo(t + i, o + r, t + i - m, o + r), u.lineTo(t + p, o + r), p > 0 && u.quadraticCurveTo(t, o + r, t, o + r - p), u.lineTo(t, o + f), f > 0 && u.quadraticCurveTo(t, o, t + f, o), u.closePath();
+  const [l, a, c, h] = Ye(n), d = Math.min(i / 2, r / 2), f = Math.min(l, d), g = Math.min(a, d), m = Math.min(c, d), y = Math.min(h, d);
+  u.beginPath(), u.moveTo(t + f, o), u.lineTo(t + i - g, o), g > 0 && u.quadraticCurveTo(t + i, o, t + i, o + g), u.lineTo(t + i, o + r - m), m > 0 && u.quadraticCurveTo(t + i, o + r, t + i - m, o + r), u.lineTo(t + y, o + r), y > 0 && u.quadraticCurveTo(t, o + r, t, o + r - y), u.lineTo(t, o + f), f > 0 && u.quadraticCurveTo(t, o, t + f, o), u.closePath();
 }
 function ae(u, t, e, i, s, n) {
   let o;
@@ -2146,7 +2156,7 @@ class Te {
    */
   static render(t, e, i, s, n, o, r) {
     var S;
-    const l = n.left, a = s - n.right, [c, h] = i.range(), d = Math.min(h, c), f = r ? r - n.bottom : Math.max(h, c), g = Math.max(0, a - l), m = Math.max(0, f - d), p = i.ticks(5);
+    const l = n.left, a = s - n.right, [c, h] = i.range(), d = Math.min(h, c), f = r ? r - n.bottom : Math.max(h, c), g = Math.max(0, a - l), m = Math.max(0, f - d), y = i.ticks(5);
     if ((S = e == null ? void 0 : e.alternateBand) != null && S.visible && g > 0 && m > 0) {
       const $ = T(e.alternateBand.color || "rgba(148, 163, 184, 0.06)"), C = e.alternateBand.direction || "horizontal";
       if (t.save(), t.fillStyle = $, C === "vertical" && o) {
@@ -2156,10 +2166,10 @@ class Te {
             const D = o.scale(B) - (E - k) / 2, A = Math.max(l, D), z = Math.min(a, D + E) - A;
             z > 0 && t.fillRect(A, d, z, m);
           }
-      } else if (p.length >= 2) {
-        for (let F = 0; F < p.length - 1; F++)
+      } else if (y.length >= 2) {
+        for (let F = 0; F < y.length - 1; F++)
           if (F % 2 === 0) {
-            const x = i.scale(p[F]), E = i.scale(p[F + 1]), k = Math.min(x, E), B = Math.abs(x - E);
+            const x = i.scale(y[F]), E = i.scale(y[F + 1]), k = Math.min(x, E), B = Math.abs(x - E);
             t.fillRect(l, k, g, B);
           }
       }
@@ -2175,7 +2185,7 @@ class Te {
       t.save(), t.strokeStyle = T(v.color || "#F1F5F9"), t.lineWidth = v.lineWidth ?? 1, v.opacity !== void 0 && (t.globalAlpha = Math.max(0, Math.min(1, v.opacity)));
       const $ = le(v, [3, 3]);
       t.setLineDash($);
-      for (const C of p) {
+      for (const C of y) {
         const F = Math.round(i.scale(C)) + 0.5;
         t.beginPath(), t.moveTo(l, F), t.lineTo(a, F), t.stroke();
       }
@@ -2232,25 +2242,25 @@ class he {
     if (a <= 0 || s.length === 0) return;
     const c = (e == null ? void 0 : e.font) || '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', h = T((e == null ? void 0 : e.labelColor) || "#64748B"), d = (e == null ? void 0 : e.labelOffset) ?? 10, f = n - o.bottom + d;
     t.save(), t.font = c, t.fillStyle = h, t.textAlign = "center", t.textBaseline = "top";
-    const g = i.bandwidth(), m = i.step(), [p, v] = i.range(), b = Math.max(1, v - p);
+    const g = i.bandwidth(), m = i.step(), [y, v] = i.range(), b = Math.max(1, v - y);
     let w = 0;
     const S = Math.max(1, Math.floor(a / 24));
     for (let D = r; D <= l; D += S) {
-      const A = ((B = s[D]) == null ? void 0 : B.label) ?? "", z = e != null && e.formatter ? e.formatter(A) : A, V = t.measureText(z).width;
-      V > w && (w = V);
+      const A = ((B = s[D]) == null ? void 0 : B.label) ?? "", z = e != null && e.formatter ? e.formatter(A) : A, N = t.measureText(z).width;
+      N > w && (w = N);
     }
     const C = Math.min(w, Math.max(48, b * 0.45)) + 12, F = Math.max(1, Math.ceil(C / (m || 1))), x = Math.max(20, Math.min(b, (m || b) * F - 8));
     for (let D = r; D <= l; D += F) {
       const A = s[D];
       if (!A) continue;
-      const V = i.scale(D) + g / 2, N = e != null && e.formatter ? e.formatter(A.label ?? "") : A.label ?? "", W = xe(t, N, x);
-      t.fillText(W, V, f);
+      const N = i.scale(D) + g / 2, V = e != null && e.formatter ? e.formatter(A.label ?? "") : A.label ?? "", W = xe(t, V, x);
+      t.fillText(W, N, f);
     }
     const E = T((e == null ? void 0 : e.color) || "#E2E8F0"), k = (e == null ? void 0 : e.lineWidth) ?? 1;
     if (k > 0) {
       t.strokeStyle = E, t.lineWidth = k;
       const D = n - o.bottom;
-      t.beginPath(), t.moveTo(p, D), t.lineTo(v, D), t.stroke();
+      t.beginPath(), t.moveTo(y, D), t.lineTo(v, D), t.stroke();
     }
     t.restore();
   }
@@ -2291,7 +2301,7 @@ class fe {
         this.element.innerHTML = this.options.multiFormatter(i, s, n);
       else {
         const c = s.map((d) => {
-          const f = d.highlighted ? "700" : "500", g = d.highlighted ? "#F8FAFC" : "#CBD5E1", m = Q(d.color), p = typeof d.percentage == "number" && Number.isFinite(d.percentage) ? ` <span style="color:#94A3B8;font-size:11px;">(${d.percentage.toFixed(1)}%)</span>` : "";
+          const f = d.highlighted ? "700" : "500", g = d.highlighted ? "#F8FAFC" : "#CBD5E1", m = Q(d.color), y = typeof d.percentage == "number" && Number.isFinite(d.percentage) ? ` <span style="color:#94A3B8;font-size:11px;">(${d.percentage.toFixed(1)}%)</span>` : "";
           return `
             <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:3px;">
               <div style="display:flex;align-items:center;gap:6px;">
@@ -2299,7 +2309,7 @@ class fe {
                 <span style="color:${g};font-weight:${f};">${Q(d.seriesName)}</span>
               </div>
               <div style="font-weight:700;color:#F8FAFC;">
-                ${Ae(d.value)}${p}
+                ${Ae(d.value)}${y}
               </div>
             </div>
           `;
@@ -2567,10 +2577,10 @@ class ge {
     this.rootEl.remove(), this.itemElements.clear();
   }
 }
-function I(u) {
+function L(u) {
   return String(u).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
-function y(u) {
+function p(u) {
   return Number.isFinite(u) ? Number(u.toFixed(2)).toString() : "0";
 }
 function G(u) {
@@ -2584,21 +2594,21 @@ function G(u) {
   }
   return { color: e, opacity: 1 };
 }
-function Ye(u, t, e, i, s, n, o) {
-  const r = e.direction === "horizontal", l = y(i), a = y(s), c = y(r ? i + n : i), h = y(r ? s : s + o), d = G(e.from), f = G(e.to);
+function Ue(u, t, e, i, s, n, o) {
+  const r = e.direction === "horizontal", l = p(i), a = p(s), c = p(r ? i + n : i), h = p(r ? s : s + o), d = G(e.from), f = G(e.to);
   return u.push(
-    `<linearGradient id="${I(t)}" x1="${l}" y1="${a}" x2="${c}" y2="${h}" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${I(d.color)}" stop-opacity="${y(d.opacity)}" /><stop offset="100%" stop-color="${I(f.color)}" stop-opacity="${y(f.opacity)}" /></linearGradient>`
+    `<linearGradient id="${L(t)}" x1="${l}" y1="${a}" x2="${c}" y2="${h}" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${L(d.color)}" stop-opacity="${p(d.opacity)}" /><stop offset="100%" stop-color="${L(f.color)}" stop-opacity="${p(f.opacity)}" /></linearGradient>`
   ), `url(#${t})`;
 }
 function Fe(u, t, e, i, s, n, o, r, l = 1) {
   if (typeof t == "string") {
-    const h = G(t), d = h.opacity * l, f = d < 0.999 ? ` ${u}-opacity="${y(d)}"` : "";
-    return `${u}="${I(h.color)}"${f}`;
+    const h = G(t), d = h.opacity * l, f = d < 0.999 ? ` ${u}-opacity="${p(d)}"` : "";
+    return `${u}="${L(h.color)}"${f}`;
   }
-  const a = Ye(e, i, t, s, n, o, r), c = l < 0.999 ? ` ${u}-opacity="${y(l)}"` : "";
+  const a = Ue(e, i, t, s, n, o, r), c = l < 0.999 ? ` ${u}-opacity="${p(l)}"` : "";
   return `${u}="${a}"${c}`;
 }
-function Ue(u) {
+function Ze(u) {
   const t = {
     fontWeight: "500",
     fontSize: 11,
@@ -2609,56 +2619,56 @@ function Ue(u) {
   return { fontWeight: n, fontSize: i, fontFamily: r };
 }
 function j(u) {
-  const { id: t, x: e, y: i, text: s, font: n, fill: o = "#94A3B8", align: r = "center", baseline: l = "middle" } = u, { fontWeight: a, fontSize: c, fontFamily: h } = Ue(n), d = G(o);
+  const { id: t, x: e, y: i, text: s, font: n, fill: o = "#94A3B8", align: r = "center", baseline: l = "middle" } = u, { fontWeight: a, fontSize: c, fontFamily: h } = Ze(n), d = G(o);
   let f = "middle";
   r === "left" ? f = "start" : r === "right" && (f = "end");
   let g = i;
   l === "middle" ? g = i + c * 0.35 : l === "top" ? g = i + c * 0.85 : l === "bottom" && (g = i - c * 0.1);
-  const m = t ? ` id="${I(t)}"` : "", p = d.opacity < 0.999 ? ` fill-opacity="${y(d.opacity)}"` : "";
-  return `<text${m} x="${y(e)}" y="${y(g)}" text-anchor="${f}" fill="${I(d.color)}"${p} font-family="${I(h)}" font-size="${y(c)}" font-weight="${I(a)}">${I(s)}</text>`;
+  const m = t ? ` id="${L(t)}"` : "", y = d.opacity < 0.999 ? ` fill-opacity="${p(d.opacity)}"` : "";
+  return `<text${m} x="${p(e)}" y="${p(g)}" text-anchor="${f}" fill="${L(d.color)}"${y} font-family="${L(h)}" font-size="${p(c)}" font-weight="${L(a)}">${L(s)}</text>`;
 }
 function Pe(u) {
   const { id: t, x: e, y: i, width: s, height: n, radius: o = 0, fillAttrs: r, strokeAttrs: l = "" } = u;
   if (s <= 0 || n <= 0) return "";
   let a = 0, c = 0, h = 0, d = 0;
   typeof o == "number" ? a = c = h = d = Math.max(0, o) : Array.isArray(o) && (a = Math.max(0, o[0] || 0), c = Math.max(0, o[1] || 0), h = Math.max(0, o[2] || 0), d = Math.max(0, o[3] || 0));
-  const f = Math.min(s / 2, n / 2), g = Math.max(0, Math.min(a, f)), m = Math.max(0, Math.min(c, f)), p = Math.max(0, Math.min(h, f)), v = Math.max(0, Math.min(d, f)), b = t ? ` id="${I(t)}"` : "", w = l ? ` ${l}` : "", S = a > 0 || c > 0 || h > 0 || d > 0 ? ` data-corners="${y(a)},${y(c)},${y(h)},${y(d)}" data-box="${y(e)},${y(i)},${y(s)},${y(n)}"` : "";
+  const f = Math.min(s / 2, n / 2), g = Math.max(0, Math.min(a, f)), m = Math.max(0, Math.min(c, f)), y = Math.max(0, Math.min(h, f)), v = Math.max(0, Math.min(d, f)), b = t ? ` id="${L(t)}"` : "", w = l ? ` ${l}` : "", S = a > 0 || c > 0 || h > 0 || d > 0 ? ` data-corners="${p(a)},${p(c)},${p(h)},${p(d)}" data-box="${p(e)},${p(i)},${p(s)},${p(n)}"` : "";
   if (a === c && c === h && h === d) {
-    const C = a > 0 ? ` rx="${y(a)}" ry="${y(a)}"` : "";
-    return `<rect${b} x="${y(e)}" y="${y(i)}" width="${y(s)}" height="${y(n)}"${C}${S} ${r}${w} />`;
+    const C = a > 0 ? ` rx="${p(a)}" ry="${p(a)}"` : "";
+    return `<rect${b} x="${p(e)}" y="${p(i)}" width="${p(s)}" height="${p(n)}"${C}${S} ${r}${w} />`;
   }
   const $ = [
-    `M ${y(e + g)} ${y(i)}`,
-    `L ${y(e + s - m)} ${y(i)}`,
-    m > 0 ? `A ${y(m)} ${y(m)} 0 0 1 ${y(e + s)} ${y(i + m)}` : "",
-    `L ${y(e + s)} ${y(i + n - p)}`,
-    p > 0 ? `A ${y(p)} ${y(p)} 0 0 1 ${y(e + s - p)} ${y(i + n)}` : "",
-    `L ${y(e + v)} ${y(i + n)}`,
-    v > 0 ? `A ${y(v)} ${y(v)} 0 0 1 ${y(e)} ${y(i + n - v)}` : "",
-    `L ${y(e)} ${y(i + g)}`,
-    g > 0 ? `A ${y(g)} ${y(g)} 0 0 1 ${y(e + g)} ${y(i)}` : "",
+    `M ${p(e + g)} ${p(i)}`,
+    `L ${p(e + s - m)} ${p(i)}`,
+    m > 0 ? `A ${p(m)} ${p(m)} 0 0 1 ${p(e + s)} ${p(i + m)}` : "",
+    `L ${p(e + s)} ${p(i + n - y)}`,
+    y > 0 ? `A ${p(y)} ${p(y)} 0 0 1 ${p(e + s - y)} ${p(i + n)}` : "",
+    `L ${p(e + v)} ${p(i + n)}`,
+    v > 0 ? `A ${p(v)} ${p(v)} 0 0 1 ${p(e)} ${p(i + n - v)}` : "",
+    `L ${p(e)} ${p(i + g)}`,
+    g > 0 ? `A ${p(g)} ${p(g)} 0 0 1 ${p(e + g)} ${p(i)}` : "",
     "Z"
   ].filter(Boolean).join(" ");
   return `<path${b}${S} d="${$}" ${r}${w} />`;
 }
-function pe(u, t = "smooth", e = 0.35, i = !1) {
+function ye(u, t = "smooth", e = 0.35, i = !1) {
   if (u.length === 0) return "";
   const s = [];
-  if (s.push(`${i ? "L" : "M"} ${y(u[0].x)} ${y(u[0].y)}`), u.length === 1) return s.join(" ");
+  if (s.push(`${i ? "L" : "M"} ${p(u[0].x)} ${p(u[0].y)}`), u.length === 1) return s.join(" ");
   const n = Math.max(0, Math.min(1, e));
   if (t === "linear")
     for (let o = 1; o < u.length; o++)
-      s.push(`L ${y(u[o].x)} ${y(u[o].y)}`);
+      s.push(`L ${p(u[o].x)} ${p(u[o].y)}`);
   else if (t === "step")
     for (let o = 1; o < u.length; o++) {
       const r = u[o - 1], l = u[o], a = (r.x + l.x) / 2;
-      s.push(`L ${y(a)} ${y(r.y)}`), s.push(`L ${y(a)} ${y(l.y)}`), s.push(`L ${y(l.x)} ${y(l.y)}`);
+      s.push(`L ${p(a)} ${p(r.y)}`), s.push(`L ${p(a)} ${p(l.y)}`), s.push(`L ${p(l.x)} ${p(l.y)}`);
     }
   else
     for (let o = 0; o < u.length - 1; o++) {
       const r = u[o > 0 ? o - 1 : 0], l = u[o], a = u[o + 1], c = u[o + 2 < u.length ? o + 2 : o + 1], h = l.x + (a.x - r.x) * n / 2, d = l.y + (a.y - r.y) * n / 2, f = a.x - (c.x - l.x) * n / 2, g = a.y - (c.y - l.y) * n / 2;
       s.push(
-        `C ${y(h)} ${y(d)}, ${y(f)} ${y(g)}, ${y(a.x)} ${y(a.y)}`
+        `C ${p(h)} ${p(d)}, ${p(f)} ${p(g)}, ${p(a.x)} ${p(a.y)}`
       );
     }
   return s.join(" ");
@@ -2673,27 +2683,27 @@ function Se(u, t, e, i, s, n, o, r) {
   const a = l > Math.PI ? 1 : 0, c = u + Math.cos(s) * i, h = t + Math.sin(s) * i, d = u + Math.cos(n) * i, f = t + Math.sin(n) * i;
   if (e <= 0)
     return [
-      `M ${y(u)} ${y(t)}`,
-      `L ${y(c)} ${y(h)}`,
-      `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
+      `M ${p(u)} ${p(t)}`,
+      `L ${p(c)} ${p(h)}`,
+      `A ${p(i)} ${p(i)} 0 ${a} 1 ${p(d)} ${p(f)}`,
       "Z"
     ].join(" ");
-  const g = o ?? s, m = r ?? n, p = m - g;
-  if (p <= 1e-4) {
+  const g = o ?? s, m = r ?? n, y = m - g;
+  if (y <= 1e-4) {
     const C = (g + m) / 2, F = u + Math.cos(C) * e, x = t + Math.sin(C) * e;
     return [
-      `M ${y(c)} ${y(h)}`,
-      `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
-      `L ${y(F)} ${y(x)}`,
+      `M ${p(c)} ${p(h)}`,
+      `A ${p(i)} ${p(i)} 0 ${a} 1 ${p(d)} ${p(f)}`,
+      `L ${p(F)} ${p(x)}`,
       "Z"
     ].join(" ");
   }
-  const v = p > Math.PI ? 1 : 0, b = u + Math.cos(m) * e, w = t + Math.sin(m) * e, S = u + Math.cos(g) * e, $ = t + Math.sin(g) * e;
+  const v = y > Math.PI ? 1 : 0, b = u + Math.cos(m) * e, w = t + Math.sin(m) * e, S = u + Math.cos(g) * e, $ = t + Math.sin(g) * e;
   return [
-    `M ${y(c)} ${y(h)}`,
-    `A ${y(i)} ${y(i)} 0 ${a} 1 ${y(d)} ${y(f)}`,
-    `L ${y(b)} ${y(w)}`,
-    `A ${y(e)} ${y(e)} 0 ${v} 0 ${y(S)} ${y($)}`,
+    `M ${p(c)} ${p(h)}`,
+    `A ${p(i)} ${p(i)} 0 ${a} 1 ${p(d)} ${p(f)}`,
+    `L ${p(b)} ${p(w)}`,
+    `A ${p(e)} ${p(e)} 0 ${v} 0 ${p(S)} ${p($)}`,
     "Z"
   ].join(" ");
 }
@@ -2701,14 +2711,14 @@ function ze(u, t, e, i, s, n) {
   var w;
   const o = i.left, r = e - i.right, [l, a] = t.range(), c = Math.min(a, l), h = n ? n - i.bottom : Math.max(a, l), d = Math.max(0, r - o), f = Math.max(0, h - c), g = t.ticks(5), m = [];
   if ((w = u == null ? void 0 : u.alternateBand) != null && w.visible && d > 0 && f > 0) {
-    const S = G(u.alternateBand.color || "rgba(148, 163, 184, 0.06)"), $ = S.opacity < 0.999 ? ` fill-opacity="${y(S.opacity)}"` : "";
+    const S = G(u.alternateBand.color || "rgba(148, 163, 184, 0.06)"), $ = S.opacity < 0.999 ? ` fill-opacity="${p(S.opacity)}"` : "";
     if ((u.alternateBand.direction || "horizontal") === "vertical" && s) {
       const [F, x] = s.getViewport(), E = s.step(), k = s.bandwidth();
       for (let B = F; B <= x; B++)
         if (B % 2 === 1) {
           const D = s.scale(B) - (E - k) / 2, A = Math.max(o, D), z = Math.min(r, D + E) - A;
           z > 0 && m.push(
-            `<rect id="Grid Band X (${B})" x="${y(A)}" y="${y(c)}" width="${y(z)}" height="${y(f)}" fill="${I(S.color)}"${$} />`
+            `<rect id="Grid Band X (${B})" x="${p(A)}" y="${p(c)}" width="${p(z)}" height="${p(f)}" fill="${L(S.color)}"${$} />`
           );
         }
     } else if (g.length >= 2) {
@@ -2716,36 +2726,36 @@ function ze(u, t, e, i, s, n) {
         if (F % 2 === 0) {
           const x = t.scale(g[F]), E = t.scale(g[F + 1]), k = Math.min(x, E), B = Math.abs(x - E);
           m.push(
-            `<rect id="Grid Band Y (${F})" x="${y(o)}" y="${y(k)}" width="${y(d)}" height="${y(B)}" fill="${I(S.color)}"${$} />`
+            `<rect id="Grid Band Y (${F})" x="${p(o)}" y="${p(k)}" width="${p(d)}" height="${p(B)}" fill="${L(S.color)}"${$} />`
           );
         }
     }
   }
-  const p = (u == null ? void 0 : u.y) ?? { visible: !0, color: "#1E293B", lineWidth: 1, lineDash: [3, 3] };
-  if (p.visible !== !1) {
-    const S = G(p.color || "#1E293B"), $ = le(p, [3, 3]), C = $.length > 0 ? ` stroke-dasharray="${$.join(" ")}"` : "", F = S.opacity * (p.opacity ?? 1), x = F < 0.999 ? ` stroke-opacity="${y(F)}"` : "";
+  const y = (u == null ? void 0 : u.y) ?? { visible: !0, color: "#1E293B", lineWidth: 1, lineDash: [3, 3] };
+  if (y.visible !== !1) {
+    const S = G(y.color || "#1E293B"), $ = le(y, [3, 3]), C = $.length > 0 ? ` stroke-dasharray="${$.join(" ")}"` : "", F = S.opacity * (y.opacity ?? 1), x = F < 0.999 ? ` stroke-opacity="${p(F)}"` : "";
     for (const E of g) {
       const k = Math.round(t.scale(E)) + 0.5;
       m.push(
-        `<line id="Grid Line (${E})" x1="${y(o)}" y1="${y(k)}" x2="${y(r)}" y2="${y(k)}" stroke="${I(S.color)}"${x} stroke-width="${y(p.lineWidth || 1)}"${C} />`
+        `<line id="Grid Line (${E})" x1="${p(o)}" y1="${p(k)}" x2="${p(r)}" y2="${p(k)}" stroke="${L(S.color)}"${x} stroke-width="${p(y.lineWidth || 1)}"${C} />`
       );
     }
   }
   const v = u == null ? void 0 : u.x;
   if (v != null && v.visible && s) {
-    const [S, $] = s.getViewport(), C = s.bandwidth(), F = G(v.color || "#1E293B"), x = le(v, [3, 3]), E = x.length > 0 ? ` stroke-dasharray="${x.join(" ")}"` : "", k = F.opacity * (v.opacity ?? 1), B = k < 0.999 ? ` stroke-opacity="${y(k)}"` : "";
+    const [S, $] = s.getViewport(), C = s.bandwidth(), F = G(v.color || "#1E293B"), x = le(v, [3, 3]), E = x.length > 0 ? ` stroke-dasharray="${x.join(" ")}"` : "", k = F.opacity * (v.opacity ?? 1), B = k < 0.999 ? ` stroke-opacity="${p(k)}"` : "";
     for (let D = S; D <= $; D++) {
       const A = Math.round(s.scale(D) + C / 2) + 0.5;
       A >= o && A <= r && m.push(
-        `<line id="Grid Line X (${D})" x1="${y(A)}" y1="${y(c)}" x2="${y(A)}" y2="${y(h)}" stroke="${I(F.color)}"${B} stroke-width="${y(v.lineWidth || 1)}"${E} />`
+        `<line id="Grid Line X (${D})" x1="${p(A)}" y1="${p(c)}" x2="${p(A)}" y2="${p(h)}" stroke="${L(F.color)}"${B} stroke-width="${p(v.lineWidth || 1)}"${E} />`
       );
     }
   }
   const b = u == null ? void 0 : u.border;
   if (b != null && b.visible && d > 0 && f > 0) {
-    const S = G(b.color || "#CBD5E1"), $ = b.lineDash && b.lineDash.length > 0 ? ` stroke-dasharray="${b.lineDash.join(" ")}"` : "", C = b.radius && b.radius > 0 ? ` rx="${y(b.radius)}"` : "";
+    const S = G(b.color || "#CBD5E1"), $ = b.lineDash && b.lineDash.length > 0 ? ` stroke-dasharray="${b.lineDash.join(" ")}"` : "", C = b.radius && b.radius > 0 ? ` rx="${p(b.radius)}"` : "";
     m.push(
-      `<rect id="Plot Border" x="${y(o)}" y="${y(c)}" width="${y(d)}" height="${y(f)}"${C} fill="none" stroke="${I(S.color)}" stroke-width="${y(b.lineWidth || 1)}"${$} />`
+      `<rect id="Plot Border" x="${p(o)}" y="${p(c)}" width="${p(d)}" height="${p(f)}"${C} fill="none" stroke="${L(S.color)}" stroke-width="${p(b.lineWidth || 1)}"${$} />`
     );
   }
   return m.length === 0 ? "" : `<g id="Grid">
@@ -2759,18 +2769,18 @@ function Oe(u, t, e, i, s, n, o) {
   if ((t == null ? void 0 : t.visible) !== !1) {
     const a = i.ticks(5), c = (t == null ? void 0 : t.font) || "11px Pretendard, sans-serif", h = (t == null ? void 0 : t.labelColor) || "#94A3B8", d = (t == null ? void 0 : t.labelOffset) ?? 8, f = o.left - d, g = [];
     if (t != null && t.lineWidth && t.lineWidth > 0) {
-      const [m, p] = i.range(), v = G(t.color || "#CBD5E1");
+      const [m, y] = i.range(), v = G(t.color || "#CBD5E1");
       g.push(
-        `<line id="Y-Axis Line" x1="${y(o.left)}" y1="${y(m)}" x2="${y(o.left)}" y2="${y(p)}" stroke="${I(v.color)}" stroke-width="${y(t.lineWidth)}" />`
+        `<line id="Y-Axis Line" x1="${p(o.left)}" y1="${p(m)}" x2="${p(o.left)}" y2="${p(y)}" stroke="${L(v.color)}" stroke-width="${p(t.lineWidth)}" />`
       );
     }
     for (const m of a) {
-      const p = i.scale(m), v = t != null && t.formatter ? t.formatter(m) : m.toLocaleString();
+      const y = i.scale(m), v = t != null && t.formatter ? t.formatter(m) : m.toLocaleString();
       g.push(
         j({
           id: `Y-Tick: ${v}`,
           x: f,
-          y: p,
+          y,
           text: v,
           font: c,
           fill: h,
@@ -2787,11 +2797,11 @@ function Oe(u, t, e, i, s, n, o) {
   if ((u == null ? void 0 : u.visible) !== !1) {
     const [a, c] = e.getViewport();
     if (c - a + 1 > 0) {
-      const d = (u == null ? void 0 : u.font) || "11px Pretendard, sans-serif", f = (u == null ? void 0 : u.labelColor) || "#64748B", g = (u == null ? void 0 : u.labelOffset) ?? 10, m = n - o.bottom + g, p = [], v = (u == null ? void 0 : u.color) || "#1E293B", b = (u == null ? void 0 : u.lineWidth) ?? 1;
+      const d = (u == null ? void 0 : u.font) || "11px Pretendard, sans-serif", f = (u == null ? void 0 : u.labelColor) || "#64748B", g = (u == null ? void 0 : u.labelOffset) ?? 10, m = n - o.bottom + g, y = [], v = (u == null ? void 0 : u.color) || "#1E293B", b = (u == null ? void 0 : u.lineWidth) ?? 1;
       if (b > 0) {
         const [E, k] = e.range(), B = n - o.bottom, D = G(v);
-        p.push(
-          `<line id="X-Axis Baseline" x1="${y(E)}" y1="${y(B)}" x2="${y(k)}" y2="${y(B)}" stroke="${I(D.color)}" stroke-width="${y(b)}" />`
+        y.push(
+          `<line id="X-Axis Baseline" x1="${p(E)}" y1="${p(B)}" x2="${p(k)}" y2="${p(B)}" stroke="${L(D.color)}" stroke-width="${p(b)}" />`
         );
       }
       const S = (((l = s[a]) == null ? void 0 : l.label) || "Sample").length * 6.5, $ = e.bandwidth(), C = e.step(), F = S + 12, x = Math.max(1, Math.ceil(F / (C || 1)));
@@ -2799,7 +2809,7 @@ function Oe(u, t, e, i, s, n, o) {
         const k = s[E];
         if (!k) continue;
         const D = e.scale(E) + $ / 2, A = u != null && u.formatter ? u.formatter(k.label) : k.label;
-        p.push(
+        y.push(
           j({
             id: `X-Tick: ${A}`,
             x: D,
@@ -2813,7 +2823,7 @@ function Oe(u, t, e, i, s, n, o) {
         );
       }
       r.push(`<g id="X-Axis">
-    ${p.join(`
+    ${y.join(`
     `)}
   </g>`);
     }
@@ -2825,7 +2835,7 @@ function ue(u, t, e, i) {
   if (t === !1 || u.length === 0) return "";
   const s = typeof t == "object" ? t : {};
   if (s.visible === !1) return "";
-  const { side: n, align: o } = we(s.position, s.align ?? "end"), r = s.markerShape || "rounded", l = s.fontSize ?? 12, a = s.fontFamily || "Pretendard, sans-serif", c = s.fontWeight ?? 500, h = s.textColor || "#E2E8F0", d = s.inactiveColor || "#64748B", f = s.maxItems ?? 12, g = u.slice(0, f), m = g.map((v) => 16 + (s.formatter ? s.formatter(v) : v.label).length * (l * 0.62) + 16), p = [];
+  const { side: n, align: o } = we(s.position, s.align ?? "end"), r = s.markerShape || "rounded", l = s.fontSize ?? 12, a = s.fontFamily || "Pretendard, sans-serif", c = s.fontWeight ?? 500, h = s.textColor || "#E2E8F0", d = s.inactiveColor || "#64748B", f = s.maxItems ?? 12, g = u.slice(0, f), m = g.map((v) => 16 + (s.formatter ? s.formatter(v) : v.label).length * (l * 0.62) + 16), y = [];
   if (n === "top" || n === "bottom") {
     const v = m.reduce((S, $) => S + $, 0);
     let b = Math.max(16, (e - v) / 2);
@@ -2835,15 +2845,15 @@ function ue(u, t, e, i) {
       const C = S.active !== !1, F = C ? S.color : d, x = s.formatter ? s.formatter(S) : S.label, E = G(F);
       let k = "";
       if (r === "circle")
-        k = `<circle id="Marker: ${I(x)}" cx="${y(b + 5)}" cy="${y(w)}" r="5" fill="${I(E.color)}" />`;
+        k = `<circle id="Marker: ${L(x)}" cx="${p(b + 5)}" cy="${p(w)}" r="5" fill="${L(E.color)}" />`;
       else if (r === "line")
-        k = `<rect id="Marker: ${I(x)}" x="${y(b)}" y="${y(w - 1.5)}" width="12" height="3" rx="1.5" fill="${I(E.color)}" />`;
+        k = `<rect id="Marker: ${L(x)}" x="${p(b)}" y="${p(w - 1.5)}" width="12" height="3" rx="1.5" fill="${L(E.color)}" />`;
       else {
         const D = r === "rounded" ? 3 : 0;
-        k = `<rect id="Marker: ${I(x)}" x="${y(b)}" y="${y(w - 5)}" width="10" height="10" rx="${D}" fill="${I(E.color)}" />`;
+        k = `<rect id="Marker: ${L(x)}" x="${p(b)}" y="${p(w - 5)}" width="10" height="10" rx="${D}" fill="${L(E.color)}" />`;
       }
       const B = j({
-        id: `Label: ${I(x)}`,
+        id: `Label: ${L(x)}`,
         x: b + 16,
         y: w,
         text: x,
@@ -2852,14 +2862,14 @@ function ue(u, t, e, i) {
         align: "left",
         baseline: "middle"
       });
-      p.push(`<g id="Legend Item: ${I(x)}">${k}${B}</g>`), b += m[$];
+      y.push(`<g id="Legend Item: ${L(x)}">${k}${B}</g>`), b += m[$];
     });
   } else {
     const v = n === "left" ? 16 : e - 115, b = g.length * 22;
     let w = Math.max(24, (i - b) / 2);
     o === "start" ? w = 24 : o === "end" && (w = Math.max(24, i - b - 12)), g.forEach((S) => {
-      const $ = S.active !== !1, C = $ ? S.color : d, F = s.formatter ? s.formatter(S) : S.label, x = G(C), E = r === "circle" ? `<circle id="Marker: ${I(F)}" cx="${y(v + 5)}" cy="${y(w)}" r="5" fill="${I(x.color)}" />` : `<rect id="Marker: ${I(F)}" x="${y(v)}" y="${y(w - 5)}" width="10" height="10" rx="3" fill="${I(x.color)}" />`, k = j({
-        id: `Label: ${I(F)}`,
+      const $ = S.active !== !1, C = $ ? S.color : d, F = s.formatter ? s.formatter(S) : S.label, x = G(C), E = r === "circle" ? `<circle id="Marker: ${L(F)}" cx="${p(v + 5)}" cy="${p(w)}" r="5" fill="${L(x.color)}" />` : `<rect id="Marker: ${L(F)}" x="${p(v)}" y="${p(w - 5)}" width="10" height="10" rx="3" fill="${L(x.color)}" />`, k = j({
+        id: `Label: ${L(F)}`,
         x: v + 16,
         y: w,
         text: F,
@@ -2868,11 +2878,11 @@ function ue(u, t, e, i) {
         align: "left",
         baseline: "middle"
       });
-      p.push(`<g id="Legend Item: ${I(F)}">${E}${k}</g>`), w += 22;
+      y.push(`<g id="Legend Item: ${L(F)}">${E}${k}</g>`), w += 22;
     });
   }
   return `<g id="Legend">
-    ${p.join(`
+    ${y.join(`
     `)}
   </g>`;
 }
@@ -2884,13 +2894,13 @@ function me(u) {
   </defs>` : "";
   let l = "";
   if (n && n !== "transparent" && n !== "none") {
-    const c = G(n), h = o > 0 ? ` rx="${y(o)}" ry="${y(o)}"` : "", d = c.opacity < 0.999 ? ` fill-opacity="${y(c.opacity)}"` : "";
+    const c = G(n), h = o > 0 ? ` rx="${p(o)}" ry="${p(o)}"` : "", d = c.opacity < 0.999 ? ` fill-opacity="${p(c.opacity)}"` : "";
     l = `
-  <rect id="Chart Background" x="0" y="0" width="${y(t)}" height="${y(e)}"${h} fill="${I(c.color)}"${d} />`;
+  <rect id="Chart Background" x="0" y="0" width="${p(t)}" height="${p(e)}"${h} fill="${L(c.color)}"${d} />`;
   }
   const a = s.filter(Boolean).join(`
   `);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${y(t)}" height="${y(e)}" viewBox="0 0 ${y(t)} ${y(e)}" fill="none">${r}${l}
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${p(t)}" height="${p(e)}" viewBox="0 0 ${p(t)} ${p(e)}" fill="none">${r}${l}
   ${a}
 </svg>`;
 }
@@ -2922,8 +2932,8 @@ class Be {
    * @param progress 애니메이션 진행률 (0.0 ~ 1.0, 기본값: 1)
    */
   getBarGeometry(t, e, i, s, n = 1) {
-    const o = i.scale(e), r = i.bandwidth(), l = Math.max(0.05, Math.min(1, this.barOptions.widthRatio ?? 0.65)), a = r * l, c = o + (r - a) / 2, h = s.scale(0), d = typeof t.value == "number" && Number.isFinite(t.value) ? t.value : 0, f = s.scale(d), g = d >= 0, m = g ? h - f : f - h, p = Math.max(0, m * n), v = g ? h - p : h;
-    return { x: c, y: v, width: a, height: p, item: t, index: e };
+    const o = i.scale(e), r = i.bandwidth(), l = Math.max(0.05, Math.min(1, this.barOptions.widthRatio ?? 0.65)), a = r * l, c = o + (r - a) / 2, h = s.scale(0), d = typeof t.value == "number" && Number.isFinite(t.value) ? t.value : 0, f = s.scale(d), g = d >= 0, m = g ? h - f : f - h, y = Math.max(0, m * n), v = g ? h - y : h;
+    return { x: c, y: v, width: a, height: y, item: t, index: e };
   }
   /**
    * 다중 시리즈(Grouped / Stacked / Percent)의 특정 X축 슬롯(`slotIndex`)에 속한 모든 바의 기하 정보를 계산합니다.
@@ -2938,7 +2948,7 @@ class Be {
       for (let E = 0; E < o; E++) {
         const k = e[E], B = k.items[t];
         if (!B) continue;
-        const D = d + E * $ + ($ - F) / 2, A = typeof B.value == "number" && Number.isFinite(B.value) ? B.value : 0, z = s.scale(A), V = A >= 0, N = V ? x - z : z - x, W = Math.max(0, N * n), O = V ? x - W : x;
+        const D = d + E * $ + ($ - F) / 2, A = typeof B.value == "number" && Number.isFinite(B.value) ? B.value : 0, z = s.scale(A), N = A >= 0, V = N ? x - z : z - x, W = Math.max(0, V * n), O = N ? x - W : x;
         f.push({
           x: D,
           y: O,
@@ -2956,10 +2966,10 @@ class Be {
       }
       return f;
     }
-    let g = 0, m = 0, p = -1, v = -1;
+    let g = 0, m = 0, y = -1, v = -1;
     for (let $ = 0; $ < o; $++) {
       const C = (S = e[$].items[t]) == null ? void 0 : S.value, F = typeof C == "number" && Number.isFinite(C) ? C : 0;
-      F > 0 ? (g += F, p = $) : F < 0 && (m += Math.abs(F), v = $);
+      F > 0 ? (g += F, y = $) : F < 0 && (m += Math.abs(F), v = $);
     }
     let b = 0, w = 0;
     for (let $ = 0; $ < o; $++) {
@@ -2970,12 +2980,12 @@ class Be {
       if (r === "percent" && (E ? (B = g > 0 ? x / g * 100 : 0, k = B) : (B = m > 0 ? Math.abs(x) / m * 100 : 0, k = -B)), E) {
         const D = b * n, A = (b + k) * n;
         b += k;
-        const z = s.scale(D), V = s.scale(A), N = Math.max(0, z - V), W = V, O = $ === p;
+        const z = s.scale(D), N = s.scale(A), V = Math.max(0, z - N), W = N, O = $ === y;
         f.push({
           x: d,
           y: W,
           width: h,
-          height: N,
+          height: V,
           item: F,
           index: t,
           seriesKey: C.key,
@@ -2990,12 +3000,12 @@ class Be {
       } else {
         const D = w * n, A = (w + k) * n;
         w += k;
-        const z = s.scale(D), V = s.scale(A), N = Math.max(0, V - z), W = z, O = $ === v;
+        const z = s.scale(D), N = s.scale(A), V = Math.max(0, N - z), W = z, O = $ === v;
         f.push({
           x: d,
           y: W,
           width: h,
-          height: N,
+          height: V,
           item: F,
           index: t,
           seriesKey: C.key,
@@ -3092,7 +3102,7 @@ class Be {
       typeof a.color == "function" ? a.color(r, l) : a.color || (c.startsWith("inside") ? "#FFFFFF" : "#334155")
     );
     t.save(), t.font = d, t.fillStyle = f, t.textAlign = "center";
-    const g = typeof r.value == "number" && Number.isFinite(r.value) ? r.value.toLocaleString() : "-", m = e.percentage !== void 0 && this.getMode() === "percent" && !a.formatter ? `${e.percentage.toFixed(0)}%` : a.formatter ? a.formatter(r.value, r, l) : g, p = i + n / 2;
+    const g = typeof r.value == "number" && Number.isFinite(r.value) ? r.value.toLocaleString() : "-", m = e.percentage !== void 0 && this.getMode() === "percent" && !a.formatter ? `${e.percentage.toFixed(0)}%` : a.formatter ? a.formatter(r.value, r, l) : g, y = i + n / 2;
     let v = s;
     switch (c) {
       case "top-outside":
@@ -3114,7 +3124,7 @@ class Be {
         t.restore();
         return;
     }
-    t.fillText(m, p, v), t.restore();
+    t.fillText(m, y, v), t.restore();
   }
   /**
    * 범례(Legend) 아이콘 등에 표시할 대표 단색(Hex/RGB) 문자열을 반환합니다.
@@ -3152,7 +3162,7 @@ class Be {
   toSvgElements(t, e, i, s, n, o) {
     const [r, l] = s.getViewport();
     if (r > l) return "";
-    const a = [], c = [], h = this.getMode() !== "grouped", d = (g, m, p) => {
+    const a = [], c = [], h = this.getMode() !== "grouped", d = (g, m, y) => {
       var x;
       if (g.width <= 0 || g.height <= 0) return;
       const v = this.resolveColorStyle(g), b = Fe(
@@ -3168,7 +3178,7 @@ class Be {
       let S = "";
       if (w && w.width > 0) {
         const E = G(w.color), k = w.dash && w.dash.length > 0 ? ` stroke-dasharray="${w.dash.join(" ")}"` : "";
-        S = `stroke="${I(E.color)}" stroke-width="${y(w.width)}"${k}`;
+        S = `stroke="${L(E.color)}" stroke-width="${p(w.width)}"${k}`;
       }
       const $ = g.borderRadiusOverride !== void 0 ? g.borderRadiusOverride : this.barOptions.borderRadius, C = g.seriesName ? `Bar: ${g.seriesName} - ${g.item.label} (${g.item.value})` : `Bar: ${g.item.label} (${g.item.value})`, F = Pe({
         id: C,
@@ -3180,33 +3190,33 @@ class Be {
         fillAttrs: b,
         strokeAttrs: S
       });
-      if (F && a.push(F), p && ((x = this.labelOptions) != null && x.visible) && g.width >= 14) {
+      if (F && a.push(F), y && ((x = this.labelOptions) != null && x.visible) && g.width >= 14) {
         const E = this.labelOptions.position || "top-outside";
         if (E !== "none") {
-          const k = this.labelOptions.offset ?? 6, B = this.labelOptions.font || "600 11px Pretendard, sans-serif", D = typeof this.labelOptions.color == "function" ? this.labelOptions.color(g.item, g.index) : this.labelOptions.color || (E.startsWith("inside") ? "#FFFFFF" : "#94A3B8"), A = typeof g.item.value == "number" && Number.isFinite(g.item.value) ? g.item.value.toLocaleString() : "-", z = g.percentage !== void 0 && this.getMode() === "percent" && !this.labelOptions.formatter ? `${g.percentage.toFixed(0)}%` : this.labelOptions.formatter ? this.labelOptions.formatter(g.item.value, g.item, g.index) : A, V = g.x + g.width / 2;
-          let N = g.y, W = "bottom";
+          const k = this.labelOptions.offset ?? 6, B = this.labelOptions.font || "600 11px Pretendard, sans-serif", D = typeof this.labelOptions.color == "function" ? this.labelOptions.color(g.item, g.index) : this.labelOptions.color || (E.startsWith("inside") ? "#FFFFFF" : "#94A3B8"), A = typeof g.item.value == "number" && Number.isFinite(g.item.value) ? g.item.value.toLocaleString() : "-", z = g.percentage !== void 0 && this.getMode() === "percent" && !this.labelOptions.formatter ? `${g.percentage.toFixed(0)}%` : this.labelOptions.formatter ? this.labelOptions.formatter(g.item.value, g.item, g.index) : A, N = g.x + g.width / 2;
+          let V = g.y, W = "bottom";
           switch (E) {
             case "top-outside":
-              W = "bottom", N = g.y - k;
+              W = "bottom", V = g.y - k;
               break;
             case "inside-top":
-              W = "top", N = g.y + k;
+              W = "top", V = g.y + k;
               break;
             case "inside-center":
-              W = "middle", N = g.y + g.height / 2;
+              W = "middle", V = g.y + g.height / 2;
               break;
             case "inside-bottom":
-              W = "bottom", N = g.y + g.height - k;
+              W = "bottom", V = g.y + g.height - k;
               break;
             case "bottom-outside":
-              W = "top", N = g.y + g.height + k;
+              W = "top", V = g.y + g.height + k;
               break;
           }
           c.push(
             j({
               id: `Label: ${g.item.label} (${z})`,
-              x: V,
-              y: N,
+              x: N,
+              y: V,
               text: z,
               font: B,
               fill: D,
@@ -3220,18 +3230,18 @@ class Be {
     if (i)
       for (let g = r; g <= l; g++) {
         const m = this.getMultiBarGeometriesAtSlot(g, e, s, n, 1);
-        m.forEach((p, v) => {
+        m.forEach((y, v) => {
           var w;
-          const b = h && (((w = this.labelOptions) == null ? void 0 : w.position) || "top-outside") === "top-outside" ? v === m.length - 1 : !h || p.height >= 15;
-          d(p, `${g}-${v}`, b);
+          const b = h && (((w = this.labelOptions) == null ? void 0 : w.position) || "top-outside") === "top-outside" ? v === m.length - 1 : !h || y.height >= 15;
+          d(y, `${g}-${v}`, b);
         });
       }
     else
       for (let g = r; g <= l; g++) {
         const m = t[g];
         if (!m) continue;
-        const p = this.getBarGeometry(m, g, s, n, 1);
-        d(p, `${g}`, !0);
+        const y = this.getBarGeometry(m, g, s, n, 1);
+        d(y, `${g}`, !0);
       }
     const f = [];
     return a.length > 0 && f.push(`<g id="Bars">
@@ -3291,59 +3301,59 @@ class De {
     var O;
     if (t.length === 0 && !(this.styleOptions.maxValue && this.styleOptions.maxValue > 0))
       return [];
-    const n = (L) => typeof L == "number" && Number.isFinite(L) ? Math.max(0, L) : 0, o = t.reduce((L, R) => L + n(R.value), 0), r = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && o < 100 ? 100 : void 0), l = r !== void 0 && r > 0 ? Math.max(o, r) : o;
+    const n = (R) => typeof R == "number" && Number.isFinite(R) ? Math.max(0, R) : 0, o = t.reduce((R, I) => R + n(I.value), 0), r = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && o < 100 ? 100 : void 0), l = r !== void 0 && r > 0 ? Math.max(o, r) : o;
     if (l <= 0) return [];
-    const a = Math.max(0, l - o), c = this.styleOptions.trackColor ?? (r !== void 0 && r > 0 ? "var(--surface-low)" : void 0), h = a > l * 5e-4 && !!c && c !== "transparent" && c !== "none", d = e - s.left - s.right, f = i - s.top - s.bottom, g = s.left + d / 2, m = s.top + f / 2, p = Math.min(d, f), b = ((O = this.labelOptions) == null ? void 0 : O.position) === "outside" && this.labelOptions.visible ? p < 280 ? 22 : 35 : 10, w = Math.max(20, p / 2 - b), S = Math.max(0, Math.min(0.85, this.styleOptions.innerRadiusRatio ?? 0)), $ = w * S, C = w;
+    const a = Math.max(0, l - o), c = this.styleOptions.trackColor ?? (r !== void 0 && r > 0 ? "var(--surface-low)" : void 0), h = a > l * 5e-4 && !!c && c !== "transparent" && c !== "none", d = e - s.left - s.right, f = i - s.top - s.bottom, g = s.left + d / 2, m = s.top + f / 2, y = Math.min(d, f), b = ((O = this.labelOptions) == null ? void 0 : O.position) === "outside" && this.labelOptions.visible ? y < 280 ? 22 : 35 : 10, w = Math.max(20, y / 2 - b), S = Math.max(0, Math.min(0.85, this.styleOptions.innerRadiusRatio ?? 0)), $ = w * S, C = w;
     let F = -Math.PI / 2;
-    const x = this.styleOptions.sliceGap !== void 0, E = x && typeof this.styleOptions.sliceGap == "number" && Number.isFinite(this.styleOptions.sliceGap) ? Math.max(0, this.styleOptions.sliceGap) : 0, k = S > 1e-3 ? 0.02 : 0, B = this.styleOptions.padAngle ?? k, A = t.filter((L) => n(L.value) > 0).length + (h ? 1 : 0), z = x && A > 1 ? E : 0, V = !x && A > 1 ? Math.max(0, B) : 0, N = [], W = (L, R) => {
-      const P = L + R / 2;
-      if (R <= 0)
+    const x = this.styleOptions.sliceGap !== void 0, E = x && typeof this.styleOptions.sliceGap == "number" && Number.isFinite(this.styleOptions.sliceGap) ? Math.max(0, this.styleOptions.sliceGap) : 0, k = S > 1e-3 ? 0.02 : 0, B = this.styleOptions.padAngle ?? k, A = t.filter((R) => n(R.value) > 0).length + (h ? 1 : 0), z = x && A > 1 ? E : 0, N = !x && A > 1 ? Math.max(0, B) : 0, V = [], W = (R, I) => {
+      const P = R + I / 2;
+      if (I <= 0)
         return {
-          startAngle: L,
-          endAngle: L,
+          startAngle: R,
+          endAngle: R,
           midAngle: P,
           innerStartAngle: void 0,
           innerEndAngle: void 0,
           innerArcRadius: void 0
         };
       if (z > 0) {
-        const _ = C * Math.sin(Math.min(Math.PI / 2, R / 2)) * 0.9, K = Math.min(z / 2, _), X = Math.asin(Math.min(1, K / C)), Z = L + X, ye = L + R - X;
+        const _ = C * Math.sin(Math.min(Math.PI / 2, I / 2)) * 0.9, K = Math.min(z / 2, _), X = Math.asin(Math.min(1, K / C)), Z = R + X, pe = R + I - X;
         let te, se, ne;
-        if (R < Math.PI) {
-          const ie = K / Math.sin(R / 2);
+        if (I < Math.PI) {
+          const ie = K / Math.sin(I / 2);
           if ($ <= ie)
             te = Math.min(ie, C * 0.98), se = P, ne = P;
           else {
             const Me = Math.asin(Math.min(1, K / $));
-            te = $, se = L + Me, ne = L + R - Me;
+            te = $, se = R + Me, ne = R + I - Me;
           }
         } else {
           te = Math.max($, K);
           const ie = Math.asin(Math.min(1, K / te));
-          se = L + ie, ne = L + R - ie;
+          se = R + ie, ne = R + I - ie;
         }
         return {
           startAngle: Z,
-          endAngle: ye,
+          endAngle: pe,
           midAngle: P,
           innerStartAngle: se,
           innerEndAngle: ne,
           innerArcRadius: te
         };
       }
-      const H = Math.min(V, R * 0.8);
+      const H = Math.min(N, I * 0.8);
       return {
-        startAngle: L + H / 2,
-        endAngle: L + R - H / 2,
+        startAngle: R + H / 2,
+        endAngle: R + I - H / 2,
         midAngle: P,
         innerStartAngle: void 0,
         innerEndAngle: void 0,
         innerArcRadius: void 0
       };
     };
-    if (t.forEach((L, R) => {
-      const H = n(L.value) / l, _ = H * 2 * Math.PI, K = W(F, _), X = this.resolveSliceColor(L, R);
-      N.push({
+    if (t.forEach((R, I) => {
+      const H = n(R.value) / l, _ = H * 2 * Math.PI, K = W(F, _), X = this.resolveSliceColor(R, I);
+      V.push({
         startAngle: K.startAngle,
         endAngle: K.endAngle,
         midAngle: K.midAngle,
@@ -3356,12 +3366,12 @@ class De {
         cx: g,
         cy: m,
         color: X,
-        item: L,
-        index: R
+        item: R,
+        index: I
       }), F += _;
     }), h && c) {
-      const L = a / l, R = L * 2 * Math.PI, P = W(F, R);
-      N.push({
+      const R = a / l, I = R * 2 * Math.PI, P = W(F, I);
+      V.push({
         startAngle: P.startAngle,
         endAngle: P.endAngle,
         midAngle: P.midAngle,
@@ -3370,7 +3380,7 @@ class De {
         innerArcRadius: P.innerArcRadius,
         innerRadius: $,
         outerRadius: C,
-        percentage: L,
+        percentage: R,
         cx: g,
         cy: m,
         color: T(c),
@@ -3382,7 +3392,7 @@ class De {
         isTrack: !0
       });
     }
-    return N;
+    return V;
   }
   /**
    * 데이터 레이어: 전체 파이/도넛 조각 및 라벨 렌더링
@@ -3404,10 +3414,10 @@ class De {
         a.push(f);
         return;
       }
-      const m = d.innerEndAngle !== void 0 ? Math.min(d.innerEndAngle, o) : void 0, p = d.innerStartAngle !== void 0 && m !== void 0 ? Math.min(d.innerStartAngle, m) : d.innerStartAngle, v = s >= 1 ? d : {
+      const m = d.innerEndAngle !== void 0 ? Math.min(d.innerEndAngle, o) : void 0, y = d.innerStartAngle !== void 0 && m !== void 0 ? Math.min(d.innerStartAngle, m) : d.innerStartAngle, v = s >= 1 ? d : {
         ...d,
         endAngle: Math.min(d.endAngle, o),
-        innerStartAngle: p,
+        innerStartAngle: y,
         innerEndAngle: m,
         innerRadius: d.innerRadius * r,
         innerArcRadius: d.innerArcRadius !== void 0 ? d.innerArcRadius * r : void 0,
@@ -3428,19 +3438,19 @@ class De {
   drawSingleSlice(t, e, i = 0) {
     const { startAngle: s, endAngle: n, innerRadius: o, outerRadius: r, midAngle: l, cx: a, cy: c, color: h } = e;
     if (n <= s) return;
-    const d = typeof i == "boolean" ? i ? 1 : 0 : Math.max(0, Math.min(1.2, i)), f = (this.styleOptions.hoverExplode ?? 10) * d, g = Math.cos(l) * f, m = Math.sin(l) * f, p = r + 4 * d, v = a + g, b = c + m;
+    const d = typeof i == "boolean" ? i ? 1 : 0 : Math.max(0, Math.min(1.2, i)), f = (this.styleOptions.hoverExplode ?? 10) * d, g = Math.cos(l) * f, m = Math.sin(l) * f, y = r + 4 * d, v = a + g, b = c + m;
     t.save(), d > 0.02 && (t.shadowColor = h, t.shadowBlur = 16 * d, t.shadowOffsetX = g * 0.35, t.shadowOffsetY = m * 0.35);
     const w = e.innerArcRadius ?? o, S = e.innerStartAngle ?? s, $ = e.innerEndAngle ?? n;
     if (t.beginPath(), w <= 0)
-      t.moveTo(v, b), t.arc(v, b, p, s, n, !1), t.closePath();
+      t.moveTo(v, b), t.arc(v, b, y, s, n, !1), t.closePath();
     else if ($ <= S + 1e-4) {
       const x = (S + $) / 2;
-      t.arc(v, b, p, s, n, !1), t.lineTo(
+      t.arc(v, b, y, s, n, !1), t.lineTo(
         v + Math.cos(x) * w,
         b + Math.sin(x) * w
       ), t.closePath();
     } else
-      t.arc(v, b, p, s, n, !1), t.arc(v, b, w, $, S, !0), t.closePath();
+      t.arc(v, b, y, s, n, !1), t.arc(v, b, w, $, S, !0), t.closePath();
     t.fillStyle = h, t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0;
     const C = this.styleOptions.border, F = this.styleOptions.sliceGap !== void 0 ? this.styleOptions.sliceGap > 5e-4 : (this.styleOptions.padAngle ?? (o > 0 ? 0.02 : 0)) > 5e-4;
     d > 0.05 ? (t.strokeStyle = `rgba(255, 255, 255, ${0.65 * Math.min(1, d)})`, t.lineWidth = 1.5 * Math.min(1, d), t.stroke()) : C && C.width && C.width > 0 ? (t.strokeStyle = C.color || "#151C2C", t.lineWidth = C.width, t.stroke()) : F || (t.strokeStyle = h, t.lineWidth = 0.6, t.lineJoin = "round", t.stroke()), t.restore();
@@ -3469,12 +3479,12 @@ class De {
     const s = this.labelOptions;
     s.position !== "none" && (t.save(), t.font = s.font || "600 11px Pretendard, -apple-system, sans-serif", e.forEach((n, o) => {
       if (n.isTrack || n.percentage < 0.04) return;
-      const r = i ? i(o) : 0, l = (this.styleOptions.hoverExplode ?? 10) * r, a = Math.cos(n.midAngle) * l, c = Math.sin(n.midAngle) * l, { midAngle: h, innerRadius: d, item: f, percentage: g } = n, m = n.outerRadius + 4 * r, p = n.cx + a, v = n.cy + c, b = s.formatter ? s.formatter(f, g) : `${f.label} ${(g * 100).toFixed(0)}%`;
+      const r = i ? i(o) : 0, l = (this.styleOptions.hoverExplode ?? 10) * r, a = Math.cos(n.midAngle) * l, c = Math.sin(n.midAngle) * l, { midAngle: h, innerRadius: d, item: f, percentage: g } = n, m = n.outerRadius + 4 * r, y = n.cx + a, v = n.cy + c, b = s.formatter ? s.formatter(f, g) : `${f.label} ${(g * 100).toFixed(0)}%`;
       if (s.position === "inside") {
-        const w = (d + m) / 2, S = p + Math.cos(h) * w, $ = v + Math.sin(h) * w;
+        const w = (d + m) / 2, S = y + Math.cos(h) * w, $ = v + Math.sin(h) * w;
         t.fillStyle = T(s.color || "#FFFFFF"), t.textAlign = "center", t.textBaseline = "middle", t.fillText(b, S, $);
       } else {
-        const w = m + 4, S = m + 14, $ = p + Math.cos(h) * w, C = v + Math.sin(h) * w, F = p + Math.cos(h) * S, x = v + Math.sin(h) * S, E = Math.cos(h) >= 0, k = F + (E ? 14 : -14), B = x;
+        const w = m + 4, S = m + 14, $ = y + Math.cos(h) * w, C = v + Math.sin(h) * w, F = y + Math.cos(h) * S, x = v + Math.sin(h) * S, E = Math.cos(h) >= 0, k = F + (E ? 14 : -14), B = x;
         t.strokeStyle = "rgba(148, 163, 184, 0.4)", t.lineWidth = 1, t.beginPath(), t.moveTo($, C), t.lineTo(F, x), t.lineTo(k, B), t.stroke(), t.fillStyle = T(s.color || "#CBD5E1"), t.textAlign = E ? "left" : "right", t.textBaseline = "middle", t.fillText(b, k + (E ? 4 : -4), B);
       }
     }), t.restore());
@@ -3489,7 +3499,7 @@ class De {
     let r = "";
     if (s && s.width && s.width > 0) {
       const h = G(s.color || "#151C2C");
-      r = ` stroke="${I(h.color)}" stroke-width="${y(s.width)}"`;
+      r = ` stroke="${L(h.color)}" stroke-width="${p(s.width)}"`;
     }
     t.forEach((h) => {
       const d = Se(
@@ -3503,9 +3513,9 @@ class De {
         h.innerEndAngle
       );
       if (!d) return;
-      const f = G(h.color), g = f.opacity < 0.999 ? ` fill-opacity="${y(f.opacity)}"` : "", m = `${(h.percentage * 100).toFixed(1)}%`, p = r || (!o && f.opacity >= 0.999 ? ` stroke="${I(f.color)}" stroke-width="0.5" stroke-linejoin="round"` : ""), v = h.isTrack ? `Slice: Track (${m})` : `Slice: ${I(h.item.label)} (${m})`;
+      const f = G(h.color), g = f.opacity < 0.999 ? ` fill-opacity="${p(f.opacity)}"` : "", m = `${(h.percentage * 100).toFixed(1)}%`, y = r || (!o && f.opacity >= 0.999 ? ` stroke="${L(f.color)}" stroke-width="0.5" stroke-linejoin="round"` : ""), v = h.isTrack ? `Slice: Track (${m})` : `Slice: ${L(h.item.label)} (${m})`;
       e.push(
-        `<path id="${v}" d="${d}" fill="${I(f.color)}"${g}${p} />`
+        `<path id="${v}" d="${d}" fill="${L(f.color)}"${g}${y} />`
       );
     });
     const l = [];
@@ -3516,7 +3526,7 @@ class De {
       const { cx: h, cy: d } = t[0], f = t.filter(($) => !$.isTrack).map(($) => $.item), g = f.reduce(
         ($, C) => $ + (typeof C.value == "number" && Number.isFinite(C.value) ? Math.max(0, C.value) : 0),
         0
-      ), m = this.centerOptions, p = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && g < 100 ? 100 : void 0), v = p && p > 0 ? `${Math.round(g / Math.max(g, p) * 100)}%` : g.toLocaleString(), b = typeof (m == null ? void 0 : m.title) == "function" ? m.title(f, g) : (m == null ? void 0 : m.title) !== void 0 ? m.title : v, w = typeof (m == null ? void 0 : m.subtitle) == "function" ? m.subtitle(f, g) : (m == null ? void 0 : m.subtitle) !== void 0 ? m.subtitle : "Total", S = [];
+      ), m = this.centerOptions, y = this.styleOptions.maxValue ?? (this.styleOptions.trackColor && g < 100 ? 100 : void 0), v = y && y > 0 ? `${Math.round(g / Math.max(g, y) * 100)}%` : g.toLocaleString(), b = typeof (m == null ? void 0 : m.title) == "function" ? m.title(f, g) : (m == null ? void 0 : m.title) !== void 0 ? m.title : v, w = typeof (m == null ? void 0 : m.subtitle) == "function" ? m.subtitle(f, g) : (m == null ? void 0 : m.subtitle) !== void 0 ? m.subtitle : "Total", S = [];
       b && S.push(
         j({
           id: "Center Title",
@@ -3549,9 +3559,9 @@ class De {
       const h = a.font || "600 11px Pretendard, sans-serif";
       t.forEach((d) => {
         if (d.isTrack || d.percentage < 0.04) return;
-        const { midAngle: f, innerRadius: g, outerRadius: m, cx: p, cy: v, item: b, percentage: w } = d, S = a.formatter ? a.formatter(b, w) : `${b.label} ${(w * 100).toFixed(0)}%`;
+        const { midAngle: f, innerRadius: g, outerRadius: m, cx: y, cy: v, item: b, percentage: w } = d, S = a.formatter ? a.formatter(b, w) : `${b.label} ${(w * 100).toFixed(0)}%`;
         if (a.position === "inside") {
-          const $ = (g + m) / 2, C = p + Math.cos(f) * $, F = v + Math.sin(f) * $;
+          const $ = (g + m) / 2, C = y + Math.cos(f) * $, F = v + Math.sin(f) * $;
           i.push(
             j({
               id: `Label: ${b.label}`,
@@ -3565,7 +3575,7 @@ class De {
             })
           );
         } else {
-          const $ = m + 4, C = m + 14, F = p + Math.cos(f) * $, x = v + Math.sin(f) * $, E = p + Math.cos(f) * C, k = v + Math.sin(f) * C, B = Math.cos(f) >= 0, D = E + (B ? 14 : -14), A = k, z = G(a.color || "#676C75"), V = `<path id="Leader: ${I(b.label)}" d="M ${y(F)} ${y(x)} L ${y(E)} ${y(k)} L ${y(D)} ${y(A)}" fill="none" stroke="${I(z.color)}" stroke-opacity="0.4" stroke-width="1" />`, N = j({
+          const $ = m + 4, C = m + 14, F = y + Math.cos(f) * $, x = v + Math.sin(f) * $, E = y + Math.cos(f) * C, k = v + Math.sin(f) * C, B = Math.cos(f) >= 0, D = E + (B ? 14 : -14), A = k, z = G(a.color || "#676C75"), N = `<path id="Leader: ${L(b.label)}" d="M ${p(F)} ${p(x)} L ${p(E)} ${p(k)} L ${p(D)} ${p(A)}" fill="none" stroke="${L(z.color)}" stroke-opacity="0.4" stroke-width="1" />`, V = j({
             id: `Label: ${b.label}`,
             x: D + (B ? 4 : -4),
             y: A,
@@ -3575,7 +3585,7 @@ class De {
             align: B ? "left" : "right",
             baseline: "middle"
           });
-          i.push(`<g id="Slice Label: ${I(b.label)}">${V}${N}</g>`);
+          i.push(`<g id="Slice Label: ${L(b.label)}">${N}${V}</g>`);
         }
       }), i.length > 0 && l.push(`<g id="Pie Labels">
     ${i.join(`
@@ -3631,9 +3641,9 @@ function He(u) {
   if (!a.enabled)
     return { ...t, ...e };
   const c = i < a.compactBreakpoint, h = Math.max(0.68, Math.min(1, (i - 200) / 440 * 0.32 + 0.68)), d = Math.max(0.72, Math.min(1, (s - 160) / 240 * 0.28 + 0.72)), f = Math.min(h, d);
-  let g = (e == null ? void 0 : e.top) !== void 0 ? Math.round(e.top * f) : Math.round(t.top * f), m = (e == null ? void 0 : e.right) !== void 0 ? Math.round(e.right * f) : Math.round(t.right * f), p = (e == null ? void 0 : e.bottom) !== void 0 ? Math.round(e.bottom * f) : Math.round(t.bottom * f), v = (e == null ? void 0 : e.left) !== void 0 ? Math.round(e.left * f) : Math.round(t.left * f);
+  let g = (e == null ? void 0 : e.top) !== void 0 ? Math.round(e.top * f) : Math.round(t.top * f), m = (e == null ? void 0 : e.right) !== void 0 ? Math.round(e.right * f) : Math.round(t.right * f), y = (e == null ? void 0 : e.bottom) !== void 0 ? Math.round(e.bottom * f) : Math.round(t.bottom * f), v = (e == null ? void 0 : e.left) !== void 0 ? Math.round(e.left * f) : Math.round(t.left * f);
   const b = r !== !1 && (typeof r != "object" || r.visible !== !1), w = typeof r == "object" && (r != null && r.position) ? r.position : "top";
-  if (b && (w.startsWith("top") && (e == null ? void 0 : e.top) === void 0 ? g = Math.max(g, c ? 34 : 38) : w.startsWith("bottom") && (e == null ? void 0 : e.bottom) === void 0 && (p = Math.max(p, c ? 38 : 44))), n && (o == null ? void 0 : o.visible) !== !1 && (e == null ? void 0 : e.left) === void 0) {
+  if (b && (w.startsWith("top") && (e == null ? void 0 : e.top) === void 0 ? g = Math.max(g, c ? 34 : 38) : w.startsWith("bottom") && (e == null ? void 0 : e.bottom) === void 0 && (y = Math.max(y, c ? 38 : 44))), n && (o == null ? void 0 : o.visible) !== !1 && (e == null ? void 0 : e.left) === void 0) {
     const S = n.ticks(5);
     let $ = 0;
     for (const E of S) {
@@ -3643,9 +3653,9 @@ function He(u) {
     const C = c ? 6 : 6.6, F = (o == null ? void 0 : o.labelOffset) ?? 8, x = Math.ceil($ * C + F + 8);
     v = Math.max(c ? 32 : 40, Math.min(Math.round(i * 0.28), x));
   }
-  return { top: g, right: m, bottom: p, left: v };
+  return { top: g, right: m, bottom: y, left: v };
 }
-class tt extends de {
+class nt extends de {
   /**
    * BarChart 인스턴스를 생성하고 초기화합니다.
    * 
@@ -3732,19 +3742,19 @@ class tt extends de {
       this.container,
       r,
       {
-        onToggle: (m, p) => {
-          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: p }), this.render(!0);
+        onToggle: (m, y) => {
+          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: y }), this.render(!0);
         },
         onHover: (m) => {
           this.hoveredLegendKey = (m == null ? void 0 : m.key) ?? null, this.renderHoverState();
         }
       },
       o
-    ), this.xScale = new Re(), this.yScale = new Ie(), this.boundMouseUp = () => {
+    ), this.xScale = new Ie(), this.yScale = new Le(), this.boundMouseUp = () => {
       this.isDragging = !1;
     }, this.syncLegend(), this.initScales(), this.setupInteractions(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((m) => {
-      for (const p of m) {
-        const v = Math.round(p.contentRect.width), b = Math.round(p.contentRect.height);
+      for (const y of m) {
+        const v = Math.round(y.contentRect.width), b = Math.round(y.contentRect.height);
         if (v > 0) {
           const { height: w } = q(
             this.container,
@@ -3879,35 +3889,35 @@ class tt extends de {
   initScales() {
     var l;
     if (this.isMultiSeries()) {
-      this.allNormalizedSeries.length === 0 && (this.allNormalizedSeries = this.normalizeMultiSeries()), this.activeSeries = this.allNormalizedSeries.filter((p) => this.legend.isKeyActive(p.key));
+      this.allNormalizedSeries.length === 0 && (this.allNormalizedSeries = this.normalizeMultiSeries()), this.activeSeries = this.allNormalizedSeries.filter((y) => this.legend.isKeyActive(y.key));
       const a = this.activeSeries[0] || this.allNormalizedSeries[0];
       this.activeData = a ? a.items : [];
       const c = this.activeData.length;
       this.xScale.setDomainCount(c);
       const h = this.barSeries.getMode();
       if (h === "percent") {
-        let p = !1;
+        let y = !1;
         for (const v of this.activeSeries)
           if (v.items.some((b) => b.value < 0)) {
-            p = !0;
+            y = !0;
             break;
           }
-        this.yScale.domain([p ? -100 : 0, 100]).nice(5);
+        this.yScale.domain([y ? -100 : 0, 100]).nice(5);
         return;
       }
       let d = 0, f = 0;
       if (h === "stacked")
-        for (let p = 0; p < c; p++) {
+        for (let y = 0; y < c; y++) {
           let v = 0, b = 0;
           for (const w of this.activeSeries) {
-            const S = (l = w.items[p]) == null ? void 0 : l.value, $ = typeof S == "number" && Number.isFinite(S) ? S : 0;
+            const S = (l = w.items[y]) == null ? void 0 : l.value, $ = typeof S == "number" && Number.isFinite(S) ? S : 0;
             $ >= 0 ? v += $ : b += $;
           }
           v > d && (d = v), b < f && (f = b);
         }
       else
-        for (const p of this.activeSeries)
-          for (const v of p.items)
+        for (const y of this.activeSeries)
+          for (const v of y.items)
             typeof v.value != "number" || !Number.isFinite(v.value) || (v.value > d && (d = v.value), v.value < f && (f = v.value));
       d === 0 && f === 0 && (d = 100);
       const g = f < 0 ? f * 1.1 : 0, m = d > 0 ? d * 1.1 : 0;
@@ -4028,8 +4038,8 @@ class tt extends de {
         1
       );
       if (m.length === 0) return;
-      const p = Math.min(...m.map((F) => F.x)), v = Math.max(...m.map((F) => F.x + F.width));
-      if (e < p || e > v) {
+      const y = Math.min(...m.map((F) => F.x)), v = Math.max(...m.map((F) => F.x + F.width));
+      if (e < y || e > v) {
         (this.hoveredIndex !== null || this.hoveredSeriesKey !== null) && (this.hoveredIndex = null, this.hoveredSeriesKey = null, this.legend.setHoveredKey(null), this.layerManager.clear("interaction"), this.tooltip.hide());
         return;
       }
@@ -4045,7 +4055,7 @@ class tt extends de {
         seriesKey: S,
         geometry: w ?? m[0]
       }));
-      const $ = Math.min(...m.map((F) => F.y)), C = (p + v) / 2;
+      const $ = Math.min(...m.map((F) => F.y)), C = (y + v) / 2;
       if (((g = this.options.tooltip) == null ? void 0 : g.shared) === !1 && w)
         this.tooltip.show(w.x + w.width / 2, w.y, w.item, a);
       else {
@@ -4153,8 +4163,8 @@ class tt extends de {
     let a = Math.round(n * l);
     if (a = Math.max(Math.min(o, r), Math.min(r, a)), a === n) return;
     const c = this.getEffectivePadding(), h = this.layerManager.getCanvas("interaction").getBoundingClientRect(), d = e.clientX - h.left, f = Math.max(1, this.width - c.left - c.right), g = Math.max(0, Math.min(1, (d - c.left) / f)), m = a - n;
-    let p = Math.round(i - m * g), v = p + a - 1;
-    p < 0 && (p = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, p = Math.max(0, v - a + 1)), this.xScale.setViewport(p, v), this.render();
+    let y = Math.round(i - m * g), v = y + a - 1;
+    y < 0 && (y = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, y = Math.max(0, v - a + 1)), this.xScale.setViewport(y, v), this.render();
   }
   /**
    * 런타임에 차트의 데이터 및 옵션을 동적으로 갱신하고 다시 그립니다.
@@ -4234,7 +4244,7 @@ class tt extends de {
     this.animator.cancel(), typeof window < "u" && window.removeEventListener("mouseup", this.boundMouseUp), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-class it extends de {
+class qe extends de {
   constructor(e, i) {
     super();
     M(this, "container");
@@ -4434,7 +4444,7 @@ class it extends de {
     for (let g = 0; g < this.slices.length; g++) {
       const m = this.slices[g];
       if (m.isTrack) continue;
-      const p = this.hoverRatios[g] ?? 0, v = (((d = this.options.pie) == null ? void 0 : d.hoverExplode) ?? 10) * p + 10;
+      const y = this.hoverRatios[g] ?? 0, v = (((d = this.options.pie) == null ? void 0 : d.hoverExplode) ?? 10) * y + 10;
       if (a >= m.innerRadius && a <= m.outerRadius + v) {
         let b = m.startAngle, w = m.endAngle;
         if (b < -Math.PI / 2 && (b += 2 * Math.PI), w < -Math.PI / 2 && (w += 2 * Math.PI), c >= b && c <= w) {
@@ -4446,7 +4456,7 @@ class it extends de {
     if (h !== null) {
       const g = this.slices[h];
       this.hoveredIndex !== h && (this.hoveredIndex = h, this.startHoverTransition(), this.legend.setHoveredKey(this.getItemLegendKey(g.item, g.index)), this.emit("hover", { item: g.item, index: h, slice: g }));
-      const m = this.hoverRatios[h] ?? 0, p = (((f = this.options.pie) == null ? void 0 : f.hoverExplode) ?? 10) * m, v = g.outerRadius * 0.82 + p, b = n + Math.cos(g.midAngle) * v, w = o + Math.sin(g.midAngle) * v;
+      const m = this.hoverRatios[h] ?? 0, y = (((f = this.options.pie) == null ? void 0 : f.hoverExplode) ?? 10) * m, v = g.outerRadius * 0.82 + y, b = n + Math.cos(g.midAngle) * v, w = o + Math.sin(g.midAngle) * v;
       this.showSliceTooltip(b, w, g, h);
     } else
       this.hoveredIndex !== null && (this.hoveredIndex = null, this.startHoverTransition(), this.legend.setHoveredKey(null), this.tooltip.hide(), this.emit("hover", null));
@@ -4515,7 +4525,40 @@ class it extends de {
     this.animator.cancel(), this.stopHoverTransition(), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-function Le(u, t) {
+const Ke = 0.6;
+function Qe(u) {
+  const t = {
+    ...u.pie,
+    ...u.donut
+  }, e = t.innerRadiusRatio;
+  t.innerRadiusRatio = typeof e == "number" && Number.isFinite(e) && e > 0 ? e : Ke;
+  const { donut: i, ...s } = u;
+  return {
+    ...s,
+    pie: t
+  };
+}
+class ot extends qe {
+  constructor(e, i) {
+    var n;
+    const s = Qe(i);
+    super(e, s);
+    M(this, "lastInnerRadiusRatio");
+    this.lastInnerRadiusRatio = ((n = s.pie) == null ? void 0 : n.innerRadiusRatio) ?? Ke;
+  }
+  /**
+   * 도넛 차트의 데이터·스타일·범례·여백 옵션을 동적으로 갱신합니다.
+   */
+  update(e) {
+    const { donut: i, pie: s, ...n } = e, o = { ...n };
+    if (i || s) {
+      const r = { ...s, ...i };
+      r.innerRadiusRatio !== void 0 && (r.innerRadiusRatio = Number.isFinite(r.innerRadiusRatio) && r.innerRadiusRatio > 0 ? r.innerRadiusRatio : this.lastInnerRadiusRatio, this.lastInnerRadiusRatio = r.innerRadiusRatio), o.pie = r;
+    }
+    super.update(o);
+  }
+}
+function Re(u, t) {
   const e = u.length;
   if (t >= e || t < 3)
     return u;
@@ -4533,12 +4576,12 @@ function Le(u, t) {
       c += u[b].x, h += u[b].y;
     c /= Math.max(1, a), h /= Math.max(1, a);
     const d = Math.floor(o * s) + 1, f = Math.floor((o + 1) * s) + 1, g = u[n].x, m = u[n].y;
-    let p = -1, v = d;
+    let y = -1, v = d;
     for (let b = d; b < f; b++) {
       const w = Math.abs(
         (g - c) * (u[b].y - m) - (g - u[b].x) * (h - m)
       );
-      w > p && (p = w, v = b);
+      w > y && (y = w, v = b);
     }
     i.push(u[v]), n = v;
   }
@@ -4596,23 +4639,23 @@ class ve {
    * @param baseValues 누적(Stacked) 모드 하단 경계 수치 배열 (선택)
    */
   render(t, e, i, s, n, o, r, l = 1, a, c) {
-    var L;
+    var R;
     const [h, d] = i.getViewport();
     if (e.length === 0 || h > d) return;
-    const f = Math.max(0, h - 1), g = Math.min(e.length - 1, d + 1), m = s.domain(), p = m[0] < 0 && m[1] > 0 ? 0 : m[0], v = s.scale(p), b = l >= 1 ? 1 : Math.min(1, 0.35 + 0.65 * l), w = [], S = [];
-    for (let R = f; R <= g; R++) {
-      const P = e[R];
+    const f = Math.max(0, h - 1), g = Math.min(e.length - 1, d + 1), m = s.domain(), y = m[0] < 0 && m[1] > 0 ? 0 : m[0], v = s.scale(y), b = l >= 1 ? 1 : Math.min(1, 0.35 + 0.65 * l), w = [], S = [];
+    for (let I = f; I <= g; I++) {
+      const P = e[I];
       if (!P) continue;
-      const H = a ? a[R] : P.value;
+      const H = a ? a[I] : P.value;
       if (typeof H != "number" || !Number.isFinite(H)) continue;
-      const _ = a ? a[R] : void 0, K = this.getPointGeometry(P, R, i, s, _);
+      const _ = a ? a[I] : void 0, K = this.getPointGeometry(P, I, i, s, _);
       if (b < 1 && (K.y = v + (K.y - v) * b), w.push(K), c) {
-        const X = this.getPointGeometry(P, R, i, s, c[R] ?? 0);
+        const X = this.getPointGeometry(P, I, i, s, c[I] ?? 0);
         b < 1 && (X.y = v + (X.y - v) * b), S.push(X);
       }
     }
     if (w.length === 0) return;
-    const C = !!(this.samplingThreshold && w.length > this.samplingThreshold && !c) ? Le(w, this.samplingThreshold) : w, F = n.left, x = o - n.right, E = n.top, k = r - n.bottom, B = Math.max(1, x - F), D = Math.max(1, k - E), A = Math.max(0, Math.min(1.05, l)), z = l >= 1 ? B : B * A, V = F + z;
+    const C = !!(this.samplingThreshold && w.length > this.samplingThreshold && !c) ? Re(w, this.samplingThreshold) : w, F = n.left, x = o - n.right, E = n.top, k = r - n.bottom, B = Math.max(1, x - F), D = Math.max(1, k - E), A = Math.max(0, Math.min(1.05, l)), z = l >= 1 ? B : B * A, N = F + z;
     t.save(), t.beginPath(), t.rect(F, E - 12, z, D + 24), t.clip(), this.areaOptions.visible && C.length >= 2 && this.drawArea(
       t,
       C,
@@ -4623,11 +4666,11 @@ class ve {
       D,
       S.length === C.length ? S : void 0
     ), this.drawLine(t, C, F, E, B, D), t.restore();
-    const N = d - h + 1, W = this.pointOptions.visible && N <= 80, O = ((L = this.labelOptions) == null ? void 0 : L.visible) && N <= 45;
+    const V = d - h + 1, W = this.pointOptions.visible && V <= 80, O = ((R = this.labelOptions) == null ? void 0 : R.visible) && V <= 45;
     if (W || O) {
       t.save();
-      for (const R of C)
-        R.index < h || R.index > d || l < 1 && R.x > V + 2 || (W && this.drawPointMarker(t, R, !1), O && this.drawDataLabel(t, R));
+      for (const I of C)
+        I.index < h || I.index > d || l < 1 && I.x > N + 2 || (W && this.drawPointMarker(t, I, !1), O && this.drawDataLabel(t, I));
       t.restore();
     }
   }
@@ -4673,8 +4716,8 @@ class ve {
         this.areaOptions.fill
       );
     else {
-      const { from: g, to: m } = this.resolveAreaGradientStops(), p = t.createLinearGradient(0, n, 0, n + r);
-      p.addColorStop(0, g), p.addColorStop(1, m), t.fillStyle = p;
+      const { from: g, to: m } = this.resolveAreaGradientStops(), y = t.createLinearGradient(0, n, 0, n + r);
+      y.addColorStop(0, g), y.addColorStop(1, m), t.fillStyle = y;
     }
     t.fill(), t.restore();
   }
@@ -4809,29 +4852,29 @@ class ve {
       baseValues: d
     } = t, [f, g] = n.getViewport();
     if (s.length === 0 || f > g) return "";
-    const m = Math.max(0, f), p = Math.min(s.length - 1, g), v = [], b = [];
-    for (let O = m; O <= p; O++) {
-      const L = s[O];
-      if (!L) continue;
-      const R = h ? h[O] : void 0;
-      v.push(this.getPointGeometry(L, O, n, o, R)), d && b.push(this.getPointGeometry(L, O, n, o, d[O] ?? 0));
+    const m = Math.max(0, f), y = Math.min(s.length - 1, g), v = [], b = [];
+    for (let O = m; O <= y; O++) {
+      const R = s[O];
+      if (!R) continue;
+      const I = h ? h[O] : void 0;
+      v.push(this.getPointGeometry(R, O, n, o, I)), d && b.push(this.getPointGeometry(R, O, n, o, d[O] ?? 0));
     }
     if (v.length === 0) return "";
-    const S = !!(this.samplingThreshold && v.length > this.samplingThreshold && !d) ? Le(v, this.samplingThreshold) : v, $ = r.left, C = l - r.right, F = r.top, x = a - r.bottom, E = Math.max(1, C - $), k = Math.max(1, x - F), B = this.lineOptions.curve || "smooth", D = this.lineOptions.tension ?? 0.35, A = [];
+    const S = !!(this.samplingThreshold && v.length > this.samplingThreshold && !d) ? Re(v, this.samplingThreshold) : v, $ = r.left, C = l - r.right, F = r.top, x = a - r.bottom, E = Math.max(1, C - $), k = Math.max(1, x - F), B = this.lineOptions.curve || "smooth", D = this.lineOptions.tension ?? 0.35, A = [];
     if (this.areaOptions.visible && S.length >= 2) {
-      const O = pe(S, B, D, !1);
-      let L = "";
+      const O = ye(S, B, D, !1);
+      let R = "";
       if (b.length === S.length && b.length > 0) {
-        const _ = [...b].reverse(), K = pe(_, B, D, !0);
-        L = `${O} ${K} Z`;
+        const _ = [...b].reverse(), K = ye(_, B, D, !0);
+        R = `${O} ${K} Z`;
       } else {
-        const _ = o.domain(), K = _[0] < 0 && _[1] > 0 ? 0 : _[0], X = o.scale(K), Z = S[0], ye = S[S.length - 1];
-        L = `${O} L ${y(ye.x)} ${y(X)} L ${y(Z.x)} ${y(X)} Z`;
+        const _ = o.domain(), K = _[0] < 0 && _[1] > 0 ? 0 : _[0], X = o.scale(K), Z = S[0], pe = S[S.length - 1];
+        R = `${O} L ${p(pe.x)} ${p(X)} L ${p(Z.x)} ${p(X)} Z`;
       }
-      const R = this.resolveAreaGradientStops(), P = this.areaOptions.fill || {
+      const I = this.resolveAreaGradientStops(), P = this.areaOptions.fill || {
         type: "linear",
-        from: R.from,
-        to: R.to,
+        from: I.from,
+        to: I.to,
         direction: "vertical"
       }, H = Fe(
         "fill",
@@ -4844,10 +4887,10 @@ class ve {
         k,
         this.areaOptions.opacity ?? 1
       );
-      A.push(`<path id="Area: ${I(e)}" d="${L}" ${H} />`);
+      A.push(`<path id="Area: ${L(e)}" d="${R}" ${H} />`);
     }
     if (S.length >= 2) {
-      const O = pe(S, B, D, !1), L = Fe(
+      const O = ye(S, B, D, !1), R = Fe(
         "stroke",
         this.lineOptions.color,
         c,
@@ -4856,28 +4899,28 @@ class ve {
         F,
         E,
         k
-      ), R = this.lineOptions.dash && this.lineOptions.dash.length > 0 ? ` stroke-dasharray="${this.lineOptions.dash.join(" ")}"` : "";
+      ), I = this.lineOptions.dash && this.lineOptions.dash.length > 0 ? ` stroke-dasharray="${this.lineOptions.dash.join(" ")}"` : "";
       A.push(
-        `<path id="Line: ${I(e)}" d="${O}" fill="none" ${L} stroke-width="${y(this.lineOptions.width)}" stroke-linecap="round" stroke-linejoin="round"${R} />`
+        `<path id="Line: ${L(e)}" d="${O}" fill="none" ${R} stroke-width="${p(this.lineOptions.width)}" stroke-linecap="round" stroke-linejoin="round"${I} />`
       );
     }
-    const z = g - f + 1, V = this.pointOptions.visible && z <= 80, N = ((W = this.labelOptions) == null ? void 0 : W.visible) && z <= 45;
-    if (V) {
-      const O = [], L = this.pointOptions.radius ?? 4, R = this.pointOptions.borderWidth ?? 2;
+    const z = g - f + 1, N = this.pointOptions.visible && z <= 80, V = ((W = this.labelOptions) == null ? void 0 : W.visible) && z <= 45;
+    if (N) {
+      const O = [], R = this.pointOptions.radius ?? 4, I = this.pointOptions.borderWidth ?? 2;
       for (const P of S) {
         if (P.index < f || P.index > g) continue;
         const H = P.item.color || this.getPrimaryLineColor(), _ = typeof this.pointOptions.fill == "function" ? this.pointOptions.fill(P.item, P.index) : this.pointOptions.fill || "#0B0F19", K = typeof this.pointOptions.borderColor == "function" ? this.pointOptions.borderColor(P.item, P.index) : this.pointOptions.borderColor || H, X = G(_), Z = G(K);
         O.push(
-          `<circle id="Point: ${I(P.item.label)} (${P.item.value})" cx="${y(P.x)}" cy="${y(P.y)}" r="${y(L)}" fill="${I(X.color)}" stroke="${I(Z.color)}" stroke-width="${y(R)}" />`
+          `<circle id="Point: ${L(P.item.label)} (${P.item.value})" cx="${p(P.x)}" cy="${p(P.y)}" r="${p(R)}" fill="${L(X.color)}" stroke="${L(Z.color)}" stroke-width="${p(I)}" />`
         );
       }
-      O.length > 0 && A.push(`<g id="Points: ${I(e)}">
+      O.length > 0 && A.push(`<g id="Points: ${L(e)}">
       ${O.join(`
       `)}
     </g>`);
     }
-    if (N && this.labelOptions && this.labelOptions.position !== "none") {
-      const O = [], L = this.labelOptions.offset ?? 8, R = this.labelOptions.font || "600 11px Pretendard, sans-serif", P = this.labelOptions.position === "bottom-outside" || this.labelOptions.position === "inside-bottom";
+    if (V && this.labelOptions && this.labelOptions.position !== "none") {
+      const O = [], R = this.labelOptions.offset ?? 8, I = this.labelOptions.font || "600 11px Pretendard, sans-serif", P = this.labelOptions.position === "bottom-outside" || this.labelOptions.position === "inside-bottom";
       for (const H of S) {
         if (H.index < f || H.index > g) continue;
         const _ = typeof this.labelOptions.color == "function" ? this.labelOptions.color(H.item, H.index) : this.labelOptions.color || "#94A3B8", K = this.labelOptions.formatter ? this.labelOptions.formatter(H.item.value, H.item, H.index) : H.item.value.toLocaleString();
@@ -4885,27 +4928,27 @@ class ve {
           j({
             id: `Label: ${H.item.label} (${K})`,
             x: H.x,
-            y: P ? H.y + L : H.y - L,
+            y: P ? H.y + R : H.y - R,
             text: K,
-            font: R,
+            font: I,
             fill: _,
             align: "center",
             baseline: P ? "top" : "bottom"
           })
         );
       }
-      O.length > 0 && A.push(`<g id="Labels: ${I(e)}">
+      O.length > 0 && A.push(`<g id="Labels: ${L(e)}">
       ${O.join(`
       `)}
     </g>`);
     }
-    return `<g id="Series: ${I(e)}">
+    return `<g id="Series: ${L(e)}">
     ${A.join(`
     `)}
   </g>`;
   }
 }
-class st extends de {
+class rt extends de {
   /**
    * LineChart 인스턴스를 생성하고 초기화합니다.
    * 
@@ -4996,19 +5039,19 @@ class st extends de {
       this.container,
       r,
       {
-        onToggle: (m, p) => {
-          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: p }), this.render(!0);
+        onToggle: (m, y) => {
+          this.hoveredIndex = null, this.hoveredSeriesKey = null, this.tooltip.hide(), this.initScales(), this.syncScaleRanges(), this.emit("legendToggle", { item: m, active: y }), this.render(!0);
         },
         onHover: (m) => {
           this.hoveredLegendKey = (m == null ? void 0 : m.key) ?? null, this.renderHoverState();
         }
       },
       o
-    ), this.xScale = new Re(), this.yScale = new Ie(), this.boundMouseUp = () => {
+    ), this.xScale = new Ie(), this.yScale = new Le(), this.boundMouseUp = () => {
       this.isDragging = !1;
     }, this.syncLegend(), this.initScales(), this.setupInteractions(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((m) => {
-      for (const p of m) {
-        const v = Math.round(p.contentRect.width), b = Math.round(p.contentRect.height);
+      for (const y of m) {
+        const v = Math.round(y.contentRect.width), b = Math.round(y.contentRect.height);
         if (v > 0) {
           const { height: w } = q(
             this.container,
@@ -5070,19 +5113,19 @@ class st extends de {
         g ? { font: g, ...this.options.labels } : this.options.labels,
         this.options.crosshair,
         this.options.samplingThreshold ?? 600
-      ), p = [];
+      ), y = [];
       for (let x = 0; x < i; x++) {
         const E = n.data[x], k = (s == null ? void 0 : s[x]) ?? (typeof E == "object" && (E != null && E.label) ? E.label : `#${x + 1}`);
-        typeof E == "number" ? p.push({
+        typeof E == "number" ? y.push({
           id: `${r}-${x}`,
           label: k,
           value: E,
           category: n.name
-        }) : E ? p.push({
+        }) : E ? y.push({
           ...E,
           label: (s == null ? void 0 : s[x]) ?? E.label ?? k,
           category: E.category ?? n.name
-        }) : p.push({
+        }) : y.push({
           id: `${r}-${x}`,
           label: k,
           value: 0,
@@ -5092,7 +5135,7 @@ class st extends de {
       return {
         key: r,
         name: n.name,
-        items: p,
+        items: y,
         renderer: m,
         swatchColor: c
       };
@@ -5183,18 +5226,18 @@ class st extends de {
       let h = 0, d = 0;
       if (this.options.stacked) {
         const m = new Array(c).fill(0);
-        for (const p of this.activeSeries) {
-          p.baseValues = [...m], p.stackedValues = new Array(c);
+        for (const y of this.activeSeries) {
+          y.baseValues = [...m], y.stackedValues = new Array(c);
           for (let v = 0; v < c; v++) {
-            const b = (l = p.items[v]) == null ? void 0 : l.value, w = typeof b == "number" && Number.isFinite(b) ? b : 0;
-            m[v] += w, p.stackedValues[v] = m[v], m[v] > h && (h = m[v]), m[v] < d && (d = m[v]);
+            const b = (l = y.items[v]) == null ? void 0 : l.value, w = typeof b == "number" && Number.isFinite(b) ? b : 0;
+            m[v] += w, y.stackedValues[v] = m[v], m[v] > h && (h = m[v]), m[v] < d && (d = m[v]);
           }
         }
       } else
         for (const m of this.activeSeries) {
           m.baseValues = void 0, m.stackedValues = void 0;
-          for (const p of m.items)
-            typeof p.value != "number" || !Number.isFinite(p.value) || (p.value > h && (h = p.value), p.value < d && (d = p.value));
+          for (const y of m.items)
+            typeof y.value != "number" || !Number.isFinite(y.value) || (y.value > h && (h = y.value), y.value < d && (d = y.value));
         }
       h === 0 && d === 0 && (h = 100);
       const f = d < 0 ? d * 1.1 : 0, g = h > 0 ? h * 1.1 : 0;
@@ -5355,7 +5398,7 @@ class st extends de {
         seriesKey: f,
         point: m
       }));
-      const p = d.map(({ series: S, pt: $ }) => ({
+      const y = d.map(({ series: S, pt: $ }) => ({
         seriesKey: S.key,
         seriesName: S.name,
         color: S.swatchColor,
@@ -5367,7 +5410,7 @@ class st extends de {
         m.x,
         v,
         c.label,
-        p,
+        y,
         a,
         w ? "합계 (Total)" : void 0,
         w ? b.toLocaleString() : void 0
@@ -5451,8 +5494,8 @@ class st extends de {
       0,
       Math.min(1, (d - c.left) / f)
     ), m = a - n;
-    let p = Math.round(i - m * g), v = p + a - 1;
-    p < 0 && (p = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, p = Math.max(0, v - a + 1)), this.xScale.setViewport(p, v), this.render();
+    let y = Math.round(i - m * g), v = y + a - 1;
+    y < 0 && (y = 0, v = Math.min(r - 1, a - 1)), v >= r && (v = r - 1, y = Math.max(0, v - a + 1)), this.xScale.setViewport(y, v), this.render();
   }
   /**
    * 런타임에 차트의 데이터 및 옵션을 동적으로 갱신하고 다시 그립니다.
@@ -5563,7 +5606,7 @@ class st extends de {
     this.animator.cancel(), typeof window < "u" && window.removeEventListener("mouseup", this.boundMouseUp), (e = this.resizeObserver) == null || e.disconnect(), this.layerManager.destroy(), this.tooltip.destroy(), this.legend.destroy(), this.clear();
   }
 }
-class Ze {
+class Je {
   constructor(t, e) {
     M(this, "styleOptions");
     M(this, "labelOptions");
@@ -5599,14 +5642,14 @@ class Ze {
     var k;
     const o = t.length;
     if (o === 0) return [];
-    const r = (B) => typeof B == "number" && Number.isFinite(B) ? Math.max(0, B) : 0, l = Math.max(1, ...t.map((B) => r(B.value))), a = Math.max(1, r((k = t[0]) == null ? void 0 : k.value) || l), c = this.styleOptions.direction || "vertical", h = this.styleOptions.shape || "trapezoid", d = Math.max(0, this.styleOptions.gap ?? 4), f = Math.max(0.08, Math.min(0.5, this.styleOptions.minSizeRatio ?? 0.16)), g = Math.max(0, Math.min(1, n)), m = this.labelOptions.visible !== !1 && this.labelOptions.position === "outside", p = s.left + (c === "vertical" && m ? 10 : 0), v = e - s.right - (c === "vertical" && m ? 90 : 0), b = s.top, w = i - s.bottom - (c === "horizontal" && m ? 26 : 0), S = Math.max(40, v - p), $ = Math.max(40, w - b), C = p + S / 2, F = b + $ / 2, x = t.map((B) => {
+    const r = (B) => typeof B == "number" && Number.isFinite(B) ? Math.max(0, B) : 0, l = Math.max(1, ...t.map((B) => r(B.value))), a = Math.max(1, r((k = t[0]) == null ? void 0 : k.value) || l), c = this.styleOptions.direction || "vertical", h = this.styleOptions.shape || "trapezoid", d = Math.max(0, this.styleOptions.gap ?? 4), f = Math.max(0.08, Math.min(0.5, this.styleOptions.minSizeRatio ?? 0.16)), g = Math.max(0, Math.min(1, n)), m = this.labelOptions.visible !== !1 && this.labelOptions.position === "outside", y = s.left + (c === "vertical" && m ? 10 : 0), v = e - s.right - (c === "vertical" && m ? 90 : 0), b = s.top, w = i - s.bottom - (c === "horizontal" && m ? 26 : 0), S = Math.max(40, v - y), $ = Math.max(40, w - b), C = y + S / 2, F = b + $ / 2, x = t.map((B) => {
       const D = r(B.value) / l;
       return f + (1 - f) * D;
     }), E = [];
     if (c === "horizontal") {
       const B = d * Math.max(0, o - 1), D = (S - B) / o;
       for (let A = 0; A < o; A++) {
-        const z = t[A], V = r(z.value), N = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, V), W = V / a, O = A === 0 ? 1 : V / N, L = x[A] * g, R = h === "bar" ? L : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? L * 0.55 : L, P = $ * L, H = $ * R, _ = p + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
+        const z = t[A], N = r(z.value), V = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, N), W = N / a, O = A === 0 ? 1 : N / V, R = x[A] * g, I = h === "bar" ? R : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? R * 0.55 : R, P = $ * R, H = $ * I, _ = y + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
           { x: _, y: F - P / 2 },
           { x: K, y: F - H / 2 },
           { x: K, y: F + H / 2 },
@@ -5630,7 +5673,7 @@ class Ze {
     } else {
       const B = d * Math.max(0, o - 1), D = ($ - B) / o;
       for (let A = 0; A < o; A++) {
-        const z = t[A], V = r(z.value), N = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, V), W = V / a, O = A === 0 ? 1 : V / N, L = x[A] * g, R = h === "bar" ? L : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? L * 0.55 : L, P = S * L, H = S * R, _ = b + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
+        const z = t[A], N = r(z.value), V = A > 0 ? Math.max(1, r(t[A - 1].value)) : Math.max(1, N), W = N / a, O = A === 0 ? 1 : N / V, R = x[A] * g, I = h === "bar" ? R : A < o - 1 ? x[A + 1] * g : this.styleOptions.neckStyle === "pinch" ? R * 0.55 : R, P = S * R, H = S * I, _ = b + A * (D + d), K = _ + D, X = Math.max(P, H), Z = [
           { x: C - P / 2, y: _ },
           { x: C + P / 2, y: _ },
           { x: C + H / 2, y: K },
@@ -5727,14 +5770,14 @@ class Ze {
     let r = "";
     if (o && o.width && o.width > 0) {
       const f = G(o.color || "#FFFFFF");
-      r = ` stroke="${I(f.color)}" stroke-width="${y(o.width)}"`;
+      r = ` stroke="${L(f.color)}" stroke-width="${p(o.width)}"`;
     }
     const l = [], a = [], c = this.labelOptions, h = c.font || "600 11px Pretendard, sans-serif";
     for (const f of t) {
-      const g = G(f.color), m = `fill="${I(g.color)}"${g.opacity < 0.999 ? ` fill-opacity="${y(g.opacity)}"` : ""}`, p = `Funnel Stage ${f.index + 1}: ${f.item.label} (${f.item.value})`;
+      const g = G(f.color), m = `fill="${L(g.color)}"${g.opacity < 0.999 ? ` fill-opacity="${p(g.opacity)}"` : ""}`, y = `Funnel Stage ${f.index + 1}: ${f.item.label} (${f.item.value})`;
       if (e === "bar") {
         const v = Pe({
-          id: p,
+          id: y,
           x: f.x,
           y: f.y,
           width: f.width,
@@ -5745,8 +5788,8 @@ class Ze {
         });
         v && l.push(v);
       } else {
-        const v = f.points.map((b, w) => `${w === 0 ? "M" : "L"} ${y(b.x)} ${y(b.y)}`).join(" ") + " Z";
-        l.push(`<path id="${I(p)}" d="${v}" ${m}${r} />`);
+        const v = f.points.map((b, w) => `${w === 0 ? "M" : "L"} ${p(b.x)} ${p(b.y)}`).join(" ") + " Z";
+        l.push(`<path id="${L(y)}" d="${v}" ${m}${r} />`);
       }
       if (c.visible !== !1 && c.position !== "none") {
         const v = n === "first" ? f.overallRatio : f.stepConversionRate, b = `${Math.round(v * 100)}%`, w = typeof f.item.value == "number" && Number.isFinite(f.item.value) ? f.item.value.toLocaleString() : "-", S = c.formatter ? c.formatter(f.item, f) : s && f.index > 0 ? `${f.item.label} · ${w} (${b})` : `${f.item.label} · ${w}`;
@@ -5806,7 +5849,7 @@ class Ze {
   `);
   }
 }
-class nt extends de {
+class at extends de {
   constructor(e, i) {
     super();
     M(this, "container");
@@ -5836,7 +5879,7 @@ class nt extends de {
       ...i.padding
     }, this.layerManager = new ce(this.container), this.tooltip = new fe(this.container, i.tooltip);
     const n = i.font ? Y(i.font, i.font.size ?? 11, i.font.weight ?? 600) : void 0;
-    this.funnelSeries = new Ze(
+    this.funnelSeries = new Je(
       i.funnel,
       n ? { font: n, ...i.labels } : i.labels
     ), this.legend = new ge(
@@ -6056,47 +6099,48 @@ class nt extends de {
 
 const Animator = J;
 const Axis = he;
-const BandScale = Re;
-const BarChart = tt;
+const BandScale = Ie;
+const BarChart = nt;
 const BarSeries = Be;
 const DEFAULT_PALETTE = U;
 const DESIGN_TOKENS = oe;
+const DonutChart = ot;
 const EASINGS = $e;
 const EventEmitter = de;
-const FunnelChart = nt;
-const FunnelSeries = Ze;
+const FunnelChart = at;
+const FunnelSeries = Je;
 const Grid = Te;
 const LayerManager = ce;
 const Legend = ge;
-const LineChart = st;
+const LineChart = rt;
 const LineSeries = ve;
-const LinearScale = Ie;
-const PieChart = it;
+const LinearScale = Le;
+const PieChart = qe;
 const PieSeries = De;
-const RADIUS_TOKENS = Qe;
-const SPACING_GAP_TOKENS = We;
-const SPACING_PADDING_TOKENS = Ne;
-const SPACING_TOKENS = Je;
+const RADIUS_TOKENS = tt;
+const SPACING_GAP_TOKENS = _e;
+const SPACING_PADDING_TOKENS = We;
+const SPACING_TOKENS = it;
 const Tooltip = fe;
 const adjustColorHsl = Ee;
 const buildCssFontString = Y;
 const buildSvgAxesGroups = Oe;
 const buildSvgGridGroup = ze;
 const buildSvgLegendGroup = ue;
-const buildSvgLinePathData = pe;
+const buildSvgLinePathData = ye;
 const buildSvgPieSlicePathData = Se;
 const computeResponsivePadding = He;
 const createGradient = ae;
-const createSvgGradientDef = Ye;
-const downsampleLTTB = Le;
+const createSvgGradientDef = Ue;
+const downsampleLTTB = Re;
 const drawRoundedRect = re;
-const escapeXml = I;
-const fmt = y;
-const normalizeBorderRadius = je;
+const escapeXml = L;
+const fmt = p;
+const normalizeBorderRadius = Ye;
 const normalizeResponsiveOptions = ee;
 const normalizeTokenKey = be;
-const parseColorToRgba = Xe;
-const parseCssFont = Ue;
+const parseColorToRgba = je;
+const parseCssFont = Ze;
 const parseLegendAnchor = we;
 const parseSvgColor = G;
 const resolveColor = T;
@@ -6105,7 +6149,7 @@ const resolveGridLineDash = le;
 const resolveSvgPaintAttrs = Fe;
 const svgRoundedRectElement = Pe;
 const svgTextElement = j;
-const toFigmaVariableName = et;
+const toFigmaVariableName = st;
 const wrapSvgDocument = me;
 
 
@@ -6360,7 +6404,7 @@ const wrapSvgDocument = me;
 
       const groupInfo = categorizedVarGroups[groupKey];
       const items = groupInfo ? groupInfo.items : [];
-      const defaultOpt = `<option value="">🎨 #${selectedChipIndex + 1} 시리즈에 적용...</option>`;
+      const defaultOpt = `<option value="">#${selectedChipIndex + 1} 시리즈에 적용...</option>`;
 
       selectEl.innerHTML =
         defaultOpt +
@@ -6524,7 +6568,8 @@ const wrapSvgDocument = me;
 
       renderTokenChips(tokenList);
 
-      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+      const isEachColored =
+        state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
       const singleData = xLabels.map((label, i) => ({
         label,
         value: rows[i]?.[0] ?? 0,
@@ -6548,15 +6593,21 @@ const wrapSvgDocument = me;
     function updateControlVisibility() {
       const isBar = state.chartType === 'bar';
       const isLine = state.chartType === 'line';
+      const isDonut = state.chartType === 'donut';
       const isPie = state.chartType === 'pie';
+      const isCircular = isDonut || isPie;
       const isFunnel = state.chartType === 'funnel';
 
-      document.getElementById('series-mode-field').style.display = isPie || isFunnel ? 'none' : '';
+      document.getElementById('series-mode-field').style.display = isCircular || isFunnel ? 'none' : '';
       document.getElementById('series-names-field').style.display =
-        isPie || isFunnel || state.seriesMode === 'single' ? 'none' : '';
+        isCircular || isFunnel || state.seriesMode === 'single' ? 'none' : '';
       document.getElementById('bar-controls').style.display = isBar ? '' : 'none';
       document.getElementById('line-controls').style.display = isLine ? 'flex' : 'none';
-      document.getElementById('pie-controls').style.display = isPie ? 'flex' : 'none';
+      document.getElementById('pie-controls').style.display = isCircular ? 'flex' : 'none';
+      const donutHoleField = document.getElementById('donut-hole-field');
+      const pieGapRow = document.getElementById('pie-gap-row');
+      if (donutHoleField) donutHoleField.style.display = isDonut ? '' : 'none';
+      if (pieGapRow) pieGapRow.style.gridTemplateColumns = isDonut ? '' : '1fr';
       document.getElementById('funnel-controls').style.display = isFunnel ? 'flex' : 'none';
       document.getElementById('grid-controls').style.display = isBar || isLine ? '' : 'none';
       const showElementGap = isBar || isLine;
@@ -6573,9 +6624,11 @@ const wrapSvgDocument = me;
           ? 'Bar · 4.Radius'
           : isLine
             ? 'Line · Area HSL'
-            : isPie
+            : isDonut
               ? 'Donut · Arc'
-              : 'Funnel · Stage';
+              : isPie
+                ? 'Pie · Arc'
+                : 'Funnel · Stage';
       }
       const spacingNumEl = document.getElementById('spacing-section-num');
       if (spacingNumEl) {
@@ -6647,7 +6700,7 @@ const wrapSvgDocument = me;
       const hasLeftLegend = state.legendPos !== 'none' && state.legendPos.startsWith('left');
       const hasRightLegend = state.legendPos !== 'none' && state.legendPos.startsWith('right');
 
-      if (state.chartType === 'pie' || state.chartType === 'funnel') {
+      if (state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel') {
         return {
           top: basePad + (hasTopLegend ? 20 : 4),
           right: basePad + (hasRightLegend ? 96 : 8),
@@ -6688,7 +6741,7 @@ const wrapSvgDocument = me;
       chartBoxEl.style.height = `${boxH}px`;
       const sizePillEl = document.getElementById('live-size-pill');
       if (sizePillEl) {
-        sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · ↔ 우측/하단 핸들 드래그로 유동 반응형 조절`;
+        sizePillEl.innerText = `${state.exportW} × ${state.exportH} px · 우측/하단 핸들 드래그로 유동 반응형 조절`;
       }
 
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
@@ -6788,12 +6841,55 @@ const wrapSvgDocument = me;
           },
           legend: legendOpt,
         });
+      } else if (state.chartType === 'donut') {
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
+        const sliceGapVal = state.pieSliceGap ?? 3;
+        const padRad = ((state.piePadDeg ?? 1.5) * Math.PI) / 180;
+        const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
+        const resolvedTrackToken =
+          state.pieTrackToken && state.pieTrackToken !== 'auto'
+            ? state.pieTrackToken
+            : state.surfaceMode === 'dark'
+              ? 'surface/high'
+              : 'surface/low';
+        const trackHex = maxVal ? useTokenColor(resolvedTrackToken) : undefined;
+        activeChart = new DonutChart(containerEl, {
+          data: singleData,
+          padding: padOpt,
+          font: fontOpt,
+          animation: animOpt,
+          responsive: { enabled: true },
+          donut: {
+            innerRadiusRatio: holeRatio,
+            ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
+            maxValue: maxVal,
+            trackColor: trackHex,
+            colors: palette,
+          },
+          center:
+            holeRatio >= 0.35
+              ? {
+                  title: (_d, total) =>
+                    maxVal
+                      ? `${Math.round((total / Math.max(total, maxVal)) * 100)}%`
+                      : `${total.toLocaleString()}`,
+                  subtitle: maxVal ? `Max ${maxVal.toLocaleString()}` : 'Total',
+                  titleColor: strongTextHex,
+                  subtitleColor: labelHex,
+                }
+              : undefined,
+          labels: {
+            visible: state.showLabels,
+            position: 'outside',
+            color: strongTextHex,
+          },
+          legend: legendOpt,
+        });
       } else {
         const isPxGap = (state.pieGapMode || 'px') === 'px';
-        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
-        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
-        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
-        const padRad = ((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180;
+        const sliceGapVal = state.pieSliceGap ?? 0;
+        const padRad = ((state.piePadDeg ?? 0) * Math.PI) / 180;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -6809,24 +6905,12 @@ const wrapSvgDocument = me;
           animation: animOpt,
           responsive: { enabled: true },
           pie: {
-            innerRadiusRatio: state.holeRatio,
+            innerRadiusRatio: 0,
             ...(isPxGap ? { sliceGap: sliceGapVal } : { padAngle: padRad }),
             maxValue: maxVal,
             trackColor: trackHex,
             colors: palette,
           },
-          center:
-            state.holeRatio >= 0.35
-              ? {
-                  title: (_d, total) =>
-                    maxVal
-                      ? `${Math.round((total / Math.max(total, maxVal)) * 100)}%`
-                      : `${total.toLocaleString()}`,
-                  subtitle: maxVal ? `Max ${maxVal.toLocaleString()}` : 'Total',
-                  titleColor: strongTextHex,
-                  subtitleColor: labelHex,
-                }
-              : undefined,
           labels: {
             visible: state.showLabels,
             position: 'outside',
@@ -6854,7 +6938,8 @@ const wrapSvgDocument = me;
       const titleMap = {
         bar: `NanoChart — Bar (${state.seriesMode})`,
         line: `NanoChart — Line (${state.seriesMode})`,
-        pie: `NanoChart — Donut`,
+        donut: `NanoChart — Donut`,
+        pie: `NanoChart — Pie`,
         funnel: `NanoChart — Funnel (${state.funnelDirection})`,
       };
 
@@ -6883,9 +6968,25 @@ const wrapSvgDocument = me;
     // 이벤트 바인딩
     document.querySelectorAll('#type-group .seg-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const prevType = state.chartType;
+        const nextType = btn.dataset.type;
         document.querySelectorAll('#type-group .seg-btn').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        state.chartType = btn.dataset.type;
+        state.chartType = nextType;
+        if (nextType === 'pie' && prevType !== 'pie') {
+          state.pieSliceGap = 0;
+          state.piePadDeg = 0;
+          syncPieGapControlUI();
+        } else if (nextType === 'donut' && prevType !== 'donut') {
+          if ((state.holeRatio ?? 0) < 0.2) state.holeRatio = 0.6;
+          if ((state.pieSliceGap ?? 0) === 0 && (state.piePadDeg ?? 0) === 0) {
+            state.pieSliceGap = 3;
+            state.piePadDeg = 1.5;
+          }
+          document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
+          document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          syncPieGapControlUI();
+        }
         renderPreview();
       });
     });
@@ -7082,19 +7183,20 @@ const wrapSvgDocument = me;
 
     function syncPieGapControlUI() {
       const mode = state.pieGapMode || 'px';
+      const isDonut = state.chartType === 'donut';
       const modeSelect = document.getElementById('pie-gap-mode-select');
       const padSlider = document.getElementById('pie-pad-slider');
       const padTxt = document.getElementById('pie-pad-txt');
       if (modeSelect) modeSelect.value = mode;
       if (mode === 'px') {
-        const pxVal = state.pieSliceGap ?? (state.holeRatio > 0 ? 3 : 0);
+        const pxVal = state.pieSliceGap ?? (isDonut ? 3 : 0);
         padSlider.min = '0';
         padSlider.max = '16';
         padSlider.step = '1';
         padSlider.value = String(pxVal);
         padTxt.innerText = `${pxVal}px`;
       } else {
-        const degVal = state.piePadDeg ?? (state.holeRatio > 0 ? 1.5 : 0);
+        const degVal = state.piePadDeg ?? (isDonut ? 1.5 : 0);
         padSlider.min = '0';
         padSlider.max = '5';
         padSlider.step = '0.5';
@@ -7105,19 +7207,8 @@ const wrapSvgDocument = me;
 
     document.getElementById('hole-slider').addEventListener('input', (e) => {
       const pct = parseInt(e.target.value, 10);
-      const prevHole = state.holeRatio;
       state.holeRatio = pct / 100;
       document.getElementById('hole-txt').innerText = `${pct}%`;
-
-      // 구멍 비율이 0%(순수 파이 차트)가 되면 조각 사이 빈 공간이 생기지 않도록 간격을 0으로 자동 전환
-      if (pct === 0) {
-        state.pieSliceGap = 0;
-        state.piePadDeg = 0;
-      } else if (prevHole === 0) {
-        if ((state.pieSliceGap ?? 0) === 0) state.pieSliceGap = 3;
-        if ((state.piePadDeg ?? 0) === 0) state.piePadDeg = 1.5;
-      }
-      syncPieGapControlUI();
       renderPreview();
     });
 
@@ -7336,7 +7427,8 @@ const wrapSvgDocument = me;
       const padOpt = computeChartPadding();
       const fontFamily = getActiveFontFamily();
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
-      const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+      const isEachColored =
+        state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
 
       const dataCode = singleData
         .map((d, idx) => {
@@ -7442,16 +7534,15 @@ const wrapSvgDocument = me;
           `  labels: {\n    visible: ${state.showLabels},\n    position: '${state.funnelLabelPos}',\n    color: '${state.funnelLabelPos === 'inside' ? insideLabelToken : strongTextToken}',\n  },`
         );
         optionsLines.push(legendCode);
-      } else {
-        className = 'PieChart';
+      } else if (state.chartType === 'donut') {
+        className = 'DonutChart';
         const isPxGap = (state.pieGapMode || 'px') === 'px';
-        const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
-        const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
-        const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
-        const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
+        const sliceGapVal = state.pieSliceGap ?? 3;
+        const padRad = Number((((state.piePadDeg ?? 1.5) * Math.PI) / 180).toFixed(4));
         const gapCodeLine = isPxGap
           ? `    sliceGap: ${sliceGapVal},`
-          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? defaultPadDeg}°`;
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 1.5}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken =
           state.pieTrackToken && state.pieTrackToken !== 'auto'
@@ -7463,16 +7554,42 @@ const wrapSvgDocument = me;
         optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         optionsLines.push(
           maxVal
-            ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-            : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            ? `  donut: {\n    innerRadiusRatio: ${holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  donut: {\n    innerRadiusRatio: ${holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
         );
-        if (state.holeRatio >= 0.35) {
+        if (holeRatio >= 0.35) {
           optionsLines.push(
             maxVal
               ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
               : `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
           );
         }
+        optionsLines.push(
+          `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
+        );
+        optionsLines.push(legendCode);
+      } else {
+        className = 'PieChart';
+        const isPxGap = (state.pieGapMode || 'px') === 'px';
+        const sliceGapVal = state.pieSliceGap ?? 0;
+        const padRad = Number((((state.piePadDeg ?? 0) * Math.PI) / 180).toFixed(4));
+        const gapCodeLine = isPxGap
+          ? `    sliceGap: ${sliceGapVal},`
+          : `    padAngle: ${padRad}, // ${state.piePadDeg ?? 0}°`;
+        const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
+        const resolvedTrackToken =
+          state.pieTrackToken && state.pieTrackToken !== 'auto'
+            ? state.pieTrackToken
+            : isDark
+              ? 'surface/high'
+              : 'surface/low';
+        const trackCssToken = toCssVarToken(resolvedTrackToken);
+        optionsLines.push(`  data: [\n${dataCode}\n  ],`);
+        optionsLines.push(
+          maxVal
+            ? `  pie: {\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+            : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+        );
         optionsLines.push(
           `  labels: {\n    visible: ${state.showLabels},\n    position: 'outside',\n    color: '${strongTextToken}',\n  },`
         );
@@ -7580,7 +7697,7 @@ const wrapSvgDocument = me;
       const toastEl = document.getElementById('code-copy-toast');
       const showCopiedToast = () => {
         if (!toastEl) return;
-        toastEl.innerText = '✅ 클립보드에 복사되었습니다!';
+        toastEl.innerText = '클립보드에 복사되었습니다!';
         toastEl.style.opacity = '1';
       };
 
@@ -7621,10 +7738,10 @@ const wrapSvgDocument = me;
       if (downloadBtn) {
         downloadBtn.innerText =
           format === 'svg'
-            ? '💾 파일로 저장 (.svg)'
+            ? '파일로 저장 (.svg)'
             : format === 'tailwind'
-              ? '💾 파일로 저장 (.tsx)'
-              : '💾 파일로 저장 (.ts)';
+              ? '파일로 저장 (.tsx)'
+              : '파일로 저장 (.ts)';
       }
 
       const code = generateDeveloperCode(format);
@@ -7695,9 +7812,9 @@ const wrapSvgDocument = me;
         if (msg.matchedCount > 0) {
           const radText = msg.radiusMatchedCount > 0 ? ` · Radius ${msg.radiusMatchedCount}` : '';
           const spText = msg.spacingMatchedCount > 0 ? ` · Spacing ${msg.spacingMatchedCount}` : '';
-          varBadge.innerText = `🔗 컬러 ${msg.matchedCount}${radText}${spText} 연결됨`;
+          varBadge.innerText = `컬러 ${msg.matchedCount}${radText}${spText} 연결됨`;
         } else {
-          varBadge.innerText = `🔗 기본 토큰 (primary/-, rounded-md, p-6...) 사용 중`;
+          varBadge.innerText = `기본 토큰 (primary/-, rounded-md, p-6...) 사용 중`;
         }
         renderPreview();
       } else if (msg.type === 'SELECTION_SAVED_CHART') {
@@ -7710,6 +7827,10 @@ const wrapSvgDocument = me;
           updateBtn.style.display = 'inline-block';
 
           state = { ...state, ...msg.state };
+          // 기존 통합 버전(chartType: 'pie', holeRatio > 0)으로 저장된 도넛 차트 하위 호환 복원
+          if (state.chartType === 'pie' && (state.holeRatio ?? 0) > 0) {
+            state.chartType = 'donut';
+          }
           document.querySelectorAll('#type-group .seg-btn').forEach((b) => {
             b.classList.toggle('active', b.dataset.type === state.chartType);
           });
@@ -7739,12 +7860,14 @@ const wrapSvgDocument = me;
           document.getElementById('area-sat-txt').innerText = `${state.areaSatDelta ?? 0}%`;
           document.getElementById('area-light-slider').value = state.areaLightDelta ?? 0;
           document.getElementById('area-light-txt').innerText = `${state.areaLightDelta ?? 0}%`;
-          document.getElementById('hole-slider').value = Math.round(state.holeRatio * 100);
-          document.getElementById('hole-txt').innerText = `${Math.round(state.holeRatio * 100)}%`;
+          const restoredHoleRatio = state.chartType === 'donut' ? Math.max(0.2, state.holeRatio || 0.6) : 0.6;
+          if (state.chartType === 'donut') state.holeRatio = restoredHoleRatio;
+          document.getElementById('hole-slider').value = Math.round(restoredHoleRatio * 100);
+          document.getElementById('hole-txt').innerText = `${Math.round(restoredHoleRatio * 100)}%`;
           state.pieGapMode = state.pieGapMode || 'px';
-          if (state.holeRatio <= 0) {
-            state.pieSliceGap = 0;
-            state.piePadDeg = 0;
+          if (state.chartType === 'pie') {
+            state.pieSliceGap = state.pieSliceGap ?? 0;
+            state.piePadDeg = state.piePadDeg ?? 0;
           } else {
             state.pieSliceGap = state.pieSliceGap ?? 3;
             state.piePadDeg = state.piePadDeg ?? 1.5;
@@ -8005,8 +8128,8 @@ const wrapSvgDocument = me;
     async function checkAndApplyOtaUpdate(isManual = false) {
       if (otaBadgeEl) {
         otaBadgeEl.innerText = isManual
-          ? '🔄 GitHub 최신 빌드 확인 중...'
-          : `✅ v${localMeta.version} · 자동업데이트 켜짐`;
+          ? 'GitHub 최신 빌드 확인 중...'
+          : `v${localMeta.version} · 자동업데이트 켜짐`;
       }
 
       const ts = Date.now();
@@ -8036,14 +8159,14 @@ const wrapSvgDocument = me;
 
       if (!newestRemote || !newestEndpoint) {
         if (otaBadgeEl) {
-          otaBadgeEl.innerText = `⚡ v${localMeta.version} (로컬 실행 중)`;
+          otaBadgeEl.innerText = `v${localMeta.version} (로컬 실행 중)`;
         }
         return;
       }
 
       if (newestRemote.buildTime > (localMeta.buildTime || 0)) {
         if (otaBadgeEl) {
-          otaBadgeEl.innerText = `⏳ 새 버전(v${newestRemote.version}) 자동 업데이트 중...`;
+          otaBadgeEl.innerText = `새 버전(v${newestRemote.version}) 자동 업데이트 중...`;
         }
         const remoteUiHtml = await fetchTextWithTimeout(`${newestEndpoint.baseUrl}/ui.html?t=${ts}`);
         if (remoteUiHtml && remoteUiHtml.includes('NanoCharts')) {
@@ -8064,7 +8187,7 @@ const wrapSvgDocument = me;
       }
 
       if (otaBadgeEl) {
-        otaBadgeEl.innerText = `✅ 최신 v${localMeta.version} (${newestEndpoint.name} 동기화됨)`;
+        otaBadgeEl.innerText = `최신 v${localMeta.version} (${newestEndpoint.name} 동기화됨)`;
       }
     }
 

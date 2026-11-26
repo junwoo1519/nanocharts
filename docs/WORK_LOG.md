@@ -24,6 +24,60 @@
 
 ---
 
+## [2026-11-26 10:01] `DonutChart` / `PieChart` 라이브러리 클래스 및 Figma 플러그인 UI 완전 분리
+
+- **변경된 파일 목록:**
+  - 생성: `src/core/DonutChart.ts`
+  - 수정: `src/types/index.ts`, `src/index.ts`, `figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`, `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 라이브러리(`src/`)에 `PieChart`를 상속하고 기본 `innerRadiusRatio: 0.6` 및 전용 `donut` 옵션(`DonutStyleOptions`, `DonutChartOptions`, `DonutLabelOptions`, `DonutCenterContentOptions`, `DonutChartEventMap`)을 제공하는 독립 `DonutChart` 클래스를 추가하고 `src/index.ts`에서 공개 export함 (기존 `PieChart`의 `innerRadiusRatio` 사용 방식도 100% 하위 호환 유지).
+  - Figma 플러그인(`figma-plugin/src/ui.template.html`) 상단 차트 유형 선택을 5개 탭(`Bar`, `Line`, `Donut`, `Pie`, `Funnel`)으로 분리함. `Donut` 선택 시 `DonutChart`와 내부 구멍 비율 슬라이더(`20%`~`80%`)·중앙 텍스트가 활성화되고, `Pie` 선택 시 `PieChart`(`innerRadiusRatio: 0`)로 동작하며 내부 구멍 비율 컨트롤을 숨김.
+  - 개발자용 코드 내보내기(`ui.template.html`) 및 Dev Mode 코드 생성(`figma-plugin/src/code.ts`)이 `DonutChart` / `PieChart`를 각각 구분해 생성하도록 동기화하고, 기존 통합 버전(`chartType: 'pie'`, `holeRatio > 0`)으로 저장된 피그마 노드 재선택 시 자동으로 `Donut` 탭으로 복원되는 하위 호환 로직을 추가함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`, `docs/ARCHITECTURE.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 09:55] Figma 플러그인 GUI 라이트 테마 포인트 컬러 블루(`#226CFF`) 적용
+
+- **변경된 파일 목록:**
+  - 수정: `figma-plugin/src/ui.template.html`, `docs/WORK_LOG.md`
+  - 재빌드: `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 화이트 배경(`#FFFFFF`) + 블랙 텍스트(`#111111`) 라이트 테마를 유지하면서, 포인트 컬러를 블루(`#226CFF`, 호버 `#1A56DB`)로 적용함.
+  - 버전 배지, 섹션 번호, 슬라이더/체크박스/포커스 테두리, 활성 세그먼트·탭, 선택된 토큰 칩, 주요 CTA/코드 버튼, 리사이즈 핸들, `랜덤 생성` 버튼에 블루 포인트 컬러를 반영함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 해당 없음 (플러그인 GUI 포인트 컬러 조정)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 09:52] Figma 플러그인 GUI 화이트 배경 · 블랙 텍스트 모노크롬 라이트 테마 적용
+
+- **변경된 파일 목록:**
+  - 수정: `figma-plugin/src/ui.template.html`, `docs/WORK_LOG.md`
+  - 재빌드: `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - 사용자 요청에 따라 Figma 플러그인 GUI를 심플한 화이트 배경(`#FFFFFF`, 프리뷰 스테이지 `#F5F5F7`)과 블랙 텍스트(`#111111`, 보조 `#3F3F46`/`#71717A`) 기반의 모노크롬 라이트 테마로 전환함.
+  - 세그먼트 활성 상태, 주요 CTA 버튼, 체크박스·슬라이더, 선택 배지, 코드 내보내기 모달까지 모두 `#111111` / `#FFFFFF` / 뉴트럴 그레이 보더(`#E5E5E5`, `#D4D4D8`)로 통일함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 해당 없음 (플러그인 GUI 테마 조정)
+- **다음 세션 주의사항:** 없음
+
+---
+
+## [2026-11-26 09:49] Figma 플러그인 GUI 텍스트 좌측 아이콘 제거 및 차콜·에메랄드 컬러 테마 개편
+
+- **변경된 파일 목록:**
+  - 수정: `figma-plugin/src/ui.template.html`, `docs/WORK_LOG.md`
+  - 재빌드: `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - Figma 플러그인 GUI 패널(차트 유형 버튼, 프리셋/범례/변수 셀렉트, 반응형 크기 프리셋, 체크박스, 툴바 상태 배지, 푸터 안내·액션 버튼, 코드 내보내기 모달 및 동적 상태 텍스트)에서 텍스트 좌측에 들어가 있던 이모지/아이콘을 전면 제거하여 UI를 깔끔하게 정리함.
+  - 기존 남색/파란색 계열(`#0B0F19`, `#111622`, `#182032`, `#226CFF`, `#3B82F6` 등)의 플러그인 UI 테마를 뉴트럴 차콜(`#111113`, `#17171A`, `#1F1F23`) 베이스 + 에메랄드/틸(`#10B981`, `#0D9488`, `#34D399`) 포인트 컬러 계열로 전면 교체함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 해당 없음 (플러그인 GUI 스타일 및 텍스트 정리)
+- **다음 세션 주의사항:** 없음
+
+---
+
 ## [2026-11-25 17:50] Figma 플러그인 Donut/Funnel 불필요 요소 간격 숨김 및 `code.ts` `sliceGap` 코드젠 동기화
 
 - **변경된 파일 목록:**

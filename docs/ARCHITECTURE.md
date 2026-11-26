@@ -10,7 +10,7 @@
 src/
 ├── index.ts                # Public Export 진입점
 ├── types/index.ts          # 전역 타입 및 인터페이스 단일 진실 원천(SSOT)
-├── core/                   # 오케스트레이터 & 인프라 (Chart, LineChart, PieChart, FunnelChart, LayerManager, Animator, EventEmitter)
+├── core/                   # 오케스트레이터 & 인프라 (Chart, LineChart, PieChart, DonutChart, FunnelChart, LayerManager, Animator, EventEmitter)
 ├── scale/                  # 데이터 ↔ 픽셀 좌표 변환 엔진 (Scale, LinearScale, BandScale)
 ├── series/                 # 순수 Canvas 2D 도형 및 SVG 직렬화 렌더러 (BarSeries, LineSeries, PieSeries, FunnelSeries)
 ├── components/             # 보조 시각화 및 DOM 인터랙션 컴포넌트 (Axis, Grid, Tooltip, Legend)
@@ -40,7 +40,7 @@ flowchart LR
      - `BandScale`: `setDomainCount(slotCount)`와 `range([eff.left, width - eff.right])`로 X축 슬롯 및 뷰포트 윈도우(`[viewStart, viewEnd]`)를 관리합니다.
      - `LinearScale`: 최솟값/최댓값에 상하 10% 여유를 준 뒤 `.nice(5)`로 도메인을 보정하고, `range([height - eff.bottom, eff.top])`로 Y축 픽셀 매핑을 수행합니다.
      - `LineChart`의 `stacked: true` 모드에서는 `initScales()` 시점에 각 시리즈의 `baseValues[]`와 `stackedValues[]`를 사전 누적 계산합니다.
-   - **비직교 좌표계 차트 (`PieChart`, `FunnelChart`)**:
+   - **비직교 좌표계 차트 (`PieChart`, `DonutChart`, `FunnelChart`)**:
      - `PieSeries.calculateSlices()`: 중심점 `(cx, cy)`, 반응형 반지름, 12시(`-PI/2`) 기준 시작/종료 각도, 잔여 `isTrack` 조각을 계산해 `this.slices`에 캐싱합니다.
      - `FunnelSeries.calculateStages()`: 진행 방향(`vertical`/`horizontal`)과 형태(`trapezoid`/`bar`)에 따라 4개 꼭짓점 다각형(`points`) 및 단계별/전체 전환율을 계산해 `this.stages`에 캐싱합니다.
 3. **3단 멀티 레이어 Canvas 렌더링 (`LayerManager`)**

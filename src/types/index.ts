@@ -713,12 +713,60 @@ export interface PieChartOptions {
   font?: ChartFontOptions;
   /** 반응형 레이아웃 및 자동 여백/비율 설정 (`true`/`false` 또는 상세 설정 객체, 기본값: true) */
   responsive?: boolean | ResponsiveOptions;
-  /** 파이/도넛 형태 및 색상 스타일 */
+  /** 파이 형태 및 색상 스타일 */
   pie?: PieStyleOptions;
   /** 데이터 라벨 옵션 */
   labels?: PieLabelOptions;
-  /** 도넛 차트 중앙 텍스트 옵션 */
+  /** 중앙 텍스트 옵션 (도넛 형태 사용 시) */
   center?: PieCenterContentOptions;
+  /** 툴팁 옵션 */
+  tooltip?: TooltipOptions;
+  /** 범례(Legend) 표시 및 데이터 토글 옵션 (`true`/`false` 또는 상세 설정 객체) */
+  legend?: boolean | LegendOptions;
+  /** 렌더링 애니메이션 옵션 (`false` 전달 시 즉시 렌더링, 기본값: 활성화) */
+  animation?: boolean | AnimationOptions;
+}
+
+/**
+ * 도넛 차트 스타일 옵션 (`PieStyleOptions` 확장, 기본 `innerRadiusRatio: 0.6`)
+ */
+export interface DonutStyleOptions extends PieStyleOptions {
+  /**
+   * 도넛 차트 내부 구멍의 반지름 비율 (0.1 ~ 0.85, 기본값: 0.6)
+   */
+  innerRadiusRatio?: number;
+}
+
+/**
+ * 도넛 차트 데이터 라벨 옵션
+ */
+export type DonutLabelOptions = PieLabelOptions;
+
+/**
+ * 도넛 차트 중앙 요약 텍스트 옵션
+ */
+export type DonutCenterContentOptions = PieCenterContentOptions;
+
+/**
+ * DonutChart 초기화 옵션
+ */
+export interface DonutChartOptions {
+  /** 차트에 바인딩할 데이터 배열 */
+  data: DataItem[];
+  /** 차트 내부 여백 설정 */
+  padding?: Partial<Padding>;
+  /** 차트 전역 폰트(패밀리, 크기, 두께) 설정 */
+  font?: ChartFontOptions;
+  /** 반응형 레이아웃 및 자동 여백/비율 설정 (`true`/`false` 또는 상세 설정 객체, 기본값: true) */
+  responsive?: boolean | ResponsiveOptions;
+  /** 도넛 형태 및 색상 스타일 (기본 `innerRadiusRatio: 0.6`) */
+  donut?: DonutStyleOptions;
+  /** `donut`의 하위 호환 별칭 (미지정 시 `donut` 옵션 사용) */
+  pie?: PieStyleOptions;
+  /** 데이터 라벨 옵션 */
+  labels?: DonutLabelOptions;
+  /** 도넛 차트 중앙 텍스트 옵션 */
+  center?: DonutCenterContentOptions;
   /** 툴팁 옵션 */
   tooltip?: TooltipOptions;
   /** 범례(Legend) 표시 및 데이터 토글 옵션 (`true`/`false` 또는 상세 설정 객체) */

@@ -343,7 +343,8 @@ function computePaddingForCodegen(state: any): { top: number; right: number; bot
   const legendPos = String(state.legendPos || 'top-right');
   const isCompact = (state.exportW || 640) < 420;
   const hasLegend = legendPos !== 'none';
-  const isPieOrFunnel = state.chartType === 'pie' || state.chartType === 'funnel';
+  const isPieOrFunnel =
+    state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
 
   let top = Math.max(16, basePad + (hasLegend && legendPos.startsWith('top') ? 22 : 6));
   let right = Math.max(16, basePad + (hasLegend && legendPos.startsWith('right') ? 88 : 0));
@@ -444,7 +445,8 @@ function generateDevModeCodeBlocks(
       ? state.customFontFamily
       : state.fontFamilyPreset || 'Pretendard, Inter, sans-serif';
   const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
-  const isEachColored = state.chartType === 'pie' || state.chartType === 'funnel';
+  const isEachColored =
+    state.chartType === 'donut' || state.chartType === 'pie' || state.chartType === 'funnel';
 
   const dataCode = singleData
     .map((d, idx) => {
@@ -546,10 +548,12 @@ function generateDevModeCodeBlocks(
     );
     optionsLines.push(legendCode);
   } else {
-    className = 'PieChart';
+    const isDonut =
+      state.chartType === 'donut' || (state.chartType === 'pie' && (state.holeRatio ?? 0) > 0);
+    className = isDonut ? 'DonutChart' : 'PieChart';
     const isPxGap = (state.pieGapMode || 'px') === 'px';
-    const defaultGapPx = state.holeRatio > 0 ? 3 : 0;
-    const defaultPadDeg = state.holeRatio > 0 ? 1.5 : 0;
+    const defaultGapPx = isDonut ? 3 : 0;
+    const defaultPadDeg = isDonut ? 1.5 : 0;
     const sliceGapVal = state.pieSliceGap ?? defaultGapPx;
     const padRad = Number((((state.piePadDeg ?? defaultPadDeg) * Math.PI) / 180).toFixed(4));
     const gapCodeLine = isPxGap
@@ -565,16 +569,25 @@ function generateDevModeCodeBlocks(
     const trackCssToken = toCssVarTokenForCodegen(resolvedTrackToken);
 
     optionsLines.push(`  data: [\n${dataCode}\n  ],`);
-    optionsLines.push(
-      maxVal
-        ? `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-        : `  pie: {\n    innerRadiusRatio: ${state.holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
-    );
-    if (state.holeRatio >= 0.35) {
+    if (isDonut) {
+      const holeRatio = Math.max(0.2, state.holeRatio || 0.6);
       optionsLines.push(
         maxVal
-          ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
-          : `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
+          ? `  donut: {\n    innerRadiusRatio: ${holeRatio},\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+          : `  donut: {\n    innerRadiusRatio: ${holeRatio},\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+      );
+      if (holeRatio >= 0.35) {
+        optionsLines.push(
+          maxVal
+            ? `  center: {\n    title: (_d, total) => \`\${Math.round((total / ${maxVal}) * 100)}%\`,\n    subtitle: 'Max ${maxVal}',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
+            : `  center: {\n    title: (_d, total) => total.toLocaleString(),\n    subtitle: 'Total',\n    titleColor: '${strongTextToken}',\n    subtitleColor: '${labelToken}',\n  },`
+        );
+      }
+    } else {
+      optionsLines.push(
+        maxVal
+          ? `  pie: {\n    maxValue: ${maxVal},\n    trackColor: '${trackCssToken}', // ${resolvedTrackToken}\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
+          : `  pie: {\n${gapCodeLine}\n    colors: ${JSON.stringify(cssTokens)},\n  },`
       );
     }
     optionsLines.push(

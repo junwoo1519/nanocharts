@@ -2,6 +2,8 @@ export { BarChart } from './core/Chart';
 export type { BarChartEventMap } from './core/Chart';
 export { PieChart } from './core/PieChart';
 export type { PieChartEventMap } from './core/PieChart';
+export { DonutChart } from './core/DonutChart';
+export type { DonutChartEventMap } from './core/DonutChart';
 export { LineChart } from './core/LineChart';
 export type { LineChartEventMap } from './core/LineChart';
 export { FunnelChart } from './core/FunnelChart';
