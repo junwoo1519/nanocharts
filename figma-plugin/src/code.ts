@@ -397,6 +397,11 @@ function generateDevModeCodeBlocks(
     pieLabelPos: 'outside',
     pieLabelFormat: 'label-percent',
     labelOffset: 8,
+    tooltipEnabled: true,
+    tooltipTheme: 'dark',
+    tooltipPlacement: 'auto',
+    tooltipOffset: 12,
+    tooltipArrow: false,
     funnelDirection: 'vertical',
     funnelShape: 'trapezoid',
     funnelGap: 4,
@@ -486,6 +491,16 @@ function generateDevModeCodeBlocks(
   );
   optionsLines.push(
     `  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`
+  );
+  const tooltipEnabledVal = state.tooltipEnabled !== false;
+  const tooltipThemeVal = state.tooltipTheme || 'dark';
+  const tooltipPlacementVal = state.tooltipPlacement || 'auto';
+  const tooltipOffsetVal = state.tooltipOffset ?? 12;
+  const tooltipArrowVal = Boolean(state.tooltipArrow);
+  optionsLines.push(
+    tooltipEnabledVal
+      ? `  tooltip: {\n    theme: '${tooltipThemeVal}',\n    placement: '${tooltipPlacementVal}',\n    offset: ${tooltipOffsetVal},\n    arrow: ${tooltipArrowVal},\n  },`
+      : `  tooltip: { enabled: false },`
   );
 
   const labelOffsetVal = state.labelOffset ?? 8;

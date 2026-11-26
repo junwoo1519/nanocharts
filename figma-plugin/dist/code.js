@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.21","buildId":"0.1.21-1795660401885","buildTime":1795660401885,"builtAt":"2026-11-26T02:33:21.885Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.21","buildId":"0.1.21-1795661570284","buildTime":1795661570284,"builtAt":"2026-11-26T02:52:50.284Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *
@@ -319,10 +319,10 @@ function computePaddingForCodegen(state) {
  * Dev Mode Codegen용 코드 블록(React+Tailwind / Vanilla TS / Options)을 생성합니다.
  */
 function generateDevModeCodeBlocks(rawState, chartNode, language) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     const liveW = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.width) || rawState.exportW || 640);
     const liveH = Math.round((chartNode === null || chartNode === void 0 ? void 0 : chartNode.height) || rawState.exportH || 400);
-    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, pieGapMode: 'px', pieSliceGap: 3, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', barLabelPos: 'auto', lineLabelPos: 'top-outside', pieLabelPos: 'outside', pieLabelFormat: 'label-percent', labelOffset: 8, funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
+    const state = Object.assign(Object.assign({ chartType: 'bar', seriesMode: 'grouped', theme: 'weseed-categorical', surfaceMode: 'light', radius: 6, radiusToken: 'rounded-md', widthRatio: 0.65, curve: 'smooth', areaTopOpacity: 0.45, areaSatDelta: 0, areaLightDelta: 0, holeRatio: 0.6, pieGapMode: 'px', pieSliceGap: 3, piePadDeg: 1.5, pieMaxValue: 0, pieTrackToken: 'auto', barLabelPos: 'auto', lineLabelPos: 'top-outside', pieLabelPos: 'outside', pieLabelFormat: 'label-percent', labelOffset: 8, tooltipEnabled: true, tooltipTheme: 'dark', tooltipPlacement: 'auto', tooltipOffset: 12, tooltipArrow: false, funnelDirection: 'vertical', funnelShape: 'trapezoid', funnelGap: 4, funnelGapToken: 'gap/gap-1', funnelLabelPos: 'inside', paddingToken: 'padding/p-6', paddingPx: 24, gapToken: 'gap/gap-2', gapPx: 8, legendPos: 'top-right', fontFamilyPreset: 'Pretendard, Inter, sans-serif', customFontFamily: '', fontSize: 11, fontWeight: '500', gridStyle: 'dashed', gridWidth: 1, gridY: true, gridX: false, gridBorder: false, gridBand: false, showLabels: true, includeBg: true }, rawState), { exportW: liveW, exportH: liveH });
     const { xLabels, singleData, multiSeries } = parseSavedDataForCodegen(state);
     const tokenList = state.theme === 'custom' && state.customTokens
         ? String(state.customTokens)
@@ -371,7 +371,15 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
     optionsLines.push(`  responsive: { enabled: true },`);
     optionsLines.push(`  padding: { top: ${padOpt.top}, right: ${padOpt.right}, bottom: ${padOpt.bottom}, left: ${padOpt.left} }, // ${state.paddingToken} (${state.paddingPx}px)`);
     optionsLines.push(`  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`);
-    const labelOffsetVal = (_a = state.labelOffset) !== null && _a !== void 0 ? _a : 8;
+    const tooltipEnabledVal = state.tooltipEnabled !== false;
+    const tooltipThemeVal = state.tooltipTheme || 'dark';
+    const tooltipPlacementVal = state.tooltipPlacement || 'auto';
+    const tooltipOffsetVal = (_a = state.tooltipOffset) !== null && _a !== void 0 ? _a : 12;
+    const tooltipArrowVal = Boolean(state.tooltipArrow);
+    optionsLines.push(tooltipEnabledVal
+        ? `  tooltip: {\n    theme: '${tooltipThemeVal}',\n    placement: '${tooltipPlacementVal}',\n    offset: ${tooltipOffsetVal},\n    arrow: ${tooltipArrowVal},\n  },`
+        : `  tooltip: { enabled: false },`);
+    const labelOffsetVal = (_b = state.labelOffset) !== null && _b !== void 0 ? _b : 8;
     if (state.chartType === 'bar') {
         className = 'BarChart';
         const mode = state.seriesMode === 'stacked' ? 'stacked' : state.seriesMode === 'percent' ? 'percent' : 'grouped';
@@ -388,7 +396,7 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
         else {
             optionsLines.push(`  data: [\n${dataCode}\n  ],`);
         }
-        optionsLines.push(`  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    barGap: ${(_b = state.gapPx) !== null && _b !== void 0 ? _b : 0},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`);
+        optionsLines.push(`  bar: {\n    mode: '${mode}',\n    widthRatio: ${state.widthRatio},\n    barGap: ${(_c = state.gapPx) !== null && _c !== void 0 ? _c : 0},\n    borderRadius: [${state.radius}, ${state.radius}, 0, 0], // ${state.radiusToken}\n    fill: '${cssTokens[0]}', // ${safeTokens[0]}\n  },`);
         optionsLines.push(legendCode);
         optionsLines.push(`  labels: {\n    visible: ${state.showLabels && barLabelPos !== 'none'},\n    position: '${barLabelPos}',\n    color: '${isInsideBar ? insideLabelToken : strongTextToken}',\n    offset: ${labelOffsetVal},\n  },`);
         optionsLines.push(gridCode);
@@ -427,16 +435,16 @@ function generateDevModeCodeBlocks(rawState, chartNode, language) {
         optionsLines.push(legendCode);
     }
     else {
-        const isDonut = state.chartType === 'donut' || (state.chartType === 'pie' && ((_c = state.holeRatio) !== null && _c !== void 0 ? _c : 0) > 0);
+        const isDonut = state.chartType === 'donut' || (state.chartType === 'pie' && ((_d = state.holeRatio) !== null && _d !== void 0 ? _d : 0) > 0);
         className = isDonut ? 'DonutChart' : 'PieChart';
         const isPxGap = (state.pieGapMode || 'px') === 'px';
         const defaultGapPx = isDonut ? 3 : 0;
         const defaultPadDeg = isDonut ? 1.5 : 0;
-        const sliceGapVal = (_d = state.pieSliceGap) !== null && _d !== void 0 ? _d : defaultGapPx;
-        const padRad = Number(((((_e = state.piePadDeg) !== null && _e !== void 0 ? _e : defaultPadDeg) * Math.PI) / 180).toFixed(4));
+        const sliceGapVal = (_e = state.pieSliceGap) !== null && _e !== void 0 ? _e : defaultGapPx;
+        const padRad = Number(((((_f = state.piePadDeg) !== null && _f !== void 0 ? _f : defaultPadDeg) * Math.PI) / 180).toFixed(4));
         const gapCodeLine = isPxGap
             ? `    sliceGap: ${sliceGapVal},`
-            : `    padAngle: ${padRad}, // ${(_f = state.piePadDeg) !== null && _f !== void 0 ? _f : defaultPadDeg}°`;
+            : `    padAngle: ${padRad}, // ${(_g = state.piePadDeg) !== null && _g !== void 0 ? _g : defaultPadDeg}°`;
         const maxVal = state.pieMaxValue && state.pieMaxValue > 0 ? state.pieMaxValue : undefined;
         const resolvedTrackToken = state.pieTrackToken && state.pieTrackToken !== 'auto'
             ? state.pieTrackToken

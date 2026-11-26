@@ -287,7 +287,10 @@ export class FunnelChart extends EventEmitter<FunnelChartEventMap> {
       this.handleHover(e.clientX - rect.left, e.clientY - rect.top);
     });
 
-    interactionCanvas.addEventListener('mouseleave', () => {
+    interactionCanvas.addEventListener('mouseleave', (e) => {
+      if (this.tooltip.isInteractive() && this.tooltip.contains(e.relatedTarget)) {
+        return;
+      }
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null;
         this.render(false);
@@ -313,7 +316,11 @@ export class FunnelChart extends EventEmitter<FunnelChartEventMap> {
     stage: FunnelStageGeometry,
     index: number
   ): void {
-    if (this.options.tooltip?.formatter) {
+    if (
+      this.options.tooltip?.formatter ||
+      this.options.tooltip?.render ||
+      this.options.tooltip?.titleFormatter
+    ) {
       this.tooltip.show(tx, ty, stage.item, index);
     } else {
       const stepPct = (stage.stepConversionRate * 100).toFixed(1);
@@ -374,6 +381,9 @@ export class FunnelChart extends EventEmitter<FunnelChartEventMap> {
     );
     if (options.legend !== undefined || options.font !== undefined) {
       this.legend.updateOptions(this.resolveLegendOptions(this.options.legend), true);
+    }
+    if (options.tooltip !== undefined) {
+      this.tooltip.updateOptions(this.options.tooltip);
     }
     if (hasNewData || options.funnel) {
       this.syncLegend();

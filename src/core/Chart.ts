@@ -572,7 +572,10 @@ export class BarChart extends EventEmitter<BarChartEventMap> {
     });
 
     // 캔버스 밖으로 마우스가 나갔을 때
-    interactionCanvas.addEventListener('mouseleave', () => {
+    interactionCanvas.addEventListener('mouseleave', (e) => {
+      if (this.tooltip.isInteractive() && this.tooltip.contains(e.relatedTarget)) {
+        return;
+      }
       const hadHover = this.hoveredIndex !== null || this.hoveredSeriesKey !== null;
       this.hoveredIndex = null;
       this.hoveredSeriesKey = null;
@@ -952,6 +955,10 @@ export class BarChart extends EventEmitter<BarChartEventMap> {
     if (options.legend !== undefined) {
       this.options.legend = options.legend;
       this.legend.updateOptions(options.legend, this.isMultiSeries());
+    }
+    if (options.tooltip !== undefined) {
+      this.options.tooltip = { ...this.options.tooltip, ...options.tooltip };
+      this.tooltip.updateOptions(this.options.tooltip);
     }
     if (hasNewData || options.bar || options.legend !== undefined) {
       this.syncLegend();

@@ -24,6 +24,21 @@
 
 ---
 
+## [2026-11-26 11:50] 툴팁 커스터마이징 기능 전면 확장 (테마·스타일·Unstyled·부분 포맷터·DOM/헤드리스·배치/꼬리표/인터랙티브 + Figma 플러그인 연동)
+
+- **변경된 파일 목록:**
+  - 수정: `src/types/index.ts`, `src/components/Tooltip.ts`, `src/core/Chart.ts`, `src/core/LineChart.ts`, `src/core/PieChart.ts`, `src/core/FunnelChart.ts`, `figma-plugin/src/ui.template.html`, `figma-plugin/src/code.ts`, `docs/API.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - `TooltipOptions`에 `theme` (`'dark' | 'light'`), `unstyled`, `style` (`TooltipStyleOptions`, `resolveColor()` 기반 `var(--token)` 디자인 토큰 지원), `offset`, `placement` (`'auto' | 'top' | 'bottom' | 'left' | 'right'`), `arrow`, `interactive`, `titleFormatter`, `valueFormatter`, 헤드리스 `render` / `onHide` 옵션을 추가하고 `formatter` / `multiFormatter`가 `HTMLElement`도 반환할 수 있도록 확장함.
+  - `Tooltip` 컴포넌트에 `updateOptions()`, `isInteractive()`, `contains()`, `data-theme`/`data-placement` 속성 및 타겟 추적형 말풍선 꼬리표(`arrow`) 렌더링을 구현함.
+  - 5종 차트(`BarChart`, `LineChart`, `PieChart`, `DonutChart`, `FunnelChart`)의 `update()`에서 `options.tooltip` 동적 갱신을 연동하고, `interactive: true` 시 캔버스에서 툴팁으로 커서를 이동해도 툴팁이 닫히지 않도록 `mouseleave` 처리를 보강함.
+  - Figma 플러그인 섹션 05에 `툴팁 스타일 (Tooltip)` 컨트롤(테마, 위치, 간격, 활성화, 꼬리표)을 추가하고 프리뷰·코드 내보내기·Dev Mode 코드젠·저장 상태 복원을 모두 동기화함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
 ## [2026-11-26 11:38] 전체 `.md` 문서 버전(`v0.1.21`)·기능 일괄 동기화 및 에이전트 문서 동기화 프로토콜 보강
 
 - **변경된 파일 목록:**

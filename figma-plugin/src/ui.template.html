@@ -1318,6 +1318,44 @@
               <option value="label">이름만 (1월)</option>
             </select>
           </div>
+
+          <div class="sub-group-label">툴팁 스타일 (Tooltip)</div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>툴팁 테마</label>
+              <select id="tooltip-theme-select">
+                <option value="dark" selected>다크 (Dark)</option>
+                <option value="light">라이트 (Light)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>툴팁 위치</label>
+              <select id="tooltip-placement-select">
+                <option value="auto" selected>자동 (Auto)</option>
+                <option value="top">상단 (Top)</option>
+                <option value="bottom">하단 (Bottom)</option>
+                <option value="left">좌측 (Left)</option>
+                <option value="right">우측 (Right)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>툴팁 간격 <span class="val-badge" id="tooltip-offset-txt">12px</span></label>
+            <div class="slider-box">
+              <input type="range" id="tooltip-offset-slider" min="4" max="24" value="12" step="1" />
+            </div>
+          </div>
+
+          <div class="row-2">
+            <label class="checkbox-row">
+              <input type="checkbox" id="chk-tooltip-enabled" checked /> 툴팁 활성화
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="chk-tooltip-arrow" /> 꼬리표 (Arrow)
+            </label>
+          </div>
         </div>
       </section>
 
@@ -1589,6 +1627,11 @@
       pieLabelPos: 'outside',
       pieLabelFormat: 'label-percent',
       labelOffset: 8,
+      tooltipEnabled: true,
+      tooltipTheme: 'dark',
+      tooltipPlacement: 'auto',
+      tooltipOffset: 12,
+      tooltipArrow: false,
       funnelDirection: 'vertical',
       funnelShape: 'trapezoid',
       funnelGap: 4,
@@ -2222,6 +2265,13 @@
       const isMulti = state.seriesMode !== 'single' && multiSeries.length > 1;
 
       const labelOffsetVal = state.labelOffset ?? 8;
+      const tooltipOpt = {
+        enabled: state.tooltipEnabled !== false,
+        theme: state.tooltipTheme || 'dark',
+        placement: state.tooltipPlacement || 'auto',
+        offset: state.tooltipOffset ?? 12,
+        arrow: Boolean(state.tooltipArrow),
+      };
 
       if (state.chartType === 'bar') {
         const mode =
@@ -2238,6 +2288,7 @@
           xLabels: isMulti ? xLabels : undefined,
           padding: padOpt,
           font: fontOpt,
+          tooltip: tooltipOpt,
           animation: animOpt,
           responsive: { enabled: true },
           bar: {
@@ -2271,6 +2322,7 @@
           stacked: isMulti && isStacked,
           padding: padOpt,
           font: fontOpt,
+          tooltip: tooltipOpt,
           animation: animOpt,
           responsive: { enabled: true },
           line: {
@@ -2305,6 +2357,7 @@
           data: singleData,
           padding: padOpt,
           font: fontOpt,
+          tooltip: tooltipOpt,
           animation: animOpt,
           responsive: { enabled: true },
           funnel: {
@@ -2342,6 +2395,7 @@
           data: singleData,
           padding: padOpt,
           font: fontOpt,
+          tooltip: tooltipOpt,
           animation: animOpt,
           responsive: { enabled: true },
           donut: {
@@ -2390,6 +2444,7 @@
           data: singleData,
           padding: padOpt,
           font: fontOpt,
+          tooltip: tooltipOpt,
           animation: animOpt,
           responsive: { enabled: true },
           pie: {
@@ -2755,6 +2810,33 @@
       renderPreview();
     });
 
+    document.getElementById('tooltip-theme-select').addEventListener('change', (e) => {
+      state.tooltipTheme = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('tooltip-placement-select').addEventListener('change', (e) => {
+      state.tooltipPlacement = e.target.value;
+      renderPreview();
+    });
+
+    document.getElementById('tooltip-offset-slider').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10) || 12;
+      state.tooltipOffset = val;
+      document.getElementById('tooltip-offset-txt').innerText = `${val}px`;
+      renderPreview();
+    });
+
+    document.getElementById('chk-tooltip-enabled').addEventListener('change', (e) => {
+      state.tooltipEnabled = e.target.checked;
+      renderPreview();
+    });
+
+    document.getElementById('chk-tooltip-arrow').addEventListener('change', (e) => {
+      state.tooltipArrow = e.target.checked;
+      renderPreview();
+    });
+
     document.getElementById('funnel-dir-select').addEventListener('change', (e) => {
       state.funnelDirection = e.target.value;
       renderPreview();
@@ -2971,6 +3053,16 @@
       );
       optionsLines.push(
         `  font: {\n    family: ${JSON.stringify(fontFamily)},\n    size: ${state.fontSize},\n    weight: '${state.fontWeight}',\n  },`
+      );
+      const tooltipEnabledVal = state.tooltipEnabled !== false;
+      const tooltipThemeVal = state.tooltipTheme || 'dark';
+      const tooltipPlacementVal = state.tooltipPlacement || 'auto';
+      const tooltipOffsetVal = state.tooltipOffset ?? 12;
+      const tooltipArrowVal = Boolean(state.tooltipArrow);
+      optionsLines.push(
+        tooltipEnabledVal
+          ? `  tooltip: {\n    theme: '${tooltipThemeVal}',\n    placement: '${tooltipPlacementVal}',\n    offset: ${tooltipOffsetVal},\n    arrow: ${tooltipArrowVal},\n  },`
+          : `  tooltip: { enabled: false },`
       );
 
       const labelOffsetVal = state.labelOffset ?? 8;
@@ -3399,6 +3491,17 @@
           state.labelOffset = restoredLabelOffset;
           document.getElementById('label-offset-slider').value = restoredLabelOffset;
           document.getElementById('label-offset-txt').innerText = `${restoredLabelOffset}px`;
+          state.tooltipEnabled = state.tooltipEnabled !== false;
+          state.tooltipTheme = state.tooltipTheme || 'dark';
+          state.tooltipPlacement = state.tooltipPlacement || 'auto';
+          state.tooltipOffset = state.tooltipOffset ?? 12;
+          state.tooltipArrow = Boolean(state.tooltipArrow);
+          document.getElementById('chk-tooltip-enabled').checked = state.tooltipEnabled;
+          document.getElementById('tooltip-theme-select').value = state.tooltipTheme;
+          document.getElementById('tooltip-placement-select').value = state.tooltipPlacement;
+          document.getElementById('tooltip-offset-slider').value = state.tooltipOffset;
+          document.getElementById('tooltip-offset-txt').innerText = `${state.tooltipOffset}px`;
+          document.getElementById('chk-tooltip-arrow').checked = state.tooltipArrow;
           document.getElementById('funnel-dir-select').value = state.funnelDirection || 'vertical';
           document.getElementById('funnel-shape-select').value = state.funnelShape || 'trapezoid';
           const fGapIdx = Math.max(

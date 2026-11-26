@@ -309,7 +309,10 @@ export class PieChart extends EventEmitter<PieChartEventMap> {
       this.handleHover(mouseX, mouseY);
     });
 
-    interactionCanvas.addEventListener('mouseleave', () => {
+    interactionCanvas.addEventListener('mouseleave', (e) => {
+      if (this.tooltip.isInteractive() && this.tooltip.contains(e.relatedTarget)) {
+        return;
+      }
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null;
         this.startHoverTransition();
@@ -331,7 +334,11 @@ export class PieChart extends EventEmitter<PieChartEventMap> {
   }
 
   private showSliceTooltip(tx: number, ty: number, targetSlice: PieSliceGeometry, index: number): void {
-    if (this.options.tooltip?.formatter) {
+    if (
+      this.options.tooltip?.formatter ||
+      this.options.tooltip?.render ||
+      this.options.tooltip?.titleFormatter
+    ) {
       this.tooltip.show(tx, ty, targetSlice.item, index);
     } else {
       this.tooltip.show(
@@ -477,6 +484,10 @@ export class PieChart extends EventEmitter<PieChartEventMap> {
     if (options.legend !== undefined) {
       this.options.legend = options.legend;
       this.legend.updateOptions(this.resolveLegendOptions(options.legend), true);
+    }
+    if (options.tooltip !== undefined) {
+      this.options.tooltip = { ...this.options.tooltip, ...options.tooltip };
+      this.tooltip.updateOptions(this.options.tooltip);
     }
     if (hasNewData || options.pie || options.legend !== undefined) {
       this.syncLegend();

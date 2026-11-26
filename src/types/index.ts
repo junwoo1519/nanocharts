@@ -344,18 +344,118 @@ export interface TooltipEntry {
   highlighted?: boolean;
 }
 
+/** 툴팁 테마 프리셋 */
+export type TooltipTheme = 'dark' | 'light';
+
+/** 툴팁 배치 방향 (`'auto'`는 공간에 따라 상/하 자동 반전) */
+export type TooltipPlacement = 'auto' | 'top' | 'bottom' | 'left' | 'right';
+
+/**
+ * 툴팁 외형 커스텀 스타일 옵션 (디자인 토큰 `var(--token)` 문자열 지원)
+ */
+export interface TooltipStyleOptions {
+  /** 배경색 (예: `'#FFFFFF'`, `'rgba(15, 23, 42, 0.92)'`, `'var(--surface-ultra-low)'`) */
+  background?: string;
+  /** 기본 텍스트 색상 */
+  color?: string;
+  /** 제목(헤더) 텍스트 색상 */
+  titleColor?: string;
+  /** 수치(값) 텍스트 색상 */
+  valueColor?: string;
+  /** 보조 텍스트(퍼센트·푸터 라벨) 색상 */
+  mutedColor?: string;
+  /** 테두리 색상 */
+  borderColor?: string;
+  /** 테두리 두께 (px, 기본값: 1) */
+  borderWidth?: number;
+  /** 모서리 둥글기 (px 또는 CSS 문자열, 예: `8`, `'12px'`) */
+  borderRadius?: number | string;
+  /** 내부 여백 (px 또는 CSS padding 문자열, 예: `'10px 14px'`) */
+  padding?: number | string;
+  /** 그림자 (`box-shadow` CSS 문자열 또는 `'none'`) */
+  shadow?: string;
+  /** 배경 블러 (예: `'blur(8px)'` 또는 `'none'`) */
+  backdropFilter?: string;
+  /** 폰트 패밀리 */
+  fontFamily?: string;
+  /** 기본 글자 크기 (px, 기본값: 12) */
+  fontSize?: number;
+  /** 최대 너비 (px 또는 CSS 문자열, 지정 시 자동 줄바꿈 허용) */
+  maxWidth?: number | string;
+  /** 최소 너비 (px 또는 CSS 문자열) */
+  minWidth?: number | string;
+  /** CSS `z-index` (기본값: 9999) */
+  zIndex?: number;
+}
+
+/**
+ * 헤드리스/외부 컴포넌트 커스텀 툴팁(`render`)에 전달되는 컨텍스트 정보
+ */
+export interface TooltipRenderContext {
+  /** 툴팁 표시 모드 (`'single'`: 단일 항목, `'multi'`: 다중 시리즈 통합) */
+  mode: 'single' | 'multi';
+  /** 앵커 X 좌표 (컨테이너 기준 px) */
+  x: number;
+  /** 앵커 Y 좌표 (컨테이너 기준 px) */
+  y: number;
+  /** 표시 제목 (단일 모드: `item.label`, 다중 모드: X축 슬롯 라벨) */
+  title: string;
+  /** 데이터 인덱스 */
+  index: number;
+  /** 단일 모드 원본 데이터 항목 */
+  item?: DataItem;
+  /** 다중 모드 시리즈 항목 배열 */
+  entries?: TooltipEntry[];
+  /** 하단 요약 라벨 (예: `'합계'`) */
+  footerLabel?: string;
+  /** 하단 요약 값 */
+  footerValue?: string;
+  /** 내장 툴팁 루트 DOM 엘리먼트 */
+  element: HTMLElement;
+  /** 차트 컨테이너 DOM 엘리먼트 */
+  container: HTMLElement;
+}
+
 /** 툴팁(Tooltip) 옵션 */
 export interface TooltipOptions {
   /** 툴팁 활성화 여부 (기본값: true) */
   enabled?: boolean;
   /** 다중 시리즈 차트에서 같은 X축 슬롯의 모든 시리즈 값을 하나의 통합 툴팁에 표시할지 여부 (기본값: true) */
   shared?: boolean;
+  /** 툴팁 테마 프리셋 (`'dark'` | `'light'`, 기본값: `'dark'`) */
+  theme?: TooltipTheme;
+  /**
+   * `true` 설정 시 시각적 인라인 스타일(배경·글자색·패딩·테두리·그림자 등)을 제거하고
+   * 위치/표시용 최소 스타일만 유지합니다. `className`이나 Tailwind CSS로 `!important` 없이 커스텀할 때 사용합니다.
+   */
+  unstyled?: boolean;
+  /** 툴팁 외형 선언적 스타일 오버라이드 (디자인 토큰 `var(--token)` 지원) */
+  style?: TooltipStyleOptions;
   /** 커스텀 CSS 클래스명 */
   className?: string;
-  /** 단일 시리즈 툴팁 HTML 내용 커스텀 포맷터 */
-  formatter?: (item: DataItem, index: number) => string;
-  /** 다중 시리즈 통합 툴팁 HTML 내용 커스텀 포맷터 */
-  multiFormatter?: (title: string, entries: TooltipEntry[], index: number) => string;
+  /** 타겟 기준점과 툴팁 사이의 간격 (px, 기본값: 12) */
+  offset?: number;
+  /** 툴팁 배치 방향 (`'auto'` | `'top'` | `'bottom'` | `'left'` | `'right'`, 기본값: `'auto'`) */
+  placement?: TooltipPlacement;
+  /** 말풍선 꼬리표(화살표) 표시 여부 (기본값: false) */
+  arrow?: boolean;
+  /** `true` 설정 시 `pointer-events: auto`로 전환하여 툴팁 내부 버튼/링크 클릭을 허용합니다 (기본값: false) */
+  interactive?: boolean;
+  /** 기본 레이아웃을 유지하면서 제목(헤더) 텍스트만 커스텀하는 포맷터 */
+  titleFormatter?: (title: string, index: number, item?: DataItem) => string;
+  /** 기본 레이아웃을 유지하면서 수치 값 텍스트만 커스텀하는 포맷터 */
+  valueFormatter?: (value: number, item: DataItem, seriesName?: string) => string;
+  /** 단일 시리즈 툴팁 내용 커스텀 포맷터 (HTML 문자열 또는 `HTMLElement` 반환 가능) */
+  formatter?: (item: DataItem, index: number) => string | HTMLElement;
+  /** 다중 시리즈 통합 툴팁 내용 커스텀 포맷터 (HTML 문자열 또는 `HTMLElement` 반환 가능) */
+  multiFormatter?: (title: string, entries: TooltipEntry[], index: number) => string | HTMLElement;
+  /**
+   * 헤드리스/외부 컴포넌트 커스텀 렌더러 (React Portal, Vue 컴포넌트 등 외부 툴팁 연동용)
+   * 지정 시 내장 DOM 툴팁을 숨기고 매 호버 갱신마다 컨텍스트를 전달합니다.
+   */
+  render?: (context: TooltipRenderContext) => void;
+  /** 헤드리스/외부 툴팁 숨김 콜백 (`render`와 함께 사용) */
+  onHide?: () => void;
 }
 
 /**

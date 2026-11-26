@@ -52,7 +52,7 @@
 | `padding` | `Partial<Padding>` | 차트별 상이 | `{ top, right, bottom, left }` 플롯 내부 여백 (px) |
 | `font` | `ChartFontOptions` | 시스템/Pretendard | `{ family?, size?, weight? }` 전역 타이포그래피 (축, 라벨, 범례, 중앙 텍스트, SVG 반영) |
 | `responsive` | `boolean \| ResponsiveOptions` | `true` | `ResizeObserver` 및 `aspectRatio`, `minHeight`(`200`), `maxHeight`, `compactBreakpoint`(`480`), `onResize` |
-| `tooltip` | `TooltipOptions` | `{ enabled: true, shared: true }` | 부동형 DOM 툴팁 (`enabled`, `shared`, `className`, `formatter`, `multiFormatter`) |
+| `tooltip` | `TooltipOptions` | `{ enabled: true, shared: true, theme: 'dark', placement: 'auto', offset: 12 }` | 부동형 DOM 툴팁 (`enabled`, `shared`, `theme`: `'dark' \| 'light'`, `unstyled`, `style`: `TooltipStyleOptions`(디자인 토큰 `var(--token)` 지원), `className`, `offset`, `placement`: `'auto' \| 'top' \| 'bottom' \| 'left' \| 'right'`, `arrow`, `interactive`, `titleFormatter`, `valueFormatter`, `formatter`, `multiFormatter`, 헤드리스 `render` / `onHide`) |
 | `legend` | `boolean \| LegendOptions` | 차트별 상이 | 12방향 배치(`position`), `align`, `markerShape`, `interactive`, `fontSize`, `fontFamily`, `fontWeight`, `textColor`, `inactiveColor`, `maxItems`(`12`), `items`, `formatter`, `onClick`, `onHover` |
 | `animation` | `boolean \| AnimationOptions` | `{ enabled: true, duration: 650, easing: 'easeOutQuart' }` | 이징 프리셋(`linear`, `easeOutCubic`, `easeOutQuart`, `easeOutExpo`, `easeOutBack`) 또는 커스텀 함수 `(t: number) => number`, `onComplete` |
 
@@ -147,8 +147,11 @@
 | `PieLabelOptions` | `formatter` | `(item: DataItem, percentage: number) => string` |
 | `FunnelLabelOptions` | `formatter` | `(item: DataItem, stage: FunnelStageGeometry) => string` |
 | `AxisOptions` | `formatter` | `(value: string \| number) => string` |
-| `TooltipOptions` | `formatter` | `(item: DataItem, index: number) => string` |
-| `TooltipOptions` | `multiFormatter` | `(title: string, entries: TooltipEntry[], index: number) => string` |
+| `TooltipOptions` | `titleFormatter` | `(title: string, index: number, item?: DataItem) => string` |
+| `TooltipOptions` | `valueFormatter` | `(value: number, item: DataItem, seriesName?: string) => string` |
+| `TooltipOptions` | `formatter` | `(item: DataItem, index: number) => string \| HTMLElement` |
+| `TooltipOptions` | `multiFormatter` | `(title: string, entries: TooltipEntry[], index: number) => string \| HTMLElement` |
+| `TooltipOptions` | `render` / `onHide` | `render: (context: TooltipRenderContext) => void` / `onHide: () => void` |
 | `LegendOptions` | `formatter` | `(item: LegendItem) => string` |
 | `ColorAccessor` | `fill` / `color` | `(item: DataItem, index: number) => string \| GradientConfig` |
 

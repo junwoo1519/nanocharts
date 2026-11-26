@@ -633,7 +633,10 @@ export class LineChart extends EventEmitter<LineChartEventMap> {
       this.handleHover(mouseX, mouseY);
     });
 
-    interactionCanvas.addEventListener('mouseleave', () => {
+    interactionCanvas.addEventListener('mouseleave', (e) => {
+      if (this.tooltip.isInteractive() && this.tooltip.contains(e.relatedTarget)) {
+        return;
+      }
       const hadHover = this.hoveredIndex !== null || this.hoveredSeriesKey !== null;
       this.hoveredIndex = null;
       this.hoveredSeriesKey = null;
@@ -1005,6 +1008,10 @@ export class LineChart extends EventEmitter<LineChartEventMap> {
     if (options.legend !== undefined) {
       this.options.legend = options.legend;
       this.legend.updateOptions(options.legend, this.isMultiSeries());
+    }
+    if (options.tooltip !== undefined) {
+      this.options.tooltip = { ...this.options.tooltip, ...options.tooltip };
+      this.tooltip.updateOptions(this.options.tooltip);
     }
     if (hasNewData || hasStyleChange || hasStackedChange || options.legend !== undefined) {
       this.syncLegend();
