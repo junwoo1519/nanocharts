@@ -82,11 +82,13 @@ export class LinearScale implements Scale<number, number> {
     const d0 = Math.min(rawD0, rawD1);
     const d1 = Math.max(rawD0, rawD1);
     const span = d1 - d0;
+    if (!Number.isFinite(span) || span <= 0) return [d0];
     const rawStep = span / Math.max(count, 1);
     if (rawStep <= 0 || !Number.isFinite(rawStep)) return [d0];
 
     const power = Math.floor(Math.log10(rawStep));
     const base = Math.pow(10, power);
+    if (!Number.isFinite(base) || base <= 0) return [d0, d1];
     const fraction = rawStep / base;
 
     // 1, 2, 5, 10 단위로 눈금 간격 보정
@@ -96,7 +98,10 @@ export class LinearScale implements Scale<number, number> {
     else if (fraction <= 5) step = 5 * base;
     else step = 10 * base;
 
+    if (!Number.isFinite(step) || step <= 0) return [d0, d1];
+
     const start = Math.ceil(d0 / step) * step;
+    if (!Number.isFinite(start)) return [d0, d1];
     const ticks: number[] = [];
     
     // 부동소수점 오차 방지
@@ -105,6 +110,7 @@ export class LinearScale implements Scale<number, number> {
     for (let val = start; val <= d1 + step * 0.001 && ticks.length < maxTicks; val += step) {
       ticks.push(Number(val.toFixed(precision)));
     }
+    if (ticks.length === 0) return [d0];
     return rawD0 > rawD1 ? ticks.reverse() : ticks;
   }
 
@@ -121,11 +127,13 @@ export class LinearScale implements Scale<number, number> {
     const d0 = Math.min(rawD0, rawD1);
     const d1 = Math.max(rawD0, rawD1);
     const span = d1 - d0;
+    if (!Number.isFinite(span) || span <= 0) return this;
     const rawStep = span / Math.max(count, 1);
     if (rawStep <= 0 || !Number.isFinite(rawStep)) return this;
 
     const power = Math.floor(Math.log10(rawStep));
     const base = Math.pow(10, power);
+    if (!Number.isFinite(base) || base <= 0) return this;
     const fraction = rawStep / base;
 
     let step: number;
@@ -134,8 +142,13 @@ export class LinearScale implements Scale<number, number> {
     else if (fraction <= 5) step = 5 * base;
     else step = 10 * base;
 
+    if (!Number.isFinite(step) || step <= 0) return this;
+
     const niceMin = Math.floor(d0 / step) * step;
     const niceMax = Math.ceil(d1 / step) * step;
+    if (!Number.isFinite(niceMin) || !Number.isFinite(niceMax) || niceMin === niceMax) {
+      return this;
+    }
     this._domain = rawD0 > rawD1 ? [niceMax, niceMin] : [niceMin, niceMax];
     return this;
   }

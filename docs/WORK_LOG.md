@@ -24,6 +24,23 @@
 
 ---
 
+## [2026-11-26 12:00] 차트 코어 스케일·시리즈 엣지 케이스 및 Figma 플러그인 SVG·레이아웃·폰트 로드 방어 로직 보강
+
+- **변경된 파일 목록:**
+  - 수정: `src/scale/LinearScale.ts`, `src/utils/svg.ts`, `src/series/BarSeries.ts`, `src/series/LineSeries.ts`, `src/core/Chart.ts`, `src/core/LineChart.ts`, `src/core/PieChart.ts`, `figma-plugin/src/code.ts`, `docs/EDGE_CASES.md`, `docs/WORK_LOG.md`
+  - 재빌드: `dist/*`, `figma-plugin/dist/ui.html`, `figma-plugin/dist/code.js`, `figma-plugin/dist/version.json`
+- **주요 변경 내용 및 이유:**
+  - `figma-plugin/src/code.ts`: `buildResponsiveFigmaLayout()`에서 `chartType === 'donut'`이 `CENTER` 제약 조건 분기에서 누락되어 도넛 차트 리사이즈 시 원형이 깨지고 중앙 텍스트가 2×2 Pin 프레임으로 분리되던 문제를 수정함. 또한 `prepareSvgAndExtractCornersForFigma()`의 정규식을 속성 순서에 무관하도록 개선하고, `ensureTextFontsLoadedInTreeAsync()`로 미설치 폰트 폴백(`Inter`/`Roboto`) 및 플러그인 종료 시 `setInterval` 타이머 해제를 추가함.
+  - `src/series/LineSeries.ts`: `toSvgElements()`에서 `NaN`/`Infinity`/`undefined` 데이터 포인트를 필터링하지 않아 SVG 경로 오염 및 `toLocaleString()` 런타임 에러가 발생하던 문제를 수정하고, 포인트 `<circle>`의 `fill-opacity`/`stroke-opacity`를 반영함.
+  - `src/scale/LinearScale.ts`: 극단적인 거대값/미소값(`±1e308`, `±1e-320`) 입력 시 `span` 오버플로우(`Infinity`) 및 `Math.pow(10, power)` 언더플로우(`0`)로 `NaN` 도메인이 생성되던 문제를 방어함.
+  - `src/series/BarSeries.ts`: `BarStyleOptions`의 `minWidth`/`maxWidth` 제약을 단일·다중 바 기하 계산에 반영하고, 음수 바(`value < 0`)의 모서리 둥글기(`[0, 0, r, r]`) 자동 반전 및 `top-outside` 라벨 하단 자동 배치를 적용함.
+  - `src/utils/svg.ts`: `buildSvgPieSlicePathData()`에서 단일 항목 100%(360° 원/도넛 링)일 때 내부 절단선 없이 닫힌 두 반원 아크 서브패스로 생성하도록 개선하고, `buildSvgLegendGroup()` 좌/우 범례의 `markerShape`('line'/'square')·`fill-opacity` 및 우측 경계 클램핑을 보강함.
+  - `src/core/Chart.ts`, `src/core/LineChart.ts`, `src/core/PieChart.ts`: `toSVG()` 호출 시 최소 플롯 영역(`+20px`) 클램핑을 적용해 소형 해상도 추출 시 스케일 역전을 방지하고, `update()` 시 전역 `options.font`가 시리즈 및 범례에 일관되게 유지되도록 수정함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/EDGE_CASES.md`)
+- **다음 세션 주의사항:** 없음
+
+---
+
 ## [2026-11-26 11:50] 툴팁 커스터마이징 기능 전면 확장 (테마·스타일·Unstyled·부분 포맷터·DOM/헤드리스·배치/꼬리표/인터랙티브 + Figma 플러그인 연동)
 
 - **변경된 파일 목록:**

@@ -947,14 +947,42 @@ export class BarChart extends EventEmitter<BarChartEventMap> {
     if (options.animation !== undefined) {
       this.options.animation = options.animation;
     }
-    if (options.bar || options.labels) {
+    if (options.font !== undefined) {
+      this.options.font = { ...this.options.font, ...options.font };
+    }
+    if (options.responsive !== undefined) {
+      this.options.responsive = options.responsive;
+    }
+    if (options.bar || options.labels || options.font) {
       if (options.bar) this.options.bar = { ...this.options.bar, ...options.bar };
       if (options.labels) this.options.labels = { ...this.options.labels, ...options.labels };
-      this.barSeries = new BarSeries(this.options.bar, this.options.labels);
+      const defaultLabelFont = this.options.font
+        ? buildCssFontString(this.options.font, this.options.font.size ?? 11, this.options.font.weight ?? 600)
+        : undefined;
+      this.barSeries = new BarSeries(
+        this.options.bar,
+        defaultLabelFont ? { font: defaultLabelFont, ...this.options.labels } : this.options.labels
+      );
     }
-    if (options.legend !== undefined) {
-      this.options.legend = options.legend;
-      this.legend.updateOptions(options.legend, this.isMultiSeries());
+    if (options.legend !== undefined || options.font !== undefined) {
+      if (options.legend !== undefined) this.options.legend = options.legend;
+      const nextLegendOpts =
+        typeof this.options.legend === 'boolean'
+          ? {
+              visible: this.options.legend,
+              fontFamily: this.options.font?.family,
+              fontSize: this.options.font?.size ? this.options.font.size + 1 : undefined,
+              fontWeight: this.options.font?.weight,
+            }
+          : this.options.legend || this.options.font
+            ? {
+                fontFamily: this.options.font?.family,
+                fontSize: this.options.font?.size ? this.options.font.size + 1 : undefined,
+                fontWeight: this.options.font?.weight,
+                ...this.options.legend,
+              }
+            : undefined;
+      this.legend.updateOptions(nextLegendOpts, this.isMultiSeries());
     }
     if (options.tooltip !== undefined) {
       this.options.tooltip = { ...this.options.tooltip, ...options.tooltip };
@@ -993,12 +1021,12 @@ export class BarChart extends EventEmitter<BarChartEventMap> {
    * @returns 표준 SVG XML 문자열
    */
   public toSVG(exportOptions?: SvgExportOptions): string {
-    const svgW = exportOptions?.width || this.width || 640;
-    const svgH = exportOptions?.height || this.height || 400;
+    const svgW = Math.max(120, exportOptions?.width || this.width || 640);
+    const svgH = Math.max(120, exportOptions?.height || this.height || 400);
     const effPadding = this.getEffectivePadding(svgW, svgH);
 
-    this.xScale.range([effPadding.left, svgW - effPadding.right]);
-    this.yScale.range([svgH - effPadding.bottom, effPadding.top]);
+    this.xScale.range([effPadding.left, Math.max(effPadding.left + 20, svgW - effPadding.right)]);
+    this.yScale.range([Math.max(effPadding.top + 20, svgH - effPadding.bottom), effPadding.top]);
 
     const defs: string[] = [];
     const body: string[] = [];

@@ -20,9 +20,9 @@
 
 | 대상 모듈 | 방어 로직 |
 | :--- | :--- |
-| `LinearScale` | `scale()`·`invert()`에서 `!Number.isFinite(value)` 또는 도메인/범위가 유한하지 않으면 각각 `r0`, `d0` 반환. `ticks()`는 비유한 도메인에 `[0]` 반환, `maxTicks = 500` 상한으로 무한 루프 방지. |
+| `LinearScale` | `scale()`·`invert()`에서 `!Number.isFinite(value)` 또는 도메인/범위가 유한하지 않으면 각각 `r0`, `d0` 반환. `ticks()`·`nice()`는 극단값(`±1e308`, `±1e-320`) 입력 시 `span` 오버플로우(`Infinity`) 및 `base = Math.pow(10, power)` 언더플로우(`0`)를 방어하며, `maxTicks = 500` 상한으로 무한 루프 방지. |
 | `BarChart` / `LineChart` | `initScales()`에서 `typeof val !== 'number' \|\| !Number.isFinite(val)` 항목은 min/max 계산에서 스킵. 다중 시리즈 정규화 시 누락 인덱스(`undefined`)는 `value: 0`으로 채움. |
-| `BarSeries` / `LineSeries` | `BarSeries`는 비유한 `item.value`를 `0`으로 치환하고 라벨은 `'-'` 표시. `LineSeries`는 비유한 포인트를 경로 계산에서 건너뛰고 라벨은 `'-'` 표시. |
+| `BarSeries` / `LineSeries` | `BarSeries`는 비유한 `item.value`를 `0`으로 치환하고 라벨은 `'-'` 표시. `LineSeries`는 Canvas `render()`와 SVG `toSvgElements()` 모두에서 비유한 포인트를 경로 계산에서 건너뛰고 라벨은 `'-'` 표시. |
 | `PieSeries` / `FunnelSeries` | `safeVal(v)` 헬퍼로 `typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : 0` 처리. |
 | `Tooltip` | `formatSafeValue()`에서 `NaN`/`Infinity`/`null`/`undefined`를 `'-'`로 포맷하고, `escapeHtml()`로 모든 라벨/값의 HTML 특수문자(`&`, `<`, `>`, `"`, `'`)를 이스케이프해 XSS를 차단. |
 | `svg.ts` | `fmt(n)`은 `!Number.isFinite(n)`이면 `'0'` 반환. |
@@ -45,7 +45,7 @@
 | 대상 모듈 | 방어 로직 |
 | :--- | :--- |
 | `BarChart` / `LineChart` | `minVal < 0`이면 `yMin = minVal * 1.1`로 하단 여유를 확보하고 `0` 기준선을 포함. `BarChart`의 `percent` 모드에서 음수가 존재하면 Y축 도메인을 `[-100, 100]`으로 자동 확장. |
-| `BarSeries` | 양수는 `baseZero` 위로, 음수는 `baseZero` 아래로 바를 생성. `stacked`/`percent` 모드에서는 양수 누적(`posAcc`)과 음수 누적(`negAcc`)을 별도 추적. |
+| `BarSeries` | 양수는 `baseZero` 위로, 음수는 `baseZero` 아래로 바를 생성하며, 음수 바의 경우 상단 모서리 둥글기(`[tl, tr, 0, 0]`)를 하단(`[0, 0, tr, tl]`)으로 자동 반전하고 `top-outside` 라벨을 바 하단 바깥쪽으로 배치해 X축·0 기준선 겹침을 방지. `stacked`/`percent` 모드에서는 양수 누적(`posAcc`)과 음수 누적(`negAcc`)을 별도 추적. |
 | `drawRoundedRect` (`canvas.ts`) | `height < 0`이면 `actualY = y + height`, `actualHeight = -height`로 보정하고, 각 모서리 반지름을 `Math.min(width / 2, actualHeight / 2)`로 클램핑하여 도형 뒤집힘 방지. |
 | `PieSeries` / `FunnelSeries` | 비율/면적 시각화 특성상 음수는 `Math.max(0, v)`로 `0` 클램핑. |
 

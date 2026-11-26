@@ -475,15 +475,32 @@ export class PieChart extends EventEmitter<PieChartEventMap> {
     const hasNewData = Boolean(options.data);
     if (options.data) this.options.data = options.data;
     if (options.animation !== undefined) this.options.animation = options.animation;
-    if (options.pie || options.labels || options.center) {
+    if (options.font !== undefined) this.options.font = { ...this.options.font, ...options.font };
+    if (options.responsive !== undefined) this.options.responsive = options.responsive;
+    if (options.pie || options.labels || options.center || options.font) {
       if (options.pie) this.options.pie = { ...this.options.pie, ...options.pie };
       if (options.labels) this.options.labels = { ...this.options.labels, ...options.labels };
       if (options.center) this.options.center = { ...this.options.center, ...options.center };
-      this.pieSeries = new PieSeries(this.options.pie, this.options.labels, this.options.center);
+      const labelFont = this.options.font
+        ? buildCssFontString(this.options.font, this.options.font.size ?? 11, this.options.font.weight ?? 600)
+        : undefined;
+      const centerOpts =
+        this.options.center && this.options.font
+          ? {
+              titleFont: buildCssFontString(this.options.font, (this.options.font.size ?? 11) + 9, 700),
+              subtitleFont: buildCssFontString(this.options.font, this.options.font.size ?? 11, 500),
+              ...this.options.center,
+            }
+          : this.options.center;
+      this.pieSeries = new PieSeries(
+        this.options.pie,
+        labelFont ? { font: labelFont, ...this.options.labels } : this.options.labels,
+        centerOpts
+      );
     }
-    if (options.legend !== undefined) {
-      this.options.legend = options.legend;
-      this.legend.updateOptions(this.resolveLegendOptions(options.legend), true);
+    if (options.legend !== undefined || options.font !== undefined) {
+      if (options.legend !== undefined) this.options.legend = options.legend;
+      this.legend.updateOptions(this.resolveLegendOptions(this.options.legend), true);
     }
     if (options.tooltip !== undefined) {
       this.options.tooltip = { ...this.options.tooltip, ...options.tooltip };

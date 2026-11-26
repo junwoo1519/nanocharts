@@ -105,6 +105,32 @@ export class BarSeries {
   }
 
   /**
+   * 바 너비에 `minWidth` 및 `maxWidth` 제약을 적용합니다.
+   */
+  private clampBarWidth(width: number, maxAllowed: number): number {
+    let w = width;
+    if (typeof this.barOptions.maxWidth === 'number' && this.barOptions.maxWidth > 0) {
+      w = Math.min(w, this.barOptions.maxWidth);
+    }
+    if (typeof this.barOptions.minWidth === 'number' && this.barOptions.minWidth > 0) {
+      w = Math.max(w, Math.min(this.barOptions.minWidth, maxAllowed));
+    }
+    return Math.max(1, w);
+  }
+
+  /**
+   * 음수 데이터 바(`value < 0`)인 경우 상단 둥글기(`[tl, tr, 0, 0]`)를 하단 둥글기(`[0, 0, tr, tl]`)로 자동 반전합니다.
+   */
+  private resolveEffectiveRadius(radius: BorderRadius | undefined, isNegative: boolean): BorderRadius | undefined {
+    if (!isNegative || !Array.isArray(radius) || radius.length < 4) return radius;
+    const [tl, tr, br, bl] = radius;
+    if ((tl > 0 || tr > 0) && br === 0 && bl === 0) {
+      return [0, 0, tr, tl];
+    }
+    return radius;
+  }
+
+  /**
    * 단일 바의 기하학적 수치(X, Y, 너비, 높이)를 계산합니다.
    * 
    * 양수 값인 경우: 베이스라인(0)에서 위쪽으로 생성
@@ -124,7 +150,7 @@ export class BarSeries {
 
     // 슬롯 내에서 바의 두께 비율 적용 및 가운데 정렬 (바 폭과 요소 간격 독립 유지)
     const ratio = Math.max(0.05, Math.min(1.0, this.barOptions.widthRatio ?? 0.65));
-    const width = rawWidth * ratio;
+    const width = this.clampBarWidth(rawWidth * ratio, rawWidth);
     const x = rawX + (rawWidth - width) / 2;
 
     const baseZero = yScale.scale(0);
@@ -135,8 +161,11 @@ export class BarSeries {
     const fullHeight = isPositive ? baseZero - targetY : targetY - baseZero;
     const height = Math.max(0, fullHeight * progress);
     const y = isPositive ? baseZero - height : baseZero;
+    const borderRadiusOverride = !isPositive
+      ? this.resolveEffectiveRadius(this.barOptions.borderRadius, true)
+      : undefined;
 
-    return { x, y, width, height, item, index };
+    return { x, y, width, height, item, index, borderRadiusOverride };
   }
 
   /**
@@ -157,7 +186,6 @@ export class BarSeries {
     const rawWidth = xScale.bandwidth();
     const ratio = Math.max(0.05, Math.min(1.0, this.barOptions.widthRatio ?? 0.65));
     const totalGroupWidth = rawWidth * ratio;
-    const groupStartX = rawX + (rawWidth - totalGroupWidth) / 2;
 
     const geometries: BarGeometry[] = [];
 
@@ -173,14 +201,14 @@ export class BarSeries {
       if (useBarGap && seriesCount > 1) {
         // 바 폭(widthRatio)과 요소 간격(barGap)을 독립 계산:
         // barWidth는 widthRatio로 고정 유지하고, barGap은 슬롯 내 여유 공간(rawWidth) 범위에서만 간격을 확장
-        barWidth = Math.max(1, totalGroupWidth / seriesCount);
+        barWidth = this.clampBarWidth(totalGroupWidth / seriesCount, rawWidth / seriesCount);
         const maxGap = Math.max(0, (rawWidth - 2 - barWidth * seriesCount) / (seriesCount - 1));
         effectiveGap = Math.min(rawBarGap, maxGap);
       } else {
         const stepWidth = totalGroupWidth / seriesCount;
         const gapRatio = seriesCount > 1 ? Math.max(0, Math.min(0.5, this.barOptions.groupGap ?? 0.12)) : 0;
-        barWidth = Math.max(1, stepWidth * (1 - gapRatio));
-        effectiveGap = seriesCount > 1 ? stepWidth - barWidth : 0;
+        barWidth = this.clampBarWidth(stepWidth * (1 - gapRatio), stepWidth);
+        effectiveGap = seriesCount > 1 ? Math.max(0, stepWidth - barWidth) : 0;
       }
 
       const usedWidth = barWidth * seriesCount + effectiveGap * Math.max(0, seriesCount - 1);
@@ -212,10 +240,16 @@ export class BarSeries {
           seriesColor: series.color,
           seriesBorder: series.border,
           swatchColor: series.swatchColor,
+          borderRadiusOverride: !isPositive
+            ? this.resolveEffectiveRadius(this.barOptions.borderRadius, true)
+            : undefined,
         });
       }
       return geometries;
     }
+
+    const clampedStackWidth = this.clampBarWidth(totalGroupWidth, rawWidth);
+    const clampedStackStartX = rawX + (rawWidth - clampedStackWidth) / 2;
 
     // Stacked 또는 Percent(100% 누적) 모드
     let posTotal = 0;
@@ -280,9 +314,9 @@ export class BarSeries {
 
         const isTopCap = s === topPosSeriesIdx;
         geometries.push({
-          x: groupStartX,
+          x: clampedStackStartX,
           y,
-          width: totalGroupWidth,
+          width: clampedStackWidth,
           height,
           item,
           index: slotIndex,
@@ -316,9 +350,9 @@ export class BarSeries {
 
         const isBottomCap = s === bottomNegSeriesIdx;
         geometries.push({
-          x: groupStartX,
+          x: clampedStackStartX,
           y,
-          width: totalGroupWidth,
+          width: clampedStackWidth,
           height,
           item,
           index: slotIndex,
@@ -328,7 +362,9 @@ export class BarSeries {
           seriesColor: series.color,
           seriesBorder: series.border,
           swatchColor: series.swatchColor,
-          borderRadiusOverride: isBottomCap ? this.barOptions.borderRadius : 0,
+          borderRadiusOverride: isBottomCap
+            ? this.resolveEffectiveRadius(this.barOptions.borderRadius, true)
+            : 0,
           percentage,
         });
       }
@@ -531,12 +567,18 @@ export class BarSeries {
 
     const centerX = x + width / 2;
     let labelY = y;
+    const isNegative = typeof item.value === 'number' && item.value < 0;
 
-    // 디자이너가 요청한 다양한 라벨 배치 위치 계산
+    // 디자이너가 요청한 다양한 라벨 배치 위치 계산 (음수 바의 경우 top-outside를 하단 바깥쪽으로 자동 배치)
     switch (pos) {
       case 'top-outside':
-        ctx.textBaseline = 'bottom';
-        labelY = y - offset;
+        if (isNegative) {
+          ctx.textBaseline = 'top';
+          labelY = y + height + offset;
+        } else {
+          ctx.textBaseline = 'bottom';
+          labelY = y - offset;
+        }
         break;
       case 'inside-top':
         ctx.textBaseline = 'top';
@@ -712,11 +754,17 @@ export class BarSeries {
           const centerX = geom.x + geom.width / 2;
           let labelY = geom.y;
           let baseline: 'top' | 'middle' | 'bottom' = 'bottom';
+          const isNegative = typeof geom.item.value === 'number' && geom.item.value < 0;
 
           switch (pos) {
             case 'top-outside':
-              baseline = 'bottom';
-              labelY = geom.y - offset;
+              if (isNegative) {
+                baseline = 'top';
+                labelY = geom.y + geom.height + offset;
+              } else {
+                baseline = 'bottom';
+                labelY = geom.y - offset;
+              }
               break;
             case 'inside-top':
               baseline = 'top';

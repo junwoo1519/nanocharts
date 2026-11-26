@@ -329,16 +329,39 @@ export function buildSvgPieSlicePathData(
   innerEndAngle?: number
 ): string {
   const sweep = endAngle - startAngle;
-  if (sweep <= 0) return '';
+  if (!Number.isFinite(sweep) || sweep <= 0 || outerRadius <= 0) return '';
 
-  // 360도 전체 원(단일 항목 100%)인 경우 두 개의 반원 아크로 분할하여 SVG 아크 소실 방지
+  // 360도 전체 원(단일 항목 100%)인 경우 내부 절단선이 생기지 않도록 연속된 두 반원 아크로 닫힌 원/링을 구성
   if (sweep >= Math.PI * 2 - 0.0001) {
     const midAngle = startAngle + Math.PI;
-    return (
-      buildSvgPieSlicePathData(cx, cy, innerRadius, outerRadius, startAngle, midAngle - 0.0005) +
-      ' ' +
-      buildSvgPieSlicePathData(cx, cy, innerRadius, outerRadius, midAngle - 0.0005, endAngle)
-    );
+    const oxStart = cx + Math.cos(startAngle) * outerRadius;
+    const oyStart = cy + Math.sin(startAngle) * outerRadius;
+    const oxMid = cx + Math.cos(midAngle) * outerRadius;
+    const oyMid = cy + Math.sin(midAngle) * outerRadius;
+
+    const outerCircleCmds = [
+      `M ${fmt(oxStart)} ${fmt(oyStart)}`,
+      `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 1 1 ${fmt(oxMid)} ${fmt(oyMid)}`,
+      `A ${fmt(outerRadius)} ${fmt(outerRadius)} 0 1 1 ${fmt(oxStart)} ${fmt(oyStart)}`,
+      'Z',
+    ];
+
+    if (innerRadius <= 0) {
+      return outerCircleCmds.join(' ');
+    }
+
+    const ixStart = cx + Math.cos(startAngle) * innerRadius;
+    const iyStart = cy + Math.sin(startAngle) * innerRadius;
+    const ixMid = cx + Math.cos(midAngle) * innerRadius;
+    const iyMid = cy + Math.sin(midAngle) * innerRadius;
+
+    return [
+      ...outerCircleCmds,
+      `M ${fmt(ixStart)} ${fmt(iyStart)}`,
+      `A ${fmt(innerRadius)} ${fmt(innerRadius)} 0 1 0 ${fmt(ixMid)} ${fmt(iyMid)}`,
+      `A ${fmt(innerRadius)} ${fmt(innerRadius)} 0 1 0 ${fmt(ixStart)} ${fmt(iyStart)}`,
+      'Z',
+    ].join(' ');
   }
 
   const outerLargeArc = sweep > Math.PI ? 1 : 0;
@@ -654,15 +677,17 @@ export function buildSvgLegendGroup(
       const color = isActive ? it.color : inactiveColor;
       const label = opts.formatter ? opts.formatter(it) : it.label;
       const parsedMarker = parseSvgColor(color);
+      const markerOpacityAttr =
+        parsedMarker.opacity < 0.999 ? ` fill-opacity="${fmt(parsedMarker.opacity)}"` : '';
 
       let markerEl = '';
       if (shape === 'circle') {
-        markerEl = `<circle id="Marker: ${escapeXml(label)}" cx="${fmt(curX + 5)}" cy="${fmt(centerY)}" r="5" fill="${escapeXml(parsedMarker.color)}" />`;
+        markerEl = `<circle id="Marker: ${escapeXml(label)}" cx="${fmt(curX + 5)}" cy="${fmt(centerY)}" r="5" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
       } else if (shape === 'line') {
-        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(curX)}" y="${fmt(centerY - 1.5)}" width="12" height="3" rx="1.5" fill="${escapeXml(parsedMarker.color)}" />`;
+        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(curX)}" y="${fmt(centerY - 1.5)}" width="12" height="3" rx="1.5" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
       } else {
         const rx = shape === 'rounded' ? 3 : 0;
-        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(curX)}" y="${fmt(centerY - 5)}" width="10" height="10" rx="${rx}" fill="${escapeXml(parsedMarker.color)}" />`;
+        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(curX)}" y="${fmt(centerY - 5)}" width="10" height="10" rx="${rx}" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
       }
 
       const textEl = svgTextElement({
@@ -680,7 +705,8 @@ export function buildSvgLegendGroup(
       curX += itemWidths[idx];
     });
   } else {
-    const startX = side === 'left' ? 16 : chartWidth - 115;
+    const maxItemW = Math.min(136, Math.max(84, ...itemWidths));
+    const startX = side === 'left' ? 16 : Math.max(16, chartWidth - maxItemW - 8);
     const totalH = visibleItems.length * 22;
     let curY = Math.max(24, (chartHeight - totalH) / 2);
     if (align === 'start') {
@@ -694,11 +720,18 @@ export function buildSvgLegendGroup(
       const color = isActive ? it.color : inactiveColor;
       const label = opts.formatter ? opts.formatter(it) : it.label;
       const parsedMarker = parseSvgColor(color);
+      const markerOpacityAttr =
+        parsedMarker.opacity < 0.999 ? ` fill-opacity="${fmt(parsedMarker.opacity)}"` : '';
 
-      const markerEl =
-        shape === 'circle'
-          ? `<circle id="Marker: ${escapeXml(label)}" cx="${fmt(startX + 5)}" cy="${fmt(curY)}" r="5" fill="${escapeXml(parsedMarker.color)}" />`
-          : `<rect id="Marker: ${escapeXml(label)}" x="${fmt(startX)}" y="${fmt(curY - 5)}" width="10" height="10" rx="3" fill="${escapeXml(parsedMarker.color)}" />`;
+      let markerEl = '';
+      if (shape === 'circle') {
+        markerEl = `<circle id="Marker: ${escapeXml(label)}" cx="${fmt(startX + 5)}" cy="${fmt(curY)}" r="5" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
+      } else if (shape === 'line') {
+        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(startX)}" y="${fmt(curY - 1.5)}" width="12" height="3" rx="1.5" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
+      } else {
+        const rx = shape === 'rounded' ? 3 : 0;
+        markerEl = `<rect id="Marker: ${escapeXml(label)}" x="${fmt(startX)}" y="${fmt(curY - 5)}" width="10" height="10" rx="${rx}" fill="${escapeXml(parsedMarker.color)}"${markerOpacityAttr} />`;
+      }
 
       const textEl = svgTextElement({
         id: `Label: ${escapeXml(label)}`,

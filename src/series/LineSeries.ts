@@ -759,6 +759,8 @@ export class LineSeries {
     for (let i = drawStart; i <= drawEnd; i++) {
       const item = data[i];
       if (!item) continue;
+      const effectiveVal = stackedValues ? stackedValues[i] : item.value;
+      if (typeof effectiveVal !== 'number' || !Number.isFinite(effectiveVal)) continue;
       const topVal = stackedValues ? stackedValues[i] : undefined;
       rawPoints.push(this.getPointGeometry(item, i, xScale, yScale, topVal));
       if (baseValues) {
@@ -875,9 +877,14 @@ export class LineSeries {
 
         const parsedFill = parseSvgColor(fillColor);
         const parsedBorder = parseSvgColor(borderColor);
+        const fillOpAttr = parsedFill.opacity < 0.999 ? ` fill-opacity="${fmt(parsedFill.opacity)}"` : '';
+        const strokeAttr =
+          borderWidth > 0
+            ? ` stroke="${escapeXml(parsedBorder.color)}"${parsedBorder.opacity < 0.999 ? ` stroke-opacity="${fmt(parsedBorder.opacity)}"` : ''} stroke-width="${fmt(borderWidth)}"`
+            : '';
 
         ptEls.push(
-          `<circle id="Point: ${escapeXml(pt.item.label)} (${pt.item.value})" cx="${fmt(pt.x)}" cy="${fmt(pt.y)}" r="${fmt(radius)}" fill="${escapeXml(parsedFill.color)}" stroke="${escapeXml(parsedBorder.color)}" stroke-width="${fmt(borderWidth)}" />`
+          `<circle id="Point: ${escapeXml(pt.item.label)} (${pt.item.value})" cx="${fmt(pt.x)}" cy="${fmt(pt.y)}" r="${fmt(radius)}" fill="${escapeXml(parsedFill.color)}"${fillOpAttr}${strokeAttr} />`
         );
       }
 
@@ -900,9 +907,13 @@ export class LineSeries {
           typeof this.labelOptions.color === 'function'
             ? this.labelOptions.color(pt.item, pt.index)
             : this.labelOptions.color || '#94A3B8';
+        const safeValStr =
+          typeof pt.item.value === 'number' && Number.isFinite(pt.item.value)
+            ? pt.item.value.toLocaleString()
+            : '-';
         const text = this.labelOptions.formatter
           ? this.labelOptions.formatter(pt.item.value, pt.item, pt.index)
-          : pt.item.value.toLocaleString();
+          : safeValStr;
 
         lblEls.push(
           svgTextElement({

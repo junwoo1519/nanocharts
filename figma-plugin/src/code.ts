@@ -1685,28 +1685,49 @@ function prepareSvgAndExtractCornersForFigma(rawSvg: string): {
 } {
   const cornerRadiiByNodeName = new Map<string, CornerRadii>();
 
-  // 1. <path ... data-corners="..." data-box="..." d="..." ... /> -> <rect ... /> 변환
-  let cleanSvg = rawSvg.replace(
-    /<path\s+id="([^"]+)"\s+data-corners="([^"]+)"\s+data-box="([^"]+)"\s+d="[^"]*"\s+([^>]+?)\/>/g,
-    (_match, rawId, cornersStr, boxStr, restAttrs) => {
-      const nodeName = unescapeXml(rawId);
-      const [tl = 0, tr = 0, br = 0, bl = 0] = cornersStr.split(',').map((n: string) => parseFloat(n) || 0);
-      const [x = '0', y = '0', w = '0', h = '0'] = boxStr.split(',');
-      cornerRadiiByNodeName.set(nodeName, { tl, tr, br, bl });
-      return `<rect id="${rawId}" x="${x}" y="${y}" width="${w}" height="${h}" ${restAttrs}/>`;
-    }
-  );
+  // 1. <path ... data-corners="..." data-box="..." ... /> -> <rect ... /> 변환 (속성 순서에 무관하게 안전 추출)
+  let cleanSvg = rawSvg.replace(/<path\b([^>]*?)\/>/g, (fullMatch, attrsStr: string) => {
+    const idMatch = attrsStr.match(/\bid="([^"]+)"/);
+    const cornersMatch = attrsStr.match(/\bdata-corners="([^"]+)"/);
+    const boxMatch = attrsStr.match(/\bdata-box="([^"]+)"/);
+    if (!idMatch || !cornersMatch || !boxMatch) return fullMatch;
+
+    const rawId = idMatch[1];
+    const nodeName = unescapeXml(rawId);
+    const [tl = 0, tr = 0, br = 0, bl = 0] = cornersMatch[1]
+      .split(',')
+      .map((n: string) => parseFloat(n) || 0);
+    const [x = '0', y = '0', w = '0', h = '0'] = boxMatch[1].split(',');
+    cornerRadiiByNodeName.set(nodeName, { tl, tr, br, bl });
+
+    const restAttrs = attrsStr
+      .replace(/\bid="[^"]*"\s*/g, '')
+      .replace(/\bdata-corners="[^"]*"\s*/g, '')
+      .replace(/\bdata-box="[^"]*"\s*/g, '')
+      .replace(/\bd="[^"]*"\s*/g, '')
+      .trim();
+
+    return `<rect id="${rawId}" x="${x}" y="${y}" width="${w}" height="${h}"${restAttrs ? ` ${restAttrs}` : ''}/>`;
+  });
 
   // 2. <rect ... data-corners="..." data-box="..." ... /> 에서 메타 속성 정리 및 추출
-  cleanSvg = cleanSvg.replace(
-    /<rect\s+id="([^"]+)"([^>]*?)\s+data-corners="([^"]+)"\s+data-box="[^"]+"([^>]*?)\/>/g,
-    (_match, rawId, beforeAttrs, cornersStr, afterAttrs) => {
-      const nodeName = unescapeXml(rawId);
-      const [tl = 0, tr = 0, br = 0, bl = 0] = cornersStr.split(',').map((n: string) => parseFloat(n) || 0);
-      cornerRadiiByNodeName.set(nodeName, { tl, tr, br, bl });
-      return `<rect id="${rawId}"${beforeAttrs}${afterAttrs}/>`;
-    }
-  );
+  cleanSvg = cleanSvg.replace(/<rect\b([^>]*?)\/>/g, (fullMatch, attrsStr: string) => {
+    const idMatch = attrsStr.match(/\bid="([^"]+)"/);
+    const cornersMatch = attrsStr.match(/\bdata-corners="([^"]+)"/);
+    if (!idMatch || !cornersMatch) return fullMatch;
+
+    const rawId = idMatch[1];
+    const nodeName = unescapeXml(rawId);
+    const [tl = 0, tr = 0, br = 0, bl = 0] = cornersMatch[1]
+      .split(',')
+      .map((n: string) => parseFloat(n) || 0);
+    cornerRadiiByNodeName.set(nodeName, { tl, tr, br, bl });
+
+    const cleanedAttrs = attrsStr
+      .replace(/\s*\bdata-corners="[^"]*"/g, '')
+      .replace(/\s*\bdata-box="[^"]*"/g, '');
+    return `<rect${cleanedAttrs}/>`;
+  });
 
   return { cleanSvg, cornerRadiiByNodeName };
 }
@@ -2091,8 +2112,14 @@ function buildResponsiveFigmaLayout(
 
   // 2. Plot Area 서브 프레임 (파이/도넛은 정원 유지를 위해 CENTER, 바/라인/퍼널은 STRETCH)
   if (plotGroupNodes.length > 0) {
+    const isCircularChart = chartType === 'pie' || chartType === 'donut';
     const plotFrame = figma.createFrame();
-    plotFrame.name = chartType === 'pie' ? 'Pie Plot Area' : 'Plot Area';
+    plotFrame.name =
+      chartType === 'donut'
+        ? 'Donut Plot Area'
+        : chartType === 'pie'
+          ? 'Pie Plot Area'
+          : 'Plot Area';
     plotFrame.fills = [];
     plotFrame.clipsContent = false;
     plotFrame.resizeWithoutConstraints(plotW, plotH);
@@ -2100,7 +2127,7 @@ function buildResponsiveFigmaLayout(
     plotFrame.y = plotTop;
     rootFrame.appendChild(plotFrame);
 
-    if (chartType === 'pie') {
+    if (isCircularChart) {
       plotFrame.constraints = { horizontal: 'CENTER', vertical: 'CENTER' };
       for (const grp of plotGroupNodes) {
         const leaves = collectLeafNodes(grp);
@@ -2301,13 +2328,74 @@ function notifySelectionState(): void {
   });
 }
 
+/**
+ * SVG로부터 생성된 프레임 내부의 TEXT 노드들에 대해 폰트 로드(`figma.loadFontAsync`)를 안전하게 시도하고,
+ * 사용자 PC에 없는 폰트일 경우 기본 설치 폰트(`Inter` 또는 `Roboto`)로 폴백합니다.
+ */
+async function ensureTextFontsLoadedInTreeAsync(rootNode: any): Promise<void> {
+  if (!rootNode || typeof figma.loadFontAsync !== 'function') return;
+
+  const textNodes: any[] = [];
+  const collectTexts = (n: any) => {
+    if (!n) return;
+    if (n.type === 'TEXT') {
+      textNodes.push(n);
+    } else if (Array.isArray(n.children)) {
+      for (const c of n.children) collectTexts(c);
+    }
+  };
+  collectTexts(rootNode);
+  if (textNodes.length === 0) return;
+
+  const triedFonts = new Map<string, boolean>();
+  const tryLoadFont = async (fontName: { family: string; style: string }): Promise<boolean> => {
+    if (!fontName || !fontName.family || !fontName.style) return false;
+    const key = `${fontName.family}::${fontName.style}`;
+    if (triedFonts.has(key)) return triedFonts.get(key)!;
+    try {
+      await figma.loadFontAsync(fontName);
+      triedFonts.set(key, true);
+      return true;
+    } catch {
+      triedFonts.set(key, false);
+      return false;
+    }
+  };
+
+  for (const textNode of textNodes) {
+    const fn = textNode.fontName;
+    if (fn && typeof fn === 'object' && typeof fn.family === 'string') {
+      const ok = await tryLoadFont(fn);
+      if (!ok) {
+        const fallbackCandidates = [
+          { family: 'Inter', style: fn.style || 'Regular' },
+          { family: 'Inter', style: 'Regular' },
+          { family: 'Roboto', style: 'Regular' },
+        ];
+        for (const fb of fallbackCandidates) {
+          if (await tryLoadFont(fb)) {
+            try {
+              textNode.fontName = fb;
+            } catch {
+              // 폰트 교체 실패 시 기존 벡터 텍스트 상태 유지
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+let selectionResizePollTimer: ReturnType<typeof setInterval> | null = null;
+
 if (!IS_DEV_CODEGEN_MODE) {
   figma.on('selectionchange', () => {
     notifySelectionState();
   });
 
   // 피그마 캔버스에서 선택된 NanoChart 프레임의 크기를 마우스로 조절할 때 UI 프리뷰와 실시간 동기화
-  setInterval(() => {
+  selectionResizePollTimer = setInterval(() => {
     try {
       const selection = figma.currentPage.selection;
       if (!selection || selection.length !== 1) return;
@@ -2328,6 +2416,15 @@ if (!IS_DEV_CODEGEN_MODE) {
       // 무시
     }
   }, 300);
+
+  if (typeof figma.on === 'function') {
+    figma.on('close', () => {
+      if (selectionResizePollTimer !== null) {
+        clearInterval(selectionResizePollTimer);
+        selectionResizePollTimer = null;
+      }
+    });
+  }
 }
 
 if (!IS_DEV_CODEGEN_MODE) {
@@ -2356,6 +2453,7 @@ figma.ui.onmessage = async (msg: {
       const { cleanSvg, cornerRadiiByNodeName } = prepareSvgAndExtractCornersForFigma(msg.svg);
       const newFrame = figma.createNodeFromSvg(cleanSvg);
       newFrame.name = msg.chartTitle || 'NanoChart Vector';
+      await ensureTextFontsLoadedInTreeAsync(newFrame);
 
       // 재편집을 위해 차트 옵션 및 데이터 상태를 노드에 메타데이터로 저장
       if (msg.state && typeof newFrame.setPluginData === 'function') {
@@ -2526,6 +2624,10 @@ figma.ui.onmessage = async (msg: {
       figma.ui.resize(currentPluginWidth, currentPluginHeight);
     }
   } else if (msg.type === 'CLOSE_PLUGIN') {
+    if (selectionResizePollTimer !== null) {
+      clearInterval(selectionResizePollTimer);
+      selectionResizePollTimer = null;
+    }
     figma.closePlugin();
   }
 };
