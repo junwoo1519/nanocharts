@@ -1,4 +1,4 @@
-const NANOCHARTS_BUILD_META = {"version":"0.1.20","buildId":"0.1.20-1795660359070","buildTime":1795660359070,"builtAt":"2026-11-26T02:32:39.070Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
+const NANOCHARTS_BUILD_META = {"version":"0.1.21","buildId":"0.1.21-1795660401885","buildTime":1795660401885,"builtAt":"2026-11-26T02:33:21.885Z","githubRepo":"junwoo1519/nanocharts","githubBranch":"main","npmPackage":"@ju9nu7/nanocharts"};
 /**
  * @fileoverview NanoCharts Figma Plugin Sandbox Controller (code.ts)
  *

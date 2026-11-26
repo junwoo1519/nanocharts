@@ -24,6 +24,19 @@
 
 ---
 
+## [2026-11-26 11:38] 전체 `.md` 문서 버전(`v0.1.21`)·기능 일괄 동기화 및 에이전트 문서 동기화 프로토콜 보강
+
+- **변경된 파일 목록:**
+  - 수정: `README.md`, `ANALYSIS.md`, `AGENTS.md`, `GEMINI.md`, `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`, `docs/WORK_LOG.md`
+- **주요 변경 내용 및 이유:**
+  - `package.json`(`0.1.21`)과 모든 `.md` 문서 상단 버전(`v0.1.16`) 간의 불일치를 해소하고 전체 8개 문서를 `v0.1.21`로 일괄 동기화함.
+  - `README.md`, `ANALYSIS.md`, `AGENTS.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`에 누락되어 있던 `DonutChart` 분리, `bar.barGap`, `sliceGap`, `labels.offset`, `deploy:figma` 스크립트 안내를 반영함.
+  - `AGENTS.md`와 `GEMINI.md`의 `[문서 동기화]` 강제 규칙에 `docs/*.md`뿐 아니라 루트 문서(`README.md`, `ANALYSIS.md`, `AGENTS.md`, `GEMINI.md`) 및 `package.json` 버전 변경 시 전체 `.md` 버전 표기 동기화를 명시하여 새 세션에서의 문서 누락을 방지함.
+- **관련 스펙 문서(`docs/`) 동기화 여부:** 동기화 완료 (`docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`, `README.md`, `ANALYSIS.md`, `AGENTS.md`, `GEMINI.md`)
+- **다음 세션 주의사항:** `npm.cmd run deploy:figma`는 `figma-plugin/manifest.json`과 `figma-plugin/dist`만 커밋·푸시하므로 `.md` 및 `src/` 변경분은 별도로 `git add`/`commit`/`push` 해야 함.
+
+---
+
 ## [2026-11-26 11:31] Figma 플러그인 사이드바 체크박스를 토글 스위치 UI로 교체
 
 - **변경된 파일 목록:**

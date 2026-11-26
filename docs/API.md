@@ -1,6 +1,6 @@
 # API 명세서 (`docs/API.md`)
 
-> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.16`)의 실제 소스 코드(`src/types/index.ts`, `src/core/`, `src/series/`, `src/components/`)를 기준으로 공통 Props, 차트별 고유 옵션, 입력 데이터 포맷, 커스텀 렌더러 시그니처, 인스턴스 메서드 및 이벤트 맵을 정리합니다.
+> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.21`)의 실제 소스 코드(`src/types/index.ts`, `src/core/`, `src/series/`, `src/components/`)를 기준으로 공통 Props, 차트별 고유 옵션, 입력 데이터 포맷, 커스텀 렌더러 시그니처, 인스턴스 메서드 및 이벤트 맵을 정리합니다.
 
 ---
 

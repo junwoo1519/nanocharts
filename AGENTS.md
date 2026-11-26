@@ -1,6 +1,6 @@
 # AGENTS.md — Developer & AI Agent Guide for `@ju9nu7/nanocharts`
 
-> **문서 목적:** AI 에이전트 및 기여자가 `@ju9nu7/nanocharts` (`v0.1.16`) 코드베이스의 아키텍처 원칙, 번들 제약, 컨벤션, 빌드/검증 명령어 및 **세션 간 작업 기록 프로토콜**을 일관되게 준수하도록 안내합니다.
+> **문서 목적:** AI 에이전트 및 기여자가 `@ju9nu7/nanocharts` (`v0.1.21`) 코드베이스의 아키텍처 원칙, 번들 제약, 컨벤션, 빌드/검증 명령어 및 **세션 간 작업 기록 프로토콜**을 일관되게 준수하도록 안내합니다.
 
 ---
 
@@ -10,7 +10,9 @@
 
 1. **[작업 시작 시]:** `docs/WORK_LOG.md`의 최근 기록 2~3개를 먼저 읽어 이전 세션의 작업 맥락, 변경 이력, 주의사항을 파악한다.
 2. **[Figma 플러그인 동기화]:** 라이브러리(`src/`)에 차트 옵션, 스타일, 렌더링 기능을 추가하거나 변경할 때는 반드시 `figma-plugin/src/ui.template.html`의 UI 컨트롤, 프리뷰 옵션 매핑, 코드 Export 스니펫, 저장 상태 복원 로직도 함께 반영하고 `npm.cmd run build:figma`로 통합 빌드를 검증한다.
-3. **[문서 동기화]:** Props/타입, 렌더링·인터랙션 아키텍처, 디자인 토큰, 엣지 케이스 방어 로직이 변경되었다면 `docs/` 내 관련 스펙 문서(`docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`)도 함께 최신화한다.
+3. **[문서 동기화]:** Props/타입, 렌더링·인터랙션 아키텍처, 디자인 토큰, 엣지 케이스, 지원 차트·명령어 또는 `package.json` 버전이 변경되었다면 관련 문서를 빠짐없이 최신화한다.
+   - 스펙 문서: `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`
+   - 루트 문서: `README.md`, `ANALYSIS.md`, `AGENTS.md`, `GEMINI.md` (차트·기능·명령어 변경 및 `package.json` 버전 증가 시 전체 `.md` 상단 버전 표기 `vX.Y.Z` 일괄 동기화)
 4. **[작업 종료 시]:** 코드, 문서, 설정을 수정한 경우 최종 답변 직전에 반드시 `docs/WORK_LOG.md` 최상단에 이번 세션의 작업 내역을 표준 양식(Template)에 맞춰 추가한다.
 
 ---
@@ -49,7 +51,8 @@ src/
 ├── core/
 │   ├── Chart.ts            # BarChart 오케스트레이터 (단일/Grouped/Stacked/Percent, 줌/팬, toSVG)
 │   ├── LineChart.ts        # LineChart 오케스트레이터 (단일/Multi-Line/Stacked Area, LTTB, 줌/팬, toSVG)
-│   ├── PieChart.ts         # PieChart 오케스트레이터 (파이/도넛, 트랙, 극좌표 히트, Lerp 팝아웃, toSVG)
+│   ├── PieChart.ts         # PieChart 오케스트레이터 (순수 파이/도넛 호환, 트랙, 극좌표 히트, Lerp 팝아웃, toSVG)
+│   ├── DonutChart.ts       # DonutChart 오케스트레이터 (PieChart 상속, 기본 innerRadiusRatio: 0.6, donut 옵션)
 │   ├── FunnelChart.ts      # FunnelChart 오케스트레이터 (vertical/horizontal, trapezoid/bar, 전환율, toSVG)
 │   ├── Animator.ts         # rAF 애니메이션 엔진 및 5종 이징 함수
 │   ├── LayerManager.ts     # 3단 Canvas(Background, Series, Interaction) 및 DPR 보정
@@ -115,12 +118,16 @@ npm.cmd run build
 # 라이브러리 + Figma 플러그인 통합 빌드 (dist/ + figma-plugin/dist/)
 npm.cmd run build:figma
 
+# Figma 플러그인 빌드 후 figma-plugin/manifest.json & figma-plugin/dist 커밋 및 푸시 (OTA)
+# 주의: src/, docs/, *.md 등 소스·문서 파일은 별도 커밋 필요
+npm.cmd run deploy:figma
+
 # 배포 패키지 내보내기 구조 검증 (선택)
 npx.cmd publint
 
 # 배포 파일 목록 사전 검증
 npm.cmd pack --dry-run
 
-# npm 정식 공개 배포 (SemVer 버전 증가 후 실행, 현재 v0.1.16)
+# npm 정식 공개 배포 (SemVer 버전 증가 후 실행, 현재 v0.1.21)
 npm.cmd publish --access public
 ```

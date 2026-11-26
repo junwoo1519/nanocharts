@@ -1,6 +1,6 @@
 # 엣지 케이스 방어 로직 명세서 (`docs/EDGE_CASES.md`)
 
-> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.16`)의 실제 소스 코드에 구현된 경계값·예외 입력 방어 로직을 항목별로 정리합니다.
+> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.21`)의 실제 소스 코드에 구현된 경계값·예외 입력 방어 로직을 항목별로 정리합니다.
 
 ---
 
@@ -72,5 +72,5 @@
 | **컨테이너 `width <= 0` (`display: none` 등)** | `resolveContainerDimensions()`가 DOM 스타일(`minHeight`)을 변형하지 않고 `{ width: 0, height: 0, isCompact: false }` 반환. `resize()`·`render()`·`LayerManager.resize()` 모두 `width <= 0 \|\| height <= 0 \|\| !Number.isFinite(...)`이면 즉시 return. |
 | **컨테이너 높이 `0` (CSS `height` 미지정)** | `width > 0`이고 `rawHeight <= 10`이면 `aspectRatio`와 `minHeight`(`200px`)로 자동 높이를 산출하고 `container.style.minHeight`를 설정. 최소 크기는 `Math.max(120, ...)` 보장. |
 | **플롯 영역 역전 방지** | `syncScaleRanges()`에서 `Math.max(eff.left + 20, width - eff.right)`, `Math.max(eff.top + 20, height - eff.bottom)`으로 최소 `20px` 플롯 크기 보장. |
-| **SSR (Node.js / 비브라우저 환경)** | 4종 차트 및 `LayerManager` 생성자에서 `typeof window === 'undefined' \|\| typeof document === 'undefined'` 체크 후 명시적 `Error` 발생. `resolveColor()`는 `try/catch`로 `getComputedStyle` 예외를 무시하고 내장 토큰 폴백. |
+| **SSR (Node.js / 비브라우저 환경)** | 5종 차트(`BarChart`, `LineChart`, `PieChart`, `DonutChart`, `FunnelChart`) 및 `LayerManager` 생성자에서 `typeof window === 'undefined' \|\| typeof document === 'undefined'` 체크 후 명시적 `Error` 발생. `resolveColor()`는 `try/catch`로 `getComputedStyle` 예외를 무시하고 내장 토큰 폴백. |
 | **잘못된 DOM 선택자** | `document.querySelector(container)`가 `null`이면 `Invalid container element or selector` 에러를 즉시 발생. |

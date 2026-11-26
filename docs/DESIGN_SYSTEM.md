@@ -1,6 +1,6 @@
 # 디자인 시스템 명세서 (`docs/DESIGN_SYSTEM.md`)
 
-> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.16`)에 내장된 컬러 팔레트, 디자인 토큰 해석 체계, 타이포그래피, 여백 및 반응형 규칙, 축/그리드/범례 배치 규칙, DOM 스타일 격리 방식을 실제 코드(`src/utils/tokens.ts`, `src/utils/responsive.ts`, `src/components/`) 기준으로 정리합니다.
+> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.21`)에 내장된 컬러 팔레트, 디자인 토큰 해석 체계, 타이포그래피, 여백 및 반응형 규칙, 축/그리드/범례 배치 규칙, DOM 스타일 격리 방식을 실제 코드(`src/utils/tokens.ts`, `src/utils/responsive.ts`, `src/components/`) 기준으로 정리합니다.
 
 ---
 
@@ -68,7 +68,7 @@
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | `BarChart` | `30px` | `20px` | `40px` | `50px` | `1.6` |
 | `LineChart` | `30px` | `20px` | `40px` | `50px` | `1.6` |
-| `PieChart` | `20px` | `20px` | `20px` | `20px` | `1.35` |
+| `PieChart` / `DonutChart` | `20px` | `20px` | `20px` | `20px` | `1.35` |
 | `FunnelChart` | `24px` | `24px` | `24px` | `24px` | `1.5` |
 
 ### 3.2 반응형 보정 (`src/utils/responsive.ts`)
@@ -89,7 +89,7 @@
 - **범례 (`Legend`, 12방향 배치)**:
   - `parseLegendAnchor()`로 `top-*`, `bottom-*`, `left-*`, `right-*`를 `{ side, align }`으로 해석합니다.
   - 범례 표시 시 차트 플롯 겹침 방지를 위해 `getReservedPadding()`으로 추가 여백을 확보합니다: `top: +28px`, `bottom: +30px`, `left: +120px`, `right: +120px`.
-  - 차트별 범례 기본 위치: `BarChart`/`LineChart`는 `top`/`end`(다중 시리즈일 때 기본 표시), `PieChart`는 `bottom`/`center`/`circle`(기본 표시), `FunnelChart`는 `top`/`center`/`rounded`(기본 표시).
+  - 차트별 범례 기본 위치: `BarChart`/`LineChart`는 `top`/`end`(다중 시리즈일 때 기본 표시), `PieChart`/`DonutChart`는 `bottom`/`center`/`circle`(기본 표시), `FunnelChart`는 `top`/`center`/`rounded`(기본 표시).
 
 ---
 

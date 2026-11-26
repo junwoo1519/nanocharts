@@ -1,6 +1,6 @@
 # GEMINI.md — AI Agent Rules & Project Protocol (`@ju9nu7/nanocharts`)
 
-> **문서 목적:** 모든 AI 에이전트 세션이 `@ju9nu7/nanocharts` (`v0.1.16`)의 기술 스택, 번들 제약, 코딩 컨벤션, 검증 명령어 및 **세션 간 작업 자동 기록 프로토콜**을 일관되게 따르도록 강제 규칙을 정의합니다.
+> **문서 목적:** 모든 AI 에이전트 세션이 `@ju9nu7/nanocharts` (`v0.1.21`)의 기술 스택, 번들 제약, 코딩 컨벤션, 검증 명령어 및 **세션 간 작업 자동 기록 프로토콜**을 일관되게 따르도록 강제 규칙을 정의합니다.
 
 ---
 
@@ -10,7 +10,9 @@
 
 1. **[작업 시작 시]:** `docs/WORK_LOG.md`의 최근 기록 2~3개를 먼저 읽어 이전 작업 맥락과 주의사항을 파악한다.
 2. **[Figma 플러그인 동기화]:** 라이브러리(`src/`)에 차트 옵션, 스타일, 렌더링 기능을 추가하거나 변경할 때는 반드시 `figma-plugin/src/ui.template.html`의 UI 컨트롤, 프리뷰 옵션 매핑, 코드 Export 스니펫, 저장 상태 복원 로직도 함께 반영하고 `npm.cmd run build:figma`로 통합 빌드를 검증한다.
-3. **[문서 동기화]:** Props, 아키텍처, 디자인 토큰, 엣지 케이스 처리 로직이 변경되었다면 `docs/` 내 관련 스펙 문서(`docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`)도 함께 최신화한다.
+3. **[문서 동기화]:** Props, 아키텍처, 디자인 토큰, 엣지 케이스, 지원 차트·명령어 또는 `package.json` 버전이 변경되었다면 관련 문서를 빠짐없이 최신화한다.
+   - 스펙 문서: `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md`, `docs/EDGE_CASES.md`
+   - 루트 문서: `README.md`, `ANALYSIS.md`, `AGENTS.md`, `GEMINI.md` (차트·기능·명령어 변경 및 `package.json` 버전 증가 시 전체 `.md` 상단 버전 표기 `vX.Y.Z` 일괄 동기화)
 4. **[작업 종료 시]:** 코드나 설정, 문서를 수정한 경우, 최종 답변 직전에 반드시 `docs/WORK_LOG.md` 최상단에 이번 세션의 작업 내역을 표준 양식에 맞춰 추가한다.
 
 ---
@@ -51,6 +53,9 @@ npm.cmd run build
 
 # 라이브러리 + Figma 플러그인 통합 빌드
 npm.cmd run build:figma
+
+# Figma 플러그인 빌드 후 manifest.json & dist 커밋/푸시 (OTA, *.md/src는 별도 커밋 필요)
+npm.cmd run deploy:figma
 
 # 로컬 데모 서버 실행
 npm.cmd run dev

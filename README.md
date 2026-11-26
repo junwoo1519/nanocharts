@@ -1,6 +1,6 @@
 # `@ju9nu7/nanocharts`
 
-> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.16`)의 핵심 특징, 설치 방법, 즉시 실행 가능한 차트별 예제, API 요약 및 Figma 플러그인 연동 방법을 안내합니다.
+> **문서 목적:** `@ju9nu7/nanocharts` (`v0.1.21`)의 핵심 특징, 설치 방법, 즉시 실행 가능한 차트별 예제, API 요약 및 Figma 플러그인 연동 방법을 안내합니다.
 
 `@ju9nu7/nanocharts`는 런타임 외부 의존성이 없는(Zero Dependency) 순수 TypeScript + Canvas 2D 기반 초경량 차트 라이브러리입니다. 3단 멀티 레이어 Canvas 아키텍처와 $O(1)$ 히트 테스팅으로 대용량 데이터에서도 60fps 인터랙션을 유지하며, 디자인 토큰(`var(--*)`) 해석과 Figma 호환 순수 벡터(`toSVG()`) 추출을 기본 지원합니다.
 
@@ -22,7 +22,8 @@
 | :--- | :--- | :--- |
 | `BarChart` | `src/core/Chart.ts` | 단일/다중 시리즈(`grouped`, `stacked`, `percent`), 그라데이션, 조건부 컬러링, 개별 모서리 둥글기, 테두리, 수치 라벨, 휠 줌 & 드래그 팬, `toSVG()` |
 | `LineChart` | `src/core/LineChart.ts` | 단일/다중 라인 & 누적 영역(`stacked`), `smooth`/`linear`/`step` 보간, Area HSL 채도·명도·투명도 그라데이션, LTTB 다운샘플링, 크로스헤어, 휠 줌 & 드래그 팬, `toSVG()` |
-| `PieChart` | `src/core/PieChart.ts` | 파이/도넛 전환(`innerRadiusRatio`), 목표 최대값 배경 트랙(`maxValue`/`trackColor`), 극좌표 히트 테스팅, Lerp 호버 팝아웃(`hoverExplode`), 리더라인 라벨, 도넛 중앙 요약 텍스트, `toSVG()` |
+| `PieChart` | `src/core/PieChart.ts` | 순수 파이(및 `innerRadiusRatio` 도넛 호환), 평행 픽셀 간격(`sliceGap`), 목표 최대값 배경 트랙(`maxValue`/`trackColor`), 극좌표 히트 테스팅, Lerp 호버 팝아웃(`hoverExplode`), 내부/외부 라벨 및 5종 포맷, `toSVG()` |
+| `DonutChart` | `src/core/DonutChart.ts` | 도넛 전용 차트 클래스(기본 `innerRadiusRatio: 0.6`), `donut` 스타일 옵션, 평행 픽셀 간격(`sliceGap`), 도넛 중앙 요약 텍스트(`center`), 내부/외부 라벨 및 5종 포맷, `toSVG()` |
 | `FunnelChart` | `src/core/FunnelChart.ts` | 상하(`vertical`)/좌우(`horizontal`) 방향, 사다리꼴(`trapezoid`)/바(`bar`) 형태, 단계 간격(`gap`), 직전/최초 단계 대비 전환율(`%`) 자동 표시, Ray-casting 히트 테스팅, `toSVG()` |
 
 ---
